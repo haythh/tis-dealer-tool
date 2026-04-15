@@ -197,7 +197,8 @@ export async function POST(request: NextRequest) {
         const allPatterns = [...new Set(boltPatterns.flatMap(bp => normalizeBoltPattern(bp)))]
         const placeholders = allPatterns.map(() => '?').join(',')
 
-        let wheelQuery = `SELECT * FROM wheels WHERE UPPER(bolt_pattern) IN (${allPatterns.map(p => `UPPER('${p.replace(/'/g, "''")}')`).join(',')})`
+        const bpConditions = allPatterns.map(p => `UPPER(bolt_pattern) LIKE UPPER('%${p.replace(/'/g, "''")}%')`).join(' OR ')
+        let wheelQuery = `SELECT * FROM wheels WHERE (${bpConditions})`
         const wheelParams: (string | number)[] = []
 
         if (parsed.size) {
