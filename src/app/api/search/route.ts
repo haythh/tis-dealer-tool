@@ -164,6 +164,10 @@ export async function POST(request: NextRequest) {
     }
 
     const parsed = await parseQueryWithGemini(query)
+    // Sanitize: if wheelModel looks like a year (4 digits, starts with 19/20), clear it
+    if (parsed.wheelModel && /^(19|20)\d{2}$/.test(parsed.wheelModel)) {
+      parsed.wheelModel = null
+    }
     const db = getDb()
 
     let wheels: Wheel[] = []
