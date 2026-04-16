@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk } from 'next/font/google'
+import { Chakra_Petch } from 'next/font/google'
 import './globals.css'
 
-const spaceGrotesk = Space_Grotesk({
+const chakraPetch = Chakra_Petch({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-space-grotesk',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-chakra-petch',
 })
 
 export const metadata: Metadata = {
@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
-      <body className={`${spaceGrotesk.className} antialiased`}>
+    <html lang="en" className={chakraPetch.variable}>
+      <body className={`${chakraPetch.className} antialiased`}>
         {children}
       </body>
     </html>

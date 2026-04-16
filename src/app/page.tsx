@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import { gsap } from 'gsap'
+import { useGSAP } from '@gsap/react'
+
+gsap.registerPlugin(useGSAP)
 
 interface Wheel {
   id: number
@@ -45,12 +49,12 @@ interface SearchResponse {
 }
 
 const EXAMPLE_QUERIES = [
-  "What fits a 2024 F-150?",
-  "22 inch wheels for RAM 1500",
-  "TIS 544 in black",
-  "DTS wheels 20 inch",
-  "Chrome wheels for Chevy Silverado",
-  "TIS Motorsports bronze",
+  'What fits a 2024 F-150?',
+  '22 inch wheels for RAM 1500',
+  'TIS 544 in black',
+  'DTS wheels 20 inch',
+  'Chrome wheels for Chevy Silverado',
+  'TIS Motorsports bronze',
 ]
 
 const BRAND_FILTERS = ['TIS', 'DTS', 'TIS Motorsports']
@@ -70,31 +74,31 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
 
   return (
     <div
+      className="wheel-card"
       style={{
         background: 'rgba(255,255,255,0.04)',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: '12px',
         overflow: 'visible',
         position: 'relative' as const,
-        transition: 'border-color 0.2s, transform 0.2s',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(220,38,38,0.4)'
-        ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
+        ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(220,38,38,0.4)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 28px 80px rgba(220,38,38,0.12)'
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
-        ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+        ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 20px 60px rgba(0,0,0,0.2)'
       }}
     >
-      {/* Stock badge */}
       {wheel.in_stock != null && (
         <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: wheel.in_stock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: wheel.in_stock ? '#22c55e' : '#ef4444', border: `1px solid ${wheel.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
           {wheel.in_stock ? `${wheel.total_stock || ''} in stock` : 'Out of stock'}
         </div>
       )}
-      {/* Image */}
-      <div style={{ background: '#000', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+
+      <div style={{ background: '#000', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -119,7 +123,6 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         )}
       </div>
 
-      {/* Content */}
       <div style={{ padding: '16px' }}>
         <div style={{ marginBottom: '4px' }}>
           <span style={{ color: '#dc2626', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -133,7 +136,6 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
           {wheel.color_finish}
         </p>
 
-        {/* Specs grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
             { label: 'Size', value: wheel.size },
@@ -148,7 +150,6 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
           ))}
         </div>
 
-        {/* Prices */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'baseline' }}>
           {(wheel.msrp || wheel.map_price) != null && (
             <div>
@@ -158,7 +159,6 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
           )}
         </div>
 
-        {/* Stock details */}
         {wheel.in_stock != null && wheel.total_stock != null && wheel.total_stock > 0 && (
           <div style={{ fontSize: '11px', color: '#888', marginTop: '6px' }}>
             {wheel.stock_tomorrow ? `${wheel.stock_tomorrow} tomorrow` : ''}
@@ -167,13 +167,11 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
           </div>
         )}
 
-        {/* Part # */}
         <div style={{ fontSize: '11px', color: '#555', marginBottom: '12px' }}>
           SKU: {wheel.supplier_pn}
           {wheel.oracle_id && <span style={{ marginLeft: '8px', color: '#444' }}>ORACLE: {wheel.oracle_id}</span>}
         </div>
 
-        {/* CTA */}
         {wheel.atd_url ? (
           <a
             href={wheel.atd_url}
@@ -224,6 +222,7 @@ export default function Home() {
   const [activeBrand, setActiveBrand] = useState<string | null>(null)
   const [inStockOnly, setInStockOnly] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -236,6 +235,41 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inStockOnly])
 
+  useGSAP(() => {
+    gsap.from('.search-animate', {
+      y: -30,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power3.out',
+    })
+  }, { scope: pageRef })
+
+  useGSAP(() => {
+    if (!result?.wheels?.length || loading) return
+
+    gsap.from('.wheel-card', {
+      y: 50,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.08,
+      ease: 'power3.out',
+      clearProps: 'transform,opacity',
+    })
+  }, { scope: pageRef, dependencies: [result?.wheels, loading], revertOnUpdate: true })
+
+  useGSAP(() => {
+    if (!hasSearched || !result || result.error) return
+
+    gsap.from('.intent-banner', {
+      x: -40,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+      clearProps: 'transform,opacity',
+    })
+  }, { scope: pageRef, dependencies: [hasSearched, result], revertOnUpdate: true })
+
   const handleSearch = async (q?: string, brand?: string | null) => {
     const searchQuery = q ?? query
     if (!searchQuery.trim() && !brand) return
@@ -244,7 +278,6 @@ export default function Home() {
     setLoading(true)
     setHasSearched(true)
 
-    // Build effective query — prepend brand if filter active
     const effectiveBrand = brand !== undefined ? brand : activeBrand
     const effectiveQuery = effectiveBrand && !searchQuery.toLowerCase().includes(effectiveBrand.toLowerCase())
       ? `${effectiveBrand} ${searchQuery}`.trim()
@@ -276,8 +309,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0b', color: '#f1f1f1', fontFamily: 'inherit' }}>
-      {/* Header */}
+    <div ref={pageRef} style={{ minHeight: '100vh', background: '#0a0a0b', color: '#f1f1f1', fontFamily: 'inherit' }}>
       <header style={{
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         padding: '16px 24px',
@@ -287,14 +319,13 @@ export default function Home() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto' }} />
-          <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0.06em', color: '#f1f1f1' }}>
-            Wheel Search
+          <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0px', color: '#f1f1f1', textTransform: 'uppercase' }}>
+            WHEEL SEARCH
           </span>
         </div>
       </header>
 
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-        {/* Hero */}
         <div style={{
           textAlign: 'center',
           padding: hasSearched ? '32px 0 24px' : '80px 0 40px',
@@ -302,7 +333,7 @@ export default function Home() {
         }}>
           {!hasSearched && (
             <>
-              <div style={{
+              <div className="search-animate" style={{
                 display: 'inline-block',
                 background: 'rgba(220,38,38,0.12)',
                 border: '1px solid rgba(220,38,38,0.25)',
@@ -323,13 +354,12 @@ export default function Home() {
                 <span style={{ color: '#dc2626' }}>Ship it from ATD.</span>
               </h1>
               <p style={{ fontSize: '16px', color: '#888', margin: '0 0 40px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
-                Search TIS wheels by vehicle fitment, model, size, or finish — and get direct ATDOnline order links.
+                Search TIS wheels by vehicle fitment, model, size, or finish and get direct ATDOnline order links.
               </p>
             </>
           )}
 
-          {/* Brand filter buttons */}
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
+          <div className="search-animate" style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
             {BRAND_FILTERS.map(brand => (
               <button
                 key={brand}
@@ -367,7 +397,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <div className="search-animate" style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
             <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ddd', fontSize: '13px', cursor: 'pointer' }}>
               <input
                 type="checkbox"
@@ -379,8 +409,7 @@ export default function Home() {
             </label>
           </div>
 
-          {/* Search bar */}
-          <div style={{
+          <div className="search-animate" style={{
             maxWidth: '640px',
             margin: '0 auto',
             position: 'relative',
@@ -446,7 +475,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Example queries */}
           {!hasSearched && (
             <div style={{ marginTop: '20px', display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
               {EXAMPLE_QUERIES.map(q => (
@@ -482,23 +510,24 @@ export default function Home() {
           )}
         </div>
 
-        {/* Results */}
         {hasSearched && (
           <div>
-            {/* Intent banner */}
             {result && !result.error && result.query_parsed && (
-              <div style={{
-                background: 'rgba(220,38,38,0.08)',
-                border: '1px solid rgba(220,38,38,0.15)',
-                borderRadius: '8px',
-                padding: '10px 16px',
-                marginBottom: '24px',
-                fontSize: '13px',
-                color: '#dc2626',
-                display: 'flex',
-                gap: '16px',
-                flexWrap: 'wrap',
-              }}>
+              <div
+                className="intent-banner"
+                style={{
+                  background: 'rgba(220,38,38,0.08)',
+                  border: '1px solid rgba(220,38,38,0.15)',
+                  borderRadius: '8px',
+                  padding: '10px 16px',
+                  marginBottom: '24px',
+                  fontSize: '13px',
+                  color: '#dc2626',
+                  display: 'flex',
+                  gap: '16px',
+                  flexWrap: 'wrap',
+                }}
+              >
                 {result.query_parsed.vehicle && (
                   <span>{result.query_parsed.vehicle.year} {result.query_parsed.vehicle.make} {result.query_parsed.vehicle.model}</span>
                 )}
@@ -511,7 +540,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Error */}
             {result?.error && (
               <div style={{
                 background: 'rgba(239,68,68,0.08)',
@@ -525,7 +553,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Loading skeleton */}
             {loading && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -542,7 +569,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* No results */}
             {!loading && result && result.wheels.length === 0 && !result.error && (
               <div style={{ textAlign: 'center', padding: '60px 0', color: '#555' }}>
                 <p style={{ fontSize: '16px', marginBottom: '8px', color: '#777' }}>No wheels found for that search.</p>
@@ -550,7 +576,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Results grid */}
             {!loading && result && result.wheels.length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', paddingBottom: '60px' }}>
                 {result.wheels.map(wheel => (
