@@ -63,9 +63,6 @@ const BRAND_FILTERS = [
   { name: 'TIS Motorsports', logo: '/tismotorsports-logo-white.svg', width: 108 },
 ]
 
-const RED_TO_BLACK_GRADIENT = 'linear-gradient(180deg, #dc2626 0%, #000000 100%)'
-const RED_TO_BLACK_GRADIENT_HOVER = 'linear-gradient(180deg, #ef4444 0%, #1f1f1f 100%)'
-
 function WheelCard({ wheel }: { wheel: Wheel }) {
   const [imgError, setImgError] = useState(false)
   const imageUrl = !imgError ? (wheel.ta_image_url || wheel.atd_image_url) : null
@@ -85,15 +82,17 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       : wheel.brand === 'DTS'
         ? '/dts-logo-white.svg'
         : wheel.brand === 'TIS Motorsports'
-          ? '/tismotorsports-logo-white.svg'
+          ? '/tismotorsports-word-logo.png'
           : null
 
   const brandLogoHeight =
     wheel.brand === 'TIS'
       ? 30
-      : wheel.brand === 'DTS' || wheel.brand === 'TIS Motorsports'
+      : wheel.brand === 'DTS'
         ? 45
-        : 30
+        : wheel.brand === 'TIS Motorsports'
+          ? 24
+          : 30
 
   return (
     <div
@@ -209,23 +208,15 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             href={wheel.atd_url}
             target="_blank"
             rel="noopener noreferrer"
+            className="btn-slide btn-slide-link"
             style={{
               display: 'block',
-              background: RED_TO_BLACK_GRADIENT,
-              color: '#fff',
               textAlign: 'center',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 600,
               textDecoration: 'none',
-              transition: 'background 0.2s',
               fontFamily: 'inherit',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = RED_TO_BLACK_GRADIENT_HOVER)}
-            onMouseLeave={e => (e.currentTarget.style.background = RED_TO_BLACK_GRADIENT)}
           >
-            Check Your Price on ATDOnline
+            <span style={{ position: 'relative', zIndex: 2 }}>Check Your Price on ATDOnline</span>
           </a>
         ) : (
           <div style={{
@@ -341,7 +332,60 @@ export default function Home() {
   }
 
   return (
-    <div ref={pageRef} style={{ minHeight: '100vh', background: '#0a0a0b', color: '#f1f1f1', fontFamily: 'inherit' }}>
+    <>
+      <style jsx global>{`
+        .btn-slide {
+          background: #1a1a1a;
+          color: #e8e8e8;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 15px;
+          padding: 15px 25px;
+          font-weight: 700;
+          font-size: 15px;
+          box-shadow: 4px 8px 19px -3px rgba(0,0,0,0.27);
+          position: relative;
+          overflow: hidden;
+          z-index: 1;
+          transition: all 250ms;
+          cursor: pointer;
+        }
+
+        .btn-slide::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 0;
+          border-radius: 15px;
+          background: #dc2626;
+          z-index: -1;
+          transition: all 250ms;
+        }
+
+        .btn-slide:hover {
+          color: #fff;
+        }
+
+        .btn-slide:hover::before {
+          width: 100%;
+        }
+
+        .btn-slide:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+
+        .btn-slide:disabled::before {
+          width: 0;
+        }
+
+        .btn-slide-link {
+          display: block;
+          width: 100%;
+        }
+      `}</style>
+      <div ref={pageRef} style={{ minHeight: '100vh', background: '#0a0a0b', color: '#f1f1f1', fontFamily: 'inherit' }}>
       <header style={{
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         padding: '16px 24px',
@@ -480,30 +524,30 @@ export default function Home() {
               <button
                 onClick={() => handleSearch()}
                 disabled={loading || !query.trim()}
+                className="btn-slide"
                 style={{
-                  background: loading ? '#555' : RED_TO_BLACK_GRADIENT,
-                  color: '#fff',
-                  border: 'none',
-                  padding: '12px 24px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 700,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  borderTop: 'none',
+                  borderRight: 'none',
+                  borderBottom: 'none',
+                  boxShadow: 'none',
+                  minWidth: '100px',
                   fontFamily: 'inherit',
                   letterSpacing: '0.04em',
-                  transition: 'background 0.2s',
-                  minWidth: '100px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
-                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT_HOVER }}
-                onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT }}
               >
                 {loading ? (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative', zIndex: 2 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 0.8s linear infinite' }}>
                       <path d="M21 12a9 9 0 11-6.219-8.56"/>
                     </svg>
                     <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
                   </span>
-                ) : 'Search'}
+                ) : <span style={{ position: 'relative', zIndex: 2 }}>Search</span>}
               </button>
             </div>
           </div>
@@ -620,5 +664,6 @@ export default function Home() {
         )}
       </main>
     </div>
+    </>
   )
 }
