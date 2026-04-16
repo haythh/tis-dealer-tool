@@ -392,6 +392,10 @@ sample.forEach(w => {
   console.log(`  ${w.model} | ${w.color_finish} | ${w.bolt_pattern} | ${w.size} | $${w.map_price} | ${w.atd_url}`)
 })
 
+// --- FIX: supplier_pn that looks like oracle IDs (A-prefix) ---
+const fixedOracles = db.prepare(`UPDATE wheels SET oracle_id = supplier_pn, atd_url = 'https://atdonline.com/p/' || supplier_pn || '/detailPage' WHERE supplier_pn LIKE 'A%' AND (oracle_id IS NULL OR oracle_id = '')`).run()
+if (fixedOracles.changes > 0) console.log(`  Fixed ${fixedOracles.changes} wheels with A-prefix supplier_pn as oracle_id`)
+
 // --- IMPORT STOCK DATA ---
 console.log('\n📦 Importing ATD stock data...')
 try {
