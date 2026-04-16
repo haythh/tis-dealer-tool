@@ -80,6 +80,15 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
   }
 
+  const brandLogoSrc =
+    wheel.brand === 'TIS'
+      ? '/tis-logo-white.svg'
+      : wheel.brand === 'DTS'
+        ? '/dts-logo-white.svg'
+        : wheel.brand === 'TIS Motorsports'
+          ? '/tismotorsports-logo-white.svg'
+          : null
+
   return (
     <div
       className="wheel-card"
@@ -132,10 +141,19 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       </div>
 
       <div style={{ padding: '16px' }}>
-        <div style={{ marginBottom: '4px' }}>
-          <span style={{ color: '#dc2626', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            {wheel.brand}
-          </span>
+        <div style={{ marginBottom: '4px', minHeight: '16px', display: 'flex', alignItems: 'center' }}>
+          {brandLogoSrc ? (
+            <img
+              src={brandLogoSrc}
+              alt={wheel.brand}
+              height={14}
+              style={{ height: '14px', width: 'auto', objectFit: 'contain' }}
+            />
+          ) : (
+            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {wheel.brand}
+            </span>
+          )}
         </div>
         <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: '#f1f1f1', lineHeight: 1.3 }}>
           {wheel.model}
