@@ -89,10 +89,10 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         </div>
       )}
       {/* Image */}
-      <div style={{ background: '#111', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {(wheel.ta_image_url || wheel.atd_image_url || wheel.image_url) && !imgError ? (
+      <div style={{ background: '#111', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        {wheel.ta_image_url && !imgError ? (
           <Image
-            src={(wheel.ta_image_url || wheel.atd_image_url || wheel.image_url) as string}
+            src={wheel.ta_image_url}
             alt={`${wheel.model} ${wheel.color_finish}`}
             fill
             style={{ objectFit: 'contain', padding: '12px' }}
