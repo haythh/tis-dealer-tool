@@ -167,7 +167,7 @@ function parseQueryFallback(query: string): ParsedQuery {
 
 export async function POST(request: NextRequest) {
   try {
-    const { query } = await request.json()
+    const { query, inStockOnly } = await request.json()
     if (!query?.trim()) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 })
     }
@@ -230,6 +230,9 @@ export async function POST(request: NextRequest) {
           wheelQuery += ' AND UPPER(brand) = UPPER(?)'
           wheelParams.push(parsed.brand)
         }
+        if (inStockOnly) {
+          wheelQuery += ' AND in_stock = 1'
+        }
 
         wheelQuery += ' ORDER BY map_price ASC LIMIT 100'
         wheels = db.prepare(wheelQuery).all(...wheelParams) as Wheel[]
@@ -263,14 +266,14 @@ export async function POST(request: NextRequest) {
       }
 
       if (conditions.length > 0) {
-        const q = `SELECT * FROM wheels WHERE ${conditions.join(' AND ')} ORDER BY map_price ASC LIMIT 100`
+        const q = `SELECT * FROM wheels WHERE ${conditions.join(' AND ')}${inStockOnly ? ' AND in_stock = 1' : ''} ORDER BY map_price ASC LIMIT 100`
         wheels = db.prepare(q).all(...params) as Wheel[]
       } else {
-        // Full text fallback — search model, brand, finish
+        // Full text fallback, search model, brand, finish
         const searchTerm = `%${query}%`
         wheels = db.prepare(`
           SELECT * FROM wheels 
-          WHERE model LIKE ? OR brand LIKE ? OR color_finish LIKE ? OR fitment_category LIKE ?
+          WHERE (model LIKE ? OR brand LIKE ? OR color_finish LIKE ? OR fitment_category LIKE ?)${inStockOnly ? ' AND in_stock = 1' : ''}
           ORDER BY map_price ASC LIMIT 100
         `).all(searchTerm, searchTerm, searchTerm, searchTerm) as Wheel[]
       }

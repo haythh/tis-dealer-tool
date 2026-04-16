@@ -90,7 +90,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       {/* Stock badge */}
       {wheel.in_stock != null && (
         <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: wheel.in_stock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: wheel.in_stock ? '#22c55e' : '#ef4444', border: `1px solid ${wheel.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
-          {wheel.in_stock ? `✓ ${wheel.total_stock || ''} in stock` : '✗ Out of stock'}
+          {wheel.in_stock ? `${wheel.total_stock || ''} in stock` : 'Out of stock'}
         </div>
       )}
       {/* Image */}
@@ -195,7 +195,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
             onMouseLeave={e => (e.currentTarget.style.background = '#dc2626')}
           >
-            View on ATDOnline →
+            Check Your Price on ATDOnline
           </a>
         ) : (
           <div style={{
@@ -222,11 +222,19 @@ export default function Home() {
   const [result, setResult] = useState<SearchResponse | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [activeBrand, setActiveBrand] = useState<string | null>(null)
+  const [inStockOnly, setInStockOnly] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
+  useEffect(() => {
+    if (hasSearched) {
+      handleSearch()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inStockOnly])
 
   const handleSearch = async (q?: string, brand?: string | null) => {
     const searchQuery = q ?? query
@@ -246,7 +254,7 @@ export default function Home() {
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: effectiveQuery }),
+        body: JSON.stringify({ query: effectiveQuery, inStockOnly }),
       })
       const data = await res.json()
       setResult(data)
@@ -359,6 +367,18 @@ export default function Home() {
             ))}
           </div>
 
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ddd', fontSize: '13px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={e => setInStockOnly(e.target.checked)}
+                style={{ accentColor: '#dc2626', cursor: 'pointer' }}
+              />
+              In Stock Only
+            </label>
+          </div>
+
           {/* Search bar */}
           <div style={{
             maxWidth: '640px',
@@ -465,7 +485,7 @@ export default function Home() {
         {/* Results */}
         {hasSearched && (
           <div>
-            {/* Parsed intent banner */}
+            {/* Intent banner */}
             {result && !result.error && result.query_parsed && (
               <div style={{
                 background: 'rgba(220,38,38,0.08)',
@@ -479,15 +499,14 @@ export default function Home() {
                 gap: '16px',
                 flexWrap: 'wrap',
               }}>
-                <span style={{ fontWeight: 700 }}>Parsed:</span>
                 {result.query_parsed.vehicle && (
-                  <span>🚗 {result.query_parsed.vehicle.year} {result.query_parsed.vehicle.make} {result.query_parsed.vehicle.model}</span>
+                  <span>{result.query_parsed.vehicle.year} {result.query_parsed.vehicle.make} {result.query_parsed.vehicle.model}</span>
                 )}
-                {result.query_parsed.wheelModel && <span>🔵 Model: {result.query_parsed.wheelModel}</span>}
-                {result.query_parsed.size && <span>📏 Size: {result.query_parsed.size}&quot;</span>}
-                {result.query_parsed.finish && <span>🎨 Finish: {result.query_parsed.finish}</span>}
-                {result.query_parsed.boltPattern && <span>🔩 Bolt: {result.query_parsed.boltPattern}</span>}
-                {result.query_parsed.brand && <span>🏷️ Brand: {result.query_parsed.brand}</span>}
+                {result.query_parsed.wheelModel && <span>Model: {result.query_parsed.wheelModel}</span>}
+                {result.query_parsed.size && <span>Size: {result.query_parsed.size}&quot;</span>}
+                {result.query_parsed.finish && <span>Finish: {result.query_parsed.finish}</span>}
+                {result.query_parsed.boltPattern && <span>Bolt: {result.query_parsed.boltPattern}</span>}
+                {result.query_parsed.brand && <span>Brand: {result.query_parsed.brand}</span>}
                 <span style={{ marginLeft: 'auto', color: '#aaa' }}>{result.total} result{result.total !== 1 ? 's' : ''}</span>
               </div>
             )}
@@ -526,7 +545,6 @@ export default function Home() {
             {/* No results */}
             {!loading && result && result.wheels.length === 0 && !result.error && (
               <div style={{ textAlign: 'center', padding: '60px 0', color: '#555' }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
                 <p style={{ fontSize: '16px', marginBottom: '8px', color: '#777' }}>No wheels found for that search.</p>
                 <p style={{ fontSize: '13px' }}>Try a different year, model, or size.</p>
               </div>
