@@ -140,18 +140,10 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
 
         {/* Prices */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'baseline' }}>
-          {wheel.map_price != null && (
+          {(wheel.msrp || wheel.map_price) != null && (
             <div>
-              <div style={{ fontSize: '10px', color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP</div>
-              <div style={{ fontSize: '18px', fontWeight: 700, color: '#f97316' }}>{formatPrice(wheel.map_price)}</div>
-            </div>
-          )}
-          {wheel.msrp != null && (
-            <div>
-              <div style={{ fontSize: '10px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MSRP</div>
-              <div style={{ fontSize: '14px', fontWeight: 500, color: '#888', textDecoration: wheel.map_price ? 'line-through' : 'none' }}>
-                {formatPrice(wheel.msrp)}
-              </div>
+              <div style={{ fontSize: '10px', color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: '#f97316' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
             </div>
           )}
         </div>
