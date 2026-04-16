@@ -22,6 +22,11 @@ interface Wheel {
   upc: string
   image_url: string | null
   atd_url: string | null
+  in_stock: number | null
+  total_stock: number | null
+  stock_tomorrow: number | null
+  stock_national: number | null
+  atd_image_url: string | null
 }
 
 interface SearchResponse {
@@ -71,11 +76,17 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
       }}
     >
+      {/* Stock badge */}
+      {wheel.in_stock != null && (
+        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: wheel.in_stock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: wheel.in_stock ? '#22c55e' : '#ef4444', border: `1px solid ${wheel.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
+          {wheel.in_stock ? `✓ ${wheel.total_stock || ''} in stock` : '✗ Out of stock'}
+        </div>
+      )}
       {/* Image */}
       <div style={{ background: '#111', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {wheel.image_url && !imgError ? (
+        {(wheel.atd_image_url || wheel.image_url) && !imgError ? (
           <Image
-            src={wheel.image_url}
+            src={wheel.atd_image_url || wheel.image_url}
             alt={`${wheel.model} ${wheel.color_finish}`}
             fill
             style={{ objectFit: 'contain', padding: '12px' }}
@@ -143,6 +154,15 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             </div>
           )}
         </div>
+
+        {/* Stock details */}
+        {wheel.in_stock != null && wheel.total_stock != null && wheel.total_stock > 0 && (
+          <div style={{ fontSize: '11px', color: '#888', marginTop: '6px' }}>
+            {wheel.stock_tomorrow ? `${wheel.stock_tomorrow} tomorrow` : ''}
+            {wheel.stock_tomorrow && wheel.stock_national ? ' · ' : ''}
+            {wheel.stock_national ? `${wheel.stock_national} national (3-5 days)` : ''}
+          </div>
+        )}
 
         {/* Part # */}
         <div style={{ fontSize: '11px', color: '#555', marginBottom: '12px' }}>

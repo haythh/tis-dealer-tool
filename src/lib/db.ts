@@ -32,6 +32,14 @@ export type Wheel = {
   upc: string
   image_url: string | null
   atd_url: string | null
+  in_stock: number | null
+  stock_pickup: number | null
+  stock_today: number | null
+  stock_tomorrow: number | null
+  stock_national: number | null
+  total_stock: number | null
+  atd_image_url: string | null
+  stock_updated_at: string | null
 }
 
 export type Vehicle = {
