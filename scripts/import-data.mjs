@@ -427,18 +427,57 @@ try {
   const taRes = await fetch('https://toughassets.com/api/public/tis/assets')
   const taData = await taRes.json()
   const taAssets = (taData.assets || taData).filter(a => a.categoryName === 'Wheels' || a.categoryName === 'Products')
+
+  const extractTaModelCandidates = (originalName) => {
+    const baseName = String(originalName || '').replace(/\.(png|jpg|webp|jpeg)$/i, '').trim()
+    if (!baseName) return []
+
+    const normalized = baseName
+      .replace(/^dts[-_\s]*/i, '')
+      .replace(/^tis[-_\s]*/i, '')
+      .trim()
+
+    const candidates = []
+    const addCandidate = (value) => {
+      const cleaned = String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+      if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
+    }
+
+    const leadingModelMatch = normalized.match(/^([0-9]+[A-Z0-9]*)/i)
+    if (leadingModelMatch) addCandidate(leadingModelMatch[1])
+
+    addCandidate(normalized.split(/[-.\s]/)[0])
+    addCandidate(baseName.split(/[-.\s]/)[0])
+
+    return candidates
+  }
+
   const taMapping = {}
   for (const a of taAssets) {
-    const name = a.originalName.replace(/\.(png|jpg|webp|jpeg)$/i, '')
-    const model = name.split(/[-.\s]/)[0].toUpperCase()
     const url = a.thumbUrl || `https://toughassets.com/api/file/${a.id}`
-    if (!taMapping[model]) taMapping[model] = url
+    for (const model of extractTaModelCandidates(a.originalName)) {
+      if (!taMapping[model]) taMapping[model] = url
+    }
   }
-  const taUpdate = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE UPPER(model) = ?')
+
+  const taUpdate = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE id = ?')
+  const wheels = db.prepare('SELECT id, model FROM wheels').all()
   let taUpdated = 0
+
   const taTxn = db.transaction(() => {
-    for (const [model, url] of Object.entries(taMapping)) {
-      taUpdated += taUpdate.run(url, model).changes
+    for (const wheel of wheels) {
+      const model = String(wheel.model || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+      if (!model) continue
+
+      const candidates = [model]
+      if (model.endsWith('B') && model.length > 1) candidates.push(model.slice(0, -1))
+      const fallback = String(wheel.model || '').trim().toUpperCase().split(/[-.\s]/)[0].replace(/[^A-Z0-9]/g, '')
+      if (fallback && !candidates.includes(fallback)) candidates.push(fallback)
+
+      const matchedUrl = candidates.map(candidate => taMapping[candidate]).find(Boolean)
+      if (!matchedUrl) continue
+
+      taUpdated += taUpdate.run(matchedUrl, wheel.id).changes
     }
   })
   taTxn()

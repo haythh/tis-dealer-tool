@@ -57,6 +57,11 @@ const BRAND_FILTERS = ['TIS', 'DTS', 'TIS Motorsports']
 
 function WheelCard({ wheel }: { wheel: Wheel }) {
   const [imgError, setImgError] = useState(false)
+  const imageUrl = !imgError ? (wheel.ta_image_url || wheel.atd_image_url) : null
+
+  useEffect(() => {
+    setImgError(false)
+  }, [wheel.id, wheel.ta_image_url, wheel.atd_image_url])
 
   const formatPrice = (price: number | null) => {
     if (price == null) return null
@@ -90,9 +95,9 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       )}
       {/* Image */}
       <div style={{ background: '#111', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {wheel.ta_image_url && !imgError ? (
+        {imageUrl ? (
           <Image
-            src={wheel.ta_image_url}
+            src={imageUrl}
             alt={`${wheel.model} ${wheel.color_finish}`}
             fill
             style={{ objectFit: 'contain', padding: '12px' }}
