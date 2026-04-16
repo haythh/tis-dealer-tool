@@ -57,7 +57,15 @@ const EXAMPLE_QUERIES = [
   'TIS Motorsports bronze',
 ]
 
-const BRAND_FILTERS = ['TIS', 'DTS', 'TIS Motorsports']
+const BRAND_FILTERS = [
+  { name: 'TIS', logo: '/tis-logo-white.svg', width: 44 },
+  { name: 'DTS', logo: '/dts-logo-white.svg', width: 52 },
+  { name: 'TIS Motorsports', logo: '/tismotorsports-logo-white.svg', width: 108 },
+]
+
+const RED_TO_BLACK_GRADIENT = 'linear-gradient(135deg, #dc2626 0%, #000000 100%)'
+const RED_TO_BLACK_GRADIENT_HOVER = 'linear-gradient(135deg, #ef4444 0%, #1f1f1f 100%)'
+const RED_TO_BLACK_GRADIENT_REVERSE = 'linear-gradient(135deg, #000000 0%, #dc2626 100%)'
 
 function WheelCard({ wheel }: { wheel: Wheel }) {
   const [imgError, setImgError] = useState(false)
@@ -179,7 +187,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             rel="noopener noreferrer"
             style={{
               display: 'block',
-              background: '#dc2626',
+              background: RED_TO_BLACK_GRADIENT,
               color: '#fff',
               textAlign: 'center',
               padding: '10px 16px',
@@ -190,8 +198,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
               transition: 'background 0.2s',
               fontFamily: 'inherit',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#dc2626')}
+            onMouseEnter={e => (e.currentTarget.style.background = RED_TO_BLACK_GRADIENT_HOVER)}
+            onMouseLeave={e => (e.currentTarget.style.background = RED_TO_BLACK_GRADIENT)}
           >
             Check Your Price on ATDOnline
           </a>
@@ -360,39 +368,40 @@ export default function Home() {
           )}
 
           <div className="search-animate" style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
-            {BRAND_FILTERS.map(brand => (
+            {BRAND_FILTERS.map(({ name, logo, width }) => (
               <button
-                key={brand}
-                onClick={() => handleBrandFilter(brand)}
+                key={name}
+                onClick={() => handleBrandFilter(name)}
+                aria-label={`Filter by ${name}`}
                 style={{
-                  background: activeBrand === brand ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${activeBrand === brand ? 'rgba(220,38,38,0.6)' : 'rgba(255,255,255,0.1)'}`,
-                  color: activeBrand === brand ? '#dc2626' : '#aaa',
-                  padding: '6px 16px',
+                  background: activeBrand === name ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${activeBrand === name ? 'rgba(220,38,38,0.6)' : 'rgba(255,255,255,0.1)'}`,
+                  color: activeBrand === name ? '#dc2626' : '#aaa',
+                  padding: '10px 16px',
                   borderRadius: '100px',
-                  fontSize: '13px',
-                  fontWeight: activeBrand === brand ? 700 : 400,
                   cursor: 'pointer',
                   fontFamily: 'inherit',
                   transition: 'all 0.15s',
-                  letterSpacing: '0.04em',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '44px',
+                  minWidth: name === 'TIS Motorsports' ? '152px' : '92px',
                 }}
                 onMouseEnter={e => {
-                  if (activeBrand !== brand) {
+                  if (activeBrand !== name) {
                     ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)'
                     ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f1f1f1'
                   }
                 }}
                 onMouseLeave={e => {
-                  if (activeBrand !== brand) {
+                  if (activeBrand !== name) {
                     ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'
                     ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#aaa'
                   }
                 }}
               >
-                {brand}
+                <img src={logo} alt={name} style={{ height: '22px', width: `${width}px`, objectFit: 'contain', display: 'block' }} />
               </button>
             ))}
           </div>
@@ -448,7 +457,7 @@ export default function Home() {
                 onClick={() => handleSearch()}
                 disabled={loading || !query.trim()}
                 style={{
-                  background: loading ? '#555' : '#dc2626',
+                  background: loading ? '#555' : RED_TO_BLACK_GRADIENT,
                   color: '#fff',
                   border: 'none',
                   padding: '12px 24px',
@@ -460,8 +469,8 @@ export default function Home() {
                   transition: 'background 0.2s',
                   minWidth: '100px',
                 }}
-                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)' }}
-                onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#dc2626' }}
+                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT_REVERSE }}
+                onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT }}
               >
                 {loading ? (
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
