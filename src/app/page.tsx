@@ -74,7 +74,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         transition: 'border-color 0.2s, transform 0.2s',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(249,115,22,0.4)'
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(220,38,38,0.4)'
         ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
       }}
       onMouseLeave={e => {
@@ -117,7 +117,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       {/* Content */}
       <div style={{ padding: '16px' }}>
         <div style={{ marginBottom: '4px' }}>
-          <span style={{ color: '#f97316', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <span style={{ color: '#dc2626', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             {wheel.brand}
           </span>
         </div>
@@ -147,8 +147,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'baseline' }}>
           {(wheel.msrp || wheel.map_price) != null && (
             <div>
-              <div style={{ fontSize: '10px', color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
-              <div style={{ fontSize: '18px', fontWeight: 700, color: '#f97316' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
+              <div style={{ fontSize: '10px', color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: '#dc2626' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
             </div>
           )}
         </div>
@@ -176,7 +176,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             rel="noopener noreferrer"
             style={{
               display: 'block',
-              background: '#f97316',
+              background: '#dc2626',
               color: '#fff',
               textAlign: 'center',
               padding: '10px 16px',
@@ -188,7 +188,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
               fontFamily: 'inherit',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = '#ea6c0e')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#f97316')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#dc2626')}
           >
             View on ATDOnline →
           </a>
@@ -272,10 +272,10 @@ export default function Home() {
         alignItems: 'center',
         gap: '12px',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f97316', boxShadow: '0 0 8px #f97316' }} />
-          <span style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f1f1f1' }}>
-            TIS <span style={{ color: '#f97316' }}>DEALER</span> TOOL
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/tis-logo.webp" alt="TIS" style={{ height: '28px', width: 'auto' }} />
+          <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0.06em', color: '#f1f1f1' }}>
+            Wheel Search
           </span>
         </div>
       </header>
@@ -291,13 +291,13 @@ export default function Home() {
             <>
               <div style={{
                 display: 'inline-block',
-                background: 'rgba(249,115,22,0.12)',
-                border: '1px solid rgba(249,115,22,0.25)',
+                background: 'rgba(220,38,38,0.12)',
+                border: '1px solid rgba(220,38,38,0.25)',
                 borderRadius: '100px',
                 padding: '6px 14px',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#f97316',
+                color: '#dc2626',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 marginBottom: '24px',
@@ -307,7 +307,7 @@ export default function Home() {
               <h1 style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                 Find the right wheel.
                 <br />
-                <span style={{ color: '#f97316' }}>Ship it from ATD.</span>
+                <span style={{ color: '#dc2626' }}>Ship it from ATD.</span>
               </h1>
               <p style={{ fontSize: '16px', color: '#888', margin: '0 0 40px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
                 Search TIS wheels by vehicle fitment, model, size, or finish — and get direct ATDOnline order links.
@@ -322,9 +322,9 @@ export default function Home() {
                 key={brand}
                 onClick={() => handleBrandFilter(brand)}
                 style={{
-                  background: activeBrand === brand ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${activeBrand === brand ? 'rgba(249,115,22,0.6)' : 'rgba(255,255,255,0.1)'}`,
-                  color: activeBrand === brand ? '#f97316' : '#aaa',
+                  background: activeBrand === brand ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${activeBrand === brand ? 'rgba(220,38,38,0.6)' : 'rgba(255,255,255,0.1)'}`,
+                  color: activeBrand === brand ? '#dc2626' : '#aaa',
                   padding: '6px 16px',
                   borderRadius: '100px',
                   fontSize: '13px',
@@ -336,8 +336,8 @@ export default function Home() {
                 }}
                 onMouseEnter={e => {
                   if (activeBrand !== brand) {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249,115,22,0.4)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f97316'
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(220,38,38,0.4)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#dc2626'
                   }
                 }}
                 onMouseLeave={e => {
@@ -367,7 +367,7 @@ export default function Home() {
               overflow: 'hidden',
               transition: 'border-color 0.2s',
             }}
-              onFocusCapture={e => (e.currentTarget.style.borderColor = 'rgba(249,115,22,0.5)')}
+              onFocusCapture={e => (e.currentTarget.style.borderColor = 'rgba(220,38,38,0.5)')}
               onBlurCapture={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
             >
               <input
@@ -392,7 +392,7 @@ export default function Home() {
                 onClick={() => handleSearch()}
                 disabled={loading || !query.trim()}
                 style={{
-                  background: loading ? '#555' : '#f97316',
+                  background: loading ? '#555' : '#dc2626',
                   color: '#fff',
                   border: 'none',
                   padding: '12px 24px',
@@ -405,7 +405,7 @@ export default function Home() {
                   minWidth: '100px',
                 }}
                 onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#ea6c0e' }}
-                onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#f97316' }}
+                onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#dc2626' }}
               >
                 {loading ? (
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -438,8 +438,8 @@ export default function Home() {
                     transition: 'all 0.15s',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249,115,22,0.4)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f97316'
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(220,38,38,0.4)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#dc2626'
                   }}
                   onMouseLeave={e => {
                     (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'
@@ -459,13 +459,13 @@ export default function Home() {
             {/* Parsed intent banner */}
             {result && !result.error && result.query_parsed && (
               <div style={{
-                background: 'rgba(249,115,22,0.08)',
-                border: '1px solid rgba(249,115,22,0.15)',
+                background: 'rgba(220,38,38,0.08)',
+                border: '1px solid rgba(220,38,38,0.15)',
                 borderRadius: '8px',
                 padding: '10px 16px',
                 marginBottom: '24px',
                 fontSize: '13px',
-                color: '#f97316',
+                color: '#dc2626',
                 display: 'flex',
                 gap: '16px',
                 flexWrap: 'wrap',

@@ -9,7 +9,7 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'TIS Dealer Tool',
+  title: 'TIS Wheel Search',
   description: 'Find TIS wheels by vehicle fitment. Search by year/make/model and get direct ATDOnline links.',
   keywords: 'TIS wheels, dealer tool, wheel fitment, ATDOnline, aftermarket wheels',
 }

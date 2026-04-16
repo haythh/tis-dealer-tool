@@ -3,8 +3,8 @@
 :root {
   --background: #0a0a0b;
   --foreground: #f1f1f1;
-  --orange: #f97316;
-  --orange-hover: #ea6c0e;
+  --orange: #dc2626;
+  --orange-hover: #b91c1c;
   --card-bg: rgba(255, 255, 255, 0.04);
   --card-border: rgba(255, 255, 255, 0.08);
 }
