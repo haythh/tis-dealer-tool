@@ -80,7 +80,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
     wheel.brand === 'TIS'
       ? '/tis-word-logo.png'
       : wheel.brand === 'DTS'
-        ? '/dts-logo-white.svg'
+        ? '/dts-logo-white.png'
         : wheel.brand === 'TIS Motorsports'
           ? '/tismotorsports-word-logo.png'
           : null
