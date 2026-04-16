@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node scripts/import-data.mjs && node scripts/import-stock.mjs && next start",
+    "start": "node scripts/startup.mjs",
     "lint": "next lint",
     "import-data": "node scripts/import-data.mjs"
   },
