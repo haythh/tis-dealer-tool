@@ -94,7 +94,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         </div>
       )}
       {/* Image */}
-      <div style={{ background: '#111', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      <div style={{ background: '#000', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -126,7 +126,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             {wheel.brand}
           </span>
         </div>
-        <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 4px', color: '#f1f1f1', lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: '#f1f1f1', lineHeight: 1.3 }}>
           {wheel.model}
         </h3>
         <p style={{ fontSize: '13px', color: '#999', margin: '0 0 12px' }}>
@@ -152,8 +152,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'baseline' }}>
           {(wheel.msrp || wheel.map_price) != null && (
             <div>
-              <div style={{ fontSize: '10px', color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
-              <div style={{ fontSize: '18px', fontWeight: 700, color: '#dc2626' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
+              <div style={{ fontSize: '10px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
             </div>
           )}
         </div>
@@ -192,7 +192,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
               transition: 'background 0.2s',
               fontFamily: 'inherit',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#ea6c0e')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.15)')}
             onMouseLeave={e => (e.currentTarget.style.background = '#dc2626')}
           >
             View on ATDOnline →
@@ -341,13 +341,15 @@ export default function Home() {
                 }}
                 onMouseEnter={e => {
                   if (activeBrand !== brand) {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(220,38,38,0.4)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#dc2626'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f1f1f1'
                   }
                 }}
                 onMouseLeave={e => {
                   if (activeBrand !== brand) {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'
                     ;(e.currentTarget as HTMLButtonElement).style.color = '#aaa'
                   }
                 }}
@@ -409,7 +411,7 @@ export default function Home() {
                   transition: 'background 0.2s',
                   minWidth: '100px',
                 }}
-                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#ea6c0e' }}
+                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)' }}
                 onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#dc2626' }}
               >
                 {loading ? (
@@ -443,11 +445,13 @@ export default function Home() {
                     transition: 'all 0.15s',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(220,38,38,0.4)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#dc2626'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f1f1f1'
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'
                     ;(e.currentTarget as HTMLButtonElement).style.color = '#aaa'
                   }}
                 >
