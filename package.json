@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "node scripts/startup.mjs",
+    "build": "node scripts/import-data.mjs && next build",
+    "start": "next start",
     "lint": "next lint",
     "import-data": "node scripts/import-data.mjs"
   },
