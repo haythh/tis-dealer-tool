@@ -40,6 +40,7 @@ export type Wheel = {
   total_stock: number | null
   atd_image_url: string | null
   ta_image_url: string | null
+  ta_images_json: string | null
   stock_updated_at: string | null
 }
 

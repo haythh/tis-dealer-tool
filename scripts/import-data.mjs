@@ -422,11 +422,16 @@ console.log('\n🖼️  Importing ToughAssets images...')
 try {
   db.exec("ALTER TABLE wheels ADD COLUMN ta_image_url TEXT")
 } catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN ta_images_json TEXT")
+} catch {}
 
 try {
   const taRes = await fetch('https://toughassets.com/api/public/tis/assets')
   const taData = await taRes.json()
-  const taAssets = (taData.assets || taData).filter(a => a.categoryName === 'Wheels' || a.categoryName === 'Products')
+  const taAssets = taData.assets || taData
+  const imageAssets = taAssets.filter(a => a.categoryName === 'Wheels' || a.categoryName === 'Products')
+  const videoAssets = taAssets.filter(a => a.categoryName === 'Videos')
 
   const normalizeTaModel = (value) => String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
 
@@ -437,11 +442,11 @@ try {
       if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
     }
 
-    const primaryTag = (Array.isArray(asset?.tags) ? asset.tags : [])
-      .find(tag => String(tag || '').trim() && !String(tag).toLowerCase().startsWith('brand:'))
-    if (primaryTag) addCandidate(primaryTag)
+    for (const tag of Array.isArray(asset?.tags) ? asset.tags : []) {
+      if (String(tag || '').trim() && !String(tag).toLowerCase().startsWith('brand:')) addCandidate(tag)
+    }
 
-    const baseName = String(asset?.originalName || '').replace(/\.(png|jpg|webp|jpeg)$/i, '').trim()
+    const baseName = String(asset?.originalName || '').replace(/\.(png|jpg|webp|jpeg|mp4|mov|webm|m4v)$/i, '').trim()
     if (!baseName) return candidates
 
     const normalized = baseName
@@ -458,47 +463,109 @@ try {
     return candidates
   }
 
+  const detectImageType = (asset) => {
+    const fileName = String(asset?.originalName || '').toLowerCase()
+    if (fileName.includes('topangle')) return 'topangle'
+    if (fileName.includes('face')) return 'face'
+    if (fileName.includes('angle')) return 'angle'
+    return 'other'
+  }
+
+  const isDuallyAsset = (asset) => {
+    const fileName = String(asset?.originalName || '').toLowerCase()
+    const tags = (Array.isArray(asset?.tags) ? asset.tags : []).map(tag => String(tag || '').toLowerCase())
+    return fileName.includes('dually') || tags.some(tag => tag.includes('dually'))
+  }
+
+  const PRIORITY = ['face', 'angle', 'topangle', 'video', 'other']
   const taMapping = {}
-  for (const a of taAssets) {
-    const url = a.thumbUrl || `https://toughassets.com/api/file/${a.id}`
-    for (const model of extractTaModelCandidates(a)) {
-      if (!taMapping[model]) taMapping[model] = url
+
+  const addAssetForModels = (models, assetItem) => {
+    for (const model of models) {
+      if (!taMapping[model]) taMapping[model] = []
+      const exists = taMapping[model].some(item => item.fullUrl === assetItem.fullUrl && item.type === assetItem.type)
+      if (!exists) taMapping[model].push(assetItem)
     }
   }
 
-  const taUpdateByModel = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE UPPER(model) = ?')
-  const taUpdateById = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE id = ?')
+  for (const asset of imageAssets) {
+    const thumbUrl = asset.thumbUrl || `https://toughassets.com/api/file/${asset.id}`
+    const fullUrl = `https://toughassets.com/api/file/${asset.id}`
+    addAssetForModels(extractTaModelCandidates(asset), {
+      url: thumbUrl,
+      type: detectImageType(asset),
+      fullUrl,
+      isDually: isDuallyAsset(asset),
+    })
+  }
+
+  for (const asset of videoAssets) {
+    const fullUrl = `https://toughassets.com/api/file/${asset.id}`
+    const displayUrl = asset.thumbUrl || fullUrl
+    const models = (Array.isArray(asset?.tags) ? asset.tags : [])
+      .map(tag => normalizeTaModel(tag))
+      .filter(Boolean)
+    addAssetForModels(models, {
+      url: displayUrl,
+      type: 'video',
+      fullUrl,
+      isDually: isDuallyAsset(asset),
+    })
+  }
+
+  const finalizeAssets = (assets) => assets
+    .sort((a, b) => PRIORITY.indexOf(a.type) - PRIORITY.indexOf(b.type))
+    .slice(0, 4)
+
+  const buildWheelCandidates = (rawModel) => {
+    const candidates = []
+    const addCandidate = (value) => {
+      const cleaned = normalizeTaModel(value)
+      if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
+    }
+
+    addCandidate(rawModel)
+    addCandidate(rawModel.split(/[-.\s]/)[0])
+    addCandidate(rawModel.replace(/\bDUALLY\b.*$/i, '').trim())
+    addCandidate(rawModel.replace(/\b2\.0\b/ig, '').trim())
+    addCandidate(rawModel.replace(/\bDUALLY\b.*$/i, '').replace(/\b2\.0\b/ig, '').trim())
+    if (normalizeTaModel(rawModel).endsWith('B') && normalizeTaModel(rawModel).length > 1) {
+      addCandidate(normalizeTaModel(rawModel).slice(0, -1))
+    }
+
+    return candidates
+  }
+
+  const selectAssetsForWheel = (rawModel) => {
+    const needsDually = /\bDUALLY\b/i.test(rawModel)
+    const matchedAssets = buildWheelCandidates(rawModel)
+      .flatMap(candidate => taMapping[candidate] || [])
+      .filter((asset, index, arr) => arr.findIndex(item => item.fullUrl === asset.fullUrl && item.type === asset.type) === index)
+      .filter(asset => needsDually ? true : asset.isDually !== true)
+
+    return finalizeAssets(matchedAssets)
+  }
+
+  const taUpdateByModel = db.prepare('UPDATE wheels SET ta_image_url = ?, ta_images_json = ? WHERE UPPER(model) = ?')
+  const taUpdateById = db.prepare('UPDATE wheels SET ta_image_url = ?, ta_images_json = ? WHERE id = ?')
   let taUpdated = 0
 
   const taTxn = db.transaction(() => {
-    for (const [model, url] of Object.entries(taMapping)) {
-      taUpdated += taUpdateByModel.run(url, model).changes
+    for (const [model, assets] of Object.entries(taMapping)) {
+      const selectedAssets = finalizeAssets(assets)
+      if (!selectedAssets.length) continue
+      taUpdated += taUpdateByModel.run(selectedAssets[0].url, JSON.stringify(selectedAssets), model).changes
     }
 
-    const wheels = db.prepare('SELECT id, model FROM wheels WHERE ta_image_url IS NULL').all()
+    const wheels = db.prepare('SELECT id, model FROM wheels').all()
     for (const wheel of wheels) {
       const rawModel = String(wheel.model || '').trim()
       if (!rawModel) continue
 
-      const candidates = []
-      const addCandidate = (value) => {
-        const cleaned = normalizeTaModel(value)
-        if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
-      }
+      const selectedAssets = selectAssetsForWheel(rawModel)
+      if (!selectedAssets.length) continue
 
-      addCandidate(rawModel)
-      addCandidate(rawModel.split(/[-.\s]/)[0])
-      addCandidate(rawModel.replace(/\bDUALLY\b.*$/i, '').trim())
-      addCandidate(rawModel.replace(/\b2\.0\b/ig, '').trim())
-      addCandidate(rawModel.replace(/\bDUALLY\b.*$/i, '').replace(/\b2\.0\b/ig, '').trim())
-      if (normalizeTaModel(rawModel).endsWith('B') && normalizeTaModel(rawModel).length > 1) {
-        addCandidate(normalizeTaModel(rawModel).slice(0, -1))
-      }
-
-      const matchedUrl = candidates.map(candidate => taMapping[candidate]).find(Boolean)
-      if (!matchedUrl) continue
-
-      taUpdated += taUpdateById.run(matchedUrl, wheel.id).changes
+      taUpdated += taUpdateById.run(selectedAssets[0].url, JSON.stringify(selectedAssets), wheel.id).changes
     }
   })
   taTxn()

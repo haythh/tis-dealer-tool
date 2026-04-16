@@ -32,6 +32,13 @@ interface Wheel {
   stock_national: number | null
   atd_image_url: string | null
   ta_image_url: string | null
+  ta_images_json: string | null
+}
+
+interface GalleryItem {
+  url: string
+  type: 'face' | 'angle' | 'topangle' | 'video' | 'other'
+  fullUrl: string
 }
 
 interface SearchResponse {
@@ -64,12 +71,33 @@ const BRAND_FILTERS = [
 ]
 
 function WheelCard({ wheel }: { wheel: Wheel }) {
+  const parseGallery = (): GalleryItem[] => {
+    try {
+      const parsed = wheel.ta_images_json ? JSON.parse(wheel.ta_images_json) : []
+      if (Array.isArray(parsed) && parsed.length) return parsed.slice(0, 4)
+    } catch {}
+
+    if (wheel.ta_image_url) {
+      return [{ url: wheel.ta_image_url, type: 'other', fullUrl: wheel.ta_image_url }]
+    }
+
+    if (wheel.atd_image_url) {
+      return [{ url: wheel.atd_image_url, type: 'other', fullUrl: wheel.atd_image_url }]
+    }
+
+    return []
+  }
+
+  const gallery = parseGallery()
+  const initialSelected = gallery[0] ?? null
   const [imgError, setImgError] = useState(false)
-  const imageUrl = !imgError ? (wheel.ta_image_url || wheel.atd_image_url) : null
+  const [selectedMedia, setSelectedMedia] = useState<GalleryItem | null>(initialSelected)
+  const imageUrl = !imgError ? (selectedMedia?.type === 'video' ? null : (selectedMedia?.fullUrl || selectedMedia?.url || wheel.ta_image_url || wheel.atd_image_url)) : null
 
   useEffect(() => {
     setImgError(false)
-  }, [wheel.id, wheel.ta_image_url, wheel.atd_image_url])
+    setSelectedMedia(gallery[0] ?? null)
+  }, [wheel.id, wheel.ta_image_url, wheel.ta_images_json, wheel.atd_image_url])
 
   const formatPrice = (price: number | null) => {
     if (price == null) return null
@@ -120,8 +148,14 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         </div>
       )}
 
-      <div style={{ background: '#000', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {imageUrl ? (
+      <div style={{ background: '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        {selectedMedia?.type === 'video' ? (
+          <video
+            src={selectedMedia.fullUrl}
+            controls
+            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
+          />
+        ) : imageUrl ? (
           <Image
             src={imageUrl}
             alt={`${wheel.model} ${wheel.color_finish}`}
@@ -144,6 +178,49 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
           </div>
         )}
       </div>
+
+      {gallery.length > 0 && (
+        <div style={{ display: 'flex', gap: '6px', padding: '8px', background: '#0a0a0a', overflowX: 'auto' }}>
+          {gallery.map((item, index) => {
+            const active = selectedMedia?.fullUrl === item.fullUrl && selectedMedia?.type === item.type
+            return (
+              <button
+                key={`${item.fullUrl}-${index}`}
+                onClick={() => {
+                  setImgError(false)
+                  setSelectedMedia(item)
+                }}
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '4px',
+                  border: `2px solid ${active ? '#dc2626' : 'rgba(255,255,255,0.14)'}`,
+                  background: '#111',
+                  padding: 0,
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  flex: '0 0 auto',
+                }}
+                aria-label={`Show ${item.type} media`}
+              >
+                {item.type === 'video' ? (
+                  <>
+                    <img src={item.url} alt={`${wheel.model} video thumbnail`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.28)' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </>
+                ) : (
+                  <img src={item.url} alt={`${wheel.model} ${item.type} thumbnail`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                )}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       <div style={{ padding: '16px' }}>
         <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>

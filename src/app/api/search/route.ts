@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
         const placeholders = allPatterns.map(() => '?').join(',')
 
         const bpConditions = allPatterns.map(p => `UPPER(bolt_pattern) LIKE UPPER('%${p.replace(/'/g, "''")}%')`).join(' OR ')
-        let wheelQuery = `SELECT * FROM wheels WHERE (${bpConditions})`
+        let wheelQuery = `SELECT id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at FROM wheels WHERE (${bpConditions})`
         const wheelParams: (string | number)[] = []
 
         if (parsed.size) {
@@ -266,13 +266,13 @@ export async function POST(request: NextRequest) {
       }
 
       if (conditions.length > 0) {
-        const q = `SELECT * FROM wheels WHERE ${conditions.join(' AND ')}${inStockOnly ? ' AND in_stock = 1' : ''} ORDER BY map_price ASC LIMIT 100`
+        const q = `SELECT id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at FROM wheels WHERE ${conditions.join(' AND ')}${inStockOnly ? ' AND in_stock = 1' : ''} ORDER BY map_price ASC LIMIT 100`
         wheels = db.prepare(q).all(...params) as Wheel[]
       } else {
         // Full text fallback, search model, brand, finish
         const searchTerm = `%${query}%`
         wheels = db.prepare(`
-          SELECT * FROM wheels 
+          SELECT id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at FROM wheels 
           WHERE (model LIKE ? OR brand LIKE ? OR color_finish LIKE ? OR fitment_category LIKE ?)${inStockOnly ? ' AND in_stock = 1' : ''}
           ORDER BY map_price ASC LIMIT 100
         `).all(searchTerm, searchTerm, searchTerm, searchTerm) as Wheel[]
