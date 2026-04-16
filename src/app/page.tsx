@@ -145,8 +145,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             <img
               src={brandLogoSrc}
               alt={wheel.brand}
-              height={14}
-              style={{ height: '14px', width: 'auto', objectFit: 'contain' }}
+              height={30}
+              style={{ height: '30px', width: 'auto', objectFit: 'contain' }}
             />
           ) : (
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
