@@ -63,9 +63,8 @@ const BRAND_FILTERS = [
   { name: 'TIS Motorsports', logo: '/tismotorsports-logo-white.svg', width: 108 },
 ]
 
-const RED_TO_BLACK_GRADIENT = 'linear-gradient(135deg, #dc2626 0%, #000000 100%)'
-const RED_TO_BLACK_GRADIENT_HOVER = 'linear-gradient(135deg, #ef4444 0%, #1f1f1f 100%)'
-const RED_TO_BLACK_GRADIENT_REVERSE = 'linear-gradient(135deg, #000000 0%, #dc2626 100%)'
+const RED_TO_BLACK_GRADIENT = 'linear-gradient(180deg, #dc2626 0%, #000000 100%)'
+const RED_TO_BLACK_GRADIENT_HOVER = 'linear-gradient(180deg, #ef4444 0%, #1f1f1f 100%)'
 
 function WheelCard({ wheel }: { wheel: Wheel }) {
   const [imgError, setImgError] = useState(false)
@@ -487,7 +486,7 @@ export default function Home() {
                   transition: 'background 0.2s',
                   minWidth: '100px',
                 }}
-                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT_REVERSE }}
+                onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT_HOVER }}
                 onMouseLeave={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = RED_TO_BLACK_GRADIENT }}
               >
                 {loading ? (
