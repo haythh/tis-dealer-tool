@@ -273,7 +273,7 @@ export default function Home() {
         gap: '12px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/tis-logo.webp" alt="TIS" style={{ height: '28px', width: 'auto' }} />
+          <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto' }} />
           <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0.06em', color: '#f1f1f1' }}>
             Wheel Search
           </span>
