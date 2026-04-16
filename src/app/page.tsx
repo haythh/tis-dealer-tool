@@ -38,6 +38,7 @@ interface SearchResponse {
     size: string | null
     finish: string | null
     boltPattern: string | null
+    brand: string | null
   }
   total: number
   error?: string
@@ -47,9 +48,12 @@ const EXAMPLE_QUERIES = [
   "What fits a 2024 F-150?",
   "22 inch wheels for RAM 1500",
   "TIS 544 in black",
-  "6x5.5 wheels 20 inch",
+  "DTS wheels 20 inch",
   "Chrome wheels for Chevy Silverado",
+  "TIS Motorsports bronze",
 ]
+
+const BRAND_FILTERS = ['TIS', 'DTS', 'TIS Motorsports']
 
 function WheelCard({ wheel }: { wheel: Wheel }) {
   const [imgError, setImgError] = useState(false)
@@ -212,30 +216,37 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<SearchResponse | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
+  const [activeBrand, setActiveBrand] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
-  const handleSearch = async (q?: string) => {
+  const handleSearch = async (q?: string, brand?: string | null) => {
     const searchQuery = q ?? query
-    if (!searchQuery.trim()) return
+    if (!searchQuery.trim() && !brand) return
 
     if (q) setQuery(q)
     setLoading(true)
     setHasSearched(true)
 
+    // Build effective query — prepend brand if filter active
+    const effectiveBrand = brand !== undefined ? brand : activeBrand
+    const effectiveQuery = effectiveBrand && !searchQuery.toLowerCase().includes(effectiveBrand.toLowerCase())
+      ? `${effectiveBrand} ${searchQuery}`.trim()
+      : (searchQuery || effectiveBrand || '')
+
     try {
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery }),
+        body: JSON.stringify({ query: effectiveQuery }),
       })
       const data = await res.json()
       setResult(data)
     } catch {
-      setResult({ wheels: [], query_parsed: { vehicle: null, wheelModel: null, size: null, finish: null, boltPattern: null }, total: 0, error: 'Search failed. Please try again.' })
+      setResult({ wheels: [], query_parsed: { vehicle: null, wheelModel: null, size: null, finish: null, boltPattern: null, brand: null }, total: 0, error: 'Search failed. Please try again.' })
     } finally {
       setLoading(false)
     }
@@ -243,6 +254,12 @@ export default function Home() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleSearch()
+  }
+
+  const handleBrandFilter = (brand: string) => {
+    const next = activeBrand === brand ? null : brand
+    setActiveBrand(next)
+    handleSearch(query || 'wheels', next)
   }
 
   return (
@@ -297,6 +314,43 @@ export default function Home() {
               </p>
             </>
           )}
+
+          {/* Brand filter buttons */}
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
+            {BRAND_FILTERS.map(brand => (
+              <button
+                key={brand}
+                onClick={() => handleBrandFilter(brand)}
+                style={{
+                  background: activeBrand === brand ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${activeBrand === brand ? 'rgba(249,115,22,0.6)' : 'rgba(255,255,255,0.1)'}`,
+                  color: activeBrand === brand ? '#f97316' : '#aaa',
+                  padding: '6px 16px',
+                  borderRadius: '100px',
+                  fontSize: '13px',
+                  fontWeight: activeBrand === brand ? 700 : 400,
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.15s',
+                  letterSpacing: '0.04em',
+                }}
+                onMouseEnter={e => {
+                  if (activeBrand !== brand) {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249,115,22,0.4)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f97316'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (activeBrand !== brand) {
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#aaa'
+                  }
+                }}
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
 
           {/* Search bar */}
           <div style={{
@@ -424,6 +478,7 @@ export default function Home() {
                 {result.query_parsed.size && <span>📏 Size: {result.query_parsed.size}&quot;</span>}
                 {result.query_parsed.finish && <span>🎨 Finish: {result.query_parsed.finish}</span>}
                 {result.query_parsed.boltPattern && <span>🔩 Bolt: {result.query_parsed.boltPattern}</span>}
+                {result.query_parsed.brand && <span>🏷️ Brand: {result.query_parsed.brand}</span>}
                 <span style={{ marginLeft: 'auto', color: '#aaa' }}>{result.total} result{result.total !== 1 ? 's' : ''}</span>
               </div>
             )}

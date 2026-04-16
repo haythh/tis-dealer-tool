@@ -8,6 +8,7 @@ interface ParsedQuery {
   size: string | null
   finish: string | null
   boltPattern: string | null
+  brand: string | null
 }
 
 async function parseQueryWithGemini(query: string): Promise<ParsedQuery> {
@@ -42,7 +43,8 @@ Rules:
 - wheelModel is the TIS wheel model number (e.g., "544", "554", "535")
 - size is just the diameter number as string (e.g., "20", "22", "24")
 - finish examples: "Black", "Chrome", "Machined", "Gloss Black", "Bronze"
-- boltPattern only if explicitly mentioned`
+- boltPattern only if explicitly mentioned
+- brand: one of "TIS", "DTS", "TIS Motorsports" or null. Detect from keywords: "dropstars" or "dts" → "DTS", "motorsports" → "TIS Motorsports", "tis" alone → "TIS"`
 
     const result = await model.generateContent(prompt)
     const text = result.response.text().trim()
@@ -62,6 +64,7 @@ function parseQueryFallback(query: string): ParsedQuery {
     size: null,
     finish: null,
     boltPattern: null,
+    brand: null,
   }
 
   // Extract year
@@ -153,6 +156,12 @@ function parseQueryFallback(query: string): ParsedQuery {
   const bpMatch = q.match(/\b(\d)x(\d+\.?\d*)\b/i)
   if (bpMatch) parsed.boltPattern = bpMatch[0]
 
+  // Extract brand
+  if (q.includes('dts') || q.includes('dropstars')) parsed.brand = 'DTS'
+  else if (q.includes('motorsports')) parsed.brand = 'TIS Motorsports'
+  else if (q.includes('tis')) parsed.brand = 'TIS'
+  else parsed.brand = null
+
   return parsed
 }
 
@@ -217,6 +226,10 @@ export async function POST(request: NextRequest) {
           wheelQuery += ' AND LOWER(color_finish) LIKE LOWER(?)'
           wheelParams.push(`%${parsed.finish}%`)
         }
+        if (parsed.brand) {
+          wheelQuery += ' AND UPPER(brand) = UPPER(?)'
+          wheelParams.push(parsed.brand)
+        }
 
         wheelQuery += ' ORDER BY map_price ASC LIMIT 100'
         wheels = db.prepare(wheelQuery).all(...wheelParams) as Wheel[]
@@ -243,6 +256,10 @@ export async function POST(request: NextRequest) {
       if (parsed.boltPattern) {
         const patterns = normalizeBoltPattern(parsed.boltPattern)
         conditions.push(`UPPER(bolt_pattern) IN (${patterns.map(p => `UPPER('${p.replace(/'/g, "''")}')`).join(',')})`)
+      }
+      if (parsed.brand) {
+        conditions.push('UPPER(brand) = UPPER(?)')
+        params.push(parsed.brand)
       }
 
       if (conditions.length > 0) {

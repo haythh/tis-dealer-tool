@@ -113,7 +113,7 @@ const VEHICLES = [
   // BMW
   { year_start: 2018, year_end: 2026, make: 'BMW', model: 'X5', bolt_pattern: '5x112', lug_count: 5 },
   { year_start: 2020, year_end: 2026, make: 'BMW', model: 'X6', bolt_pattern: '5x112', lug_count: 5 },
-  // Audi  
+  // Audi
   { year_start: 2019, year_end: 2026, make: 'Audi', model: 'Q7', bolt_pattern: '5x112', lug_count: 5 },
   { year_start: 2019, year_end: 2026, make: 'Audi', model: 'Q8', bolt_pattern: '5x112', lug_count: 5 },
   // Volkswagen
@@ -124,6 +124,17 @@ const VEHICLES = [
   // GMC Hummer EV
   { year_start: 2022, year_end: 2026, make: 'GMC', model: 'Hummer EV', bolt_pattern: '8x180', lug_count: 8 },
 ]
+
+// ============================================================
+// BRAND NORMALIZATION
+// ============================================================
+function normalizeBrand(raw) {
+  const b = String(raw || '').trim()
+  if (b.toLowerCase().includes('dropstars trail')) return 'DTS'
+  if (b.toLowerCase().includes('motorsports')) return 'TIS Motorsports'
+  if (b.toLowerCase() === 'tis') return 'TIS'
+  return b || 'TIS'
+}
 
 // ============================================================
 // BOLT PATTERN NORMALIZATION
@@ -144,67 +155,37 @@ function normalizeBP(bp) {
 }
 
 // ============================================================
-// PARSE XLSX FILES
+// PARSE tis-full-catalog.xlsx
 // ============================================================
-console.log('📄 Reading masterlist...')
-const masterlistPath = join(ROOT, 'tis-masterlist.xlsx')
-const masterlistWb = XLSX.readFile(masterlistPath)
-const masterlistSheet = masterlistWb.Sheets[masterlistWb.SheetNames[0]]
+console.log('📄 Reading tis-full-catalog.xlsx...')
+const catalogPath = join(ROOT, 'tis-full-catalog.xlsx')
+const catalogWb = XLSX.readFile(catalogPath)
+const catalogSheet = catalogWb.Sheets[catalogWb.SheetNames[0]]
 
-// Get raw array of arrays (row 3 = headers at index 2, data starts row 4 at index 3)
-const masterlistRaw = XLSX.utils.sheet_to_json(masterlistSheet, { header: 1, defval: '' })
-console.log(`  Total rows in masterlist: ${masterlistRaw.length}`)
-console.log(`  Header row (row 3):`, masterlistRaw[2]?.slice(0, 12))
+// Row 1 = headers (index 0), data starts at row 2 (index 1)
+const catalogRaw = XLSX.utils.sheet_to_json(catalogSheet, { header: 1, defval: '' })
+console.log(`  Total rows (including header): ${catalogRaw.length}`)
+console.log(`  Headers:`, catalogRaw[0])
 
-// Data starts at index 3 (row 4)
-const masterlistData = masterlistRaw.slice(3).filter(row => row[0]) // filter empty rows
+const catalogData = catalogRaw.slice(1).filter(row => row[0]) // skip header, filter empty
+console.log(`  Data rows: ${catalogData.length}`)
 
-console.log(`  Data rows: ${masterlistData.length}`)
-console.log(`  Sample row 1:`, masterlistData[0]?.slice(0, 12))
-
-console.log('\n📄 Reading MAP pricing...')
-const mapPath = join(ROOT, 'tis-map-pricing.xlsx')
-const mapWb = XLSX.readFile(mapPath)
-const mapSheet = mapWb.Sheets[mapWb.SheetNames[0]]
-const mapRaw = XLSX.utils.sheet_to_json(mapSheet, { header: 1, defval: '' })
-
-// Row 1 = headers at index 0
-const mapHeaders = mapRaw[0]
-console.log(`  Headers:`, mapHeaders)
-const mapData = mapRaw.slice(1).filter(row => row[0])
-console.log(`  Data rows: ${mapData.length}`)
-
-// Find column indices in MAP pricing
-const oracleIdx = mapHeaders.findIndex(h => String(h).toUpperCase().includes('ORACLE'))
-const supplierIdx = mapHeaders.findIndex(h => String(h).toUpperCase().includes('SUPPLIER'))
-const upcIdx = mapHeaders.findIndex(h => String(h).toUpperCase().includes('UPC'))
-const mapPriceIdx = mapHeaders.findIndex(h => String(h).toUpperCase().includes('MAP') || String(h).toUpperCase().includes('PROPOSED'))
-const sizeIdx = mapHeaders.findIndex(h => String(h).toUpperCase().includes('UNIT_SIZE') || String(h).toUpperCase().includes('SIZE'))
-
-console.log(`  Column indices — oracle:${oracleIdx} supplier:${supplierIdx} upc:${upcIdx} mapPrice:${mapPriceIdx}`)
-
-// Build UPC → MAP pricing lookup
-const mapByUpc = new Map()
-const mapBySupplier = new Map()
-
-for (const row of mapData) {
-  const oracle = String(row[oracleIdx] || '').trim()
-  const supplier = String(row[supplierIdx] || '').trim()
-  const upcRaw = String(row[upcIdx] || '').trim()
-  const mapPrice = parseFloat(String(row[mapPriceIdx] || '').replace(/[^0-9.]/g, '')) || null
-
-  if (upcRaw) {
-    // Strip leading zeros for matching
-    const upcNorm = upcRaw.replace(/^0+/, '')
-    mapByUpc.set(upcNorm, { oracle, supplier, mapPrice })
-  }
-  if (supplier) {
-    mapBySupplier.set(supplier.toLowerCase(), { oracle, supplier, mapPrice })
-  }
-}
-
-console.log(`  MAP lookup by UPC: ${mapByUpc.size} entries`)
-console.log(`  MAP lookup by supplier: ${mapBySupplier.size} entries`)
+// Column indices (0-based, confirmed from header inspection):
+// 0:  Oracle #
+// 2:  Supplier #
+// 3:  UPC Code
+// 7:  Brand
+// 8:  Brand Style
+// 10: Style Name
+// 15: Size
+// 16: Lug Ct
+// 18: Bolt Pattern
+// 19: LugxBolt #1
+// 20: LugxBolt #2
+// 22: Offset
+// 24: Hub Bore
+// 28: Finish Name
+// 34: MAP Price
 
 // ============================================================
 // OPEN DATABASE
@@ -261,13 +242,14 @@ db.exec(`CREATE INDEX IF NOT EXISTS idx_wheels_bolt ON wheels(bolt_pattern)`)
 db.exec(`CREATE INDEX IF NOT EXISTS idx_wheels_model ON wheels(model)`)
 db.exec(`CREATE INDEX IF NOT EXISTS idx_wheels_size ON wheels(size)`)
 db.exec(`CREATE INDEX IF NOT EXISTS idx_wheels_upc ON wheels(upc)`)
+db.exec(`CREATE INDEX IF NOT EXISTS idx_wheels_brand ON wheels(brand)`)
 db.exec(`CREATE INDEX IF NOT EXISTS idx_vehicles_make ON vehicles(make)`)
 db.exec(`CREATE INDEX IF NOT EXISTS idx_vehicles_bolt ON vehicles(bolt_pattern)`)
 
 // ============================================================
-// INSERT WHEELS
+// INSERT WHEELS FROM CATALOG
 // ============================================================
-console.log('\n⚙️  Inserting wheel data...')
+console.log('\n⚙️  Inserting wheel data from tis-full-catalog.xlsx...')
 
 const insertWheel = db.prepare(`
   INSERT INTO wheels (supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url)
@@ -275,75 +257,62 @@ const insertWheel = db.prepare(`
 `)
 
 let inserted = 0
-let matched = 0
-let noAtd = 0
+let brandCounts = {}
 
 const insertMany = db.transaction((rows) => {
   for (const row of rows) {
-    // Col indices (0-based): 
-    // 0: Supplier P/N, 1: Brand, 2: Wheel Model, 3: Color/Finish, 4: Size
-    // 5: Offset, 6: Bolt Pattern, 7: Hub Bore, 8: Placement, 9: Material
-    // 10: Fitment, 11: MSRP, ... 17: UPC (col 18 = index 17), 20: Image URL (col 21 = index 20)
-    const supplierPn = String(row[0] || '').trim()
-    const brand = String(row[1] || 'TIS').trim()
-    const model = String(row[2] || '').trim()
-    const colorFinish = String(row[3] || '').trim()
-    const size = String(row[4] || '').trim()
-    const offsetMm = String(row[5] || '').trim()
-    const boltPatternRaw = String(row[6] || '').trim()
-    const boltPattern = normalizeBP(boltPatternRaw)
-    const hubBore = String(row[7] || '').trim()
-    const placement = String(row[8] || '').trim()
-    const material = String(row[9] || '').trim()
-    const fitmentCategory = String(row[10] || '').trim()
-    const msrpRaw = parseFloat(String(row[11] || '').replace(/[^0-9.]/g, '')) || null
-    const upcRaw = String(row[17] || '').trim()
-    const imageUrl = String(row[20] || '').trim() || null
-
-    // Try to find MAP pricing match
-    const upcNorm = upcRaw.replace(/^0+/, '')
-    let oracleId = null
-    let mapPrice = null
-
-    let mapEntry = mapByUpc.get(upcNorm)
-    if (!mapEntry && upcRaw) {
-      // Try with padded UPC (some have leading zeros stripped)
-      for (const [key, val] of mapByUpc.entries()) {
-        if (key === upcNorm || key.replace(/^0+/, '') === upcNorm) {
-          mapEntry = val
-          break
-        }
-      }
-    }
-
-    // Fallback: match by supplier part number
-    if (!mapEntry && supplierPn) {
-      mapEntry = mapBySupplier.get(supplierPn.toLowerCase())
-    }
-
-    if (mapEntry) {
-      oracleId = mapEntry.oracle || null
-      mapPrice = mapEntry.mapPrice
-      matched++
-    } else {
-      noAtd++
-    }
+    const oracleId   = String(row[0]  || '').trim() || null
+    const supplierPn = String(row[2]  || '').trim()
+    const upc        = String(row[3]  || '').trim()
+    const brandRaw   = String(row[7]  || '').trim()
+    const brand      = normalizeBrand(brandRaw)
+    const model      = String(row[8]  || '').trim()
+    const size       = String(row[15] || '').trim()
+    const bpRaw      = String(row[18] || '').trim()
+    // Keep the full dual-pattern bolt pattern as-is (e.g. "6X135 / 6X5.50")
+    // Also store normalized for search matching
+    const boltPattern = bpRaw || normalizeBP(String(row[19] || '').trim())
+    const offsetMm   = String(row[22] || '').trim()
+    const hubBore    = String(row[24] || '').trim()
+    const colorFinish = String(row[28] || '').trim()
+    const mapPriceRaw = row[34]
+    const mapPrice   = typeof mapPriceRaw === 'number'
+      ? mapPriceRaw
+      : (parseFloat(String(mapPriceRaw || '').replace(/[^0-9.]/g, '')) || null)
 
     const atdUrl = oracleId ? `https://atdonline.com/p/${oracleId}/detailPage` : null
 
+    brandCounts[brand] = (brandCounts[brand] || 0) + 1
+
     insertWheel.run(
-      supplierPn, oracleId, brand, model, colorFinish, size, offsetMm,
-      boltPattern, hubBore, placement, material, fitmentCategory,
-      msrpRaw, mapPrice, upcRaw, imageUrl, atdUrl
+      supplierPn,
+      oracleId,
+      brand,
+      model,
+      colorFinish,
+      size,
+      offsetMm,
+      boltPattern,
+      hubBore,
+      '',    // placement
+      '',    // material
+      '',    // fitment_category
+      mapPrice, // msrp = MAP Price
+      mapPrice, // map_price = MAP Price
+      upc,
+      null,  // image_url
+      atdUrl
     )
     inserted++
   }
 })
 
-insertMany(masterlistData)
+insertMany(catalogData)
 console.log(`  ✅ Inserted: ${inserted} wheels`)
-console.log(`  🔗 Matched to ATD: ${matched}`)
-console.log(`  ⚠️  No ATD match: ${noAtd}`)
+console.log(`  📊 By brand:`)
+for (const [brand, count] of Object.entries(brandCounts)) {
+  console.log(`     ${brand}: ${count}`)
+}
 
 // ============================================================
 // INSERT VEHICLES
@@ -381,48 +350,30 @@ console.log(`  Vehicles total:    ${vehicleCount}`)
 
 // Sample query
 const sample = db.prepare(`
-  SELECT w.model, w.color_finish, w.bolt_pattern, w.size, w.map_price, w.atd_url
-  FROM wheels w 
+  SELECT w.brand, w.model, w.color_finish, w.bolt_pattern, w.size, w.map_price, w.atd_url
+  FROM wheels w
   WHERE w.atd_url IS NOT NULL
   LIMIT 3
 `).all()
 
 console.log('\n🔍 Sample wheels with ATD URLs:')
 sample.forEach(w => {
-  console.log(`  ${w.model} | ${w.color_finish} | ${w.bolt_pattern} | ${w.size} | $${w.map_price} | ${w.atd_url}`)
+  console.log(`  [${w.brand}] ${w.model} | ${w.color_finish} | ${w.bolt_pattern} | ${w.size} | $${w.map_price} | ${w.atd_url}`)
 })
 
-// --- FIX: supplier_pn that looks like oracle IDs (A-prefix) ---
-const fixedOracles = db.prepare(`UPDATE wheels SET oracle_id = supplier_pn, atd_url = 'https://atdonline.com/p/' || supplier_pn || '/detailPage' WHERE supplier_pn LIKE 'A%' AND (oracle_id IS NULL OR oracle_id = '')`).run()
-if (fixedOracles.changes > 0) console.log(`  Fixed ${fixedOracles.changes} wheels with A-prefix supplier_pn as oracle_id`)
+// ============================================================
+// STOCK COLUMNS & IMPORT ATD SCRAPE RESULTS
+// ============================================================
+try { db.exec("ALTER TABLE wheels ADD COLUMN in_stock INTEGER DEFAULT 1") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN stock_pickup INTEGER DEFAULT 0") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN stock_today INTEGER DEFAULT 0") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN stock_tomorrow INTEGER DEFAULT 0") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN stock_national INTEGER DEFAULT 0") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN total_stock INTEGER DEFAULT 0") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN atd_image_url TEXT") } catch {}
+try { db.exec("ALTER TABLE wheels ADD COLUMN stock_updated_at TEXT") } catch {}
 
-// --- IMPORT STOCK DATA ---
 console.log('\n📦 Importing ATD stock data...')
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN in_stock INTEGER DEFAULT 1")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN stock_pickup INTEGER DEFAULT 0")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN stock_today INTEGER DEFAULT 0")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN stock_tomorrow INTEGER DEFAULT 0")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN stock_national INTEGER DEFAULT 0")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN total_stock INTEGER DEFAULT 0")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN atd_image_url TEXT")
-} catch {}
-try {
-  db.exec("ALTER TABLE wheels ADD COLUMN stock_updated_at TEXT")
-} catch {}
-
 const scrapeFile = join(__dirname, '..', 'data', 'atd-scrape-results.json')
 try {
   const scrapeData = JSON.parse(readFileSync(scrapeFile, 'utf-8'))
@@ -461,10 +412,12 @@ try {
   console.log(`  Stock updated: ${stockUpdated}`)
   console.log(`  In stock: ${inStock} | Out of stock: ${outStock}`)
 } catch (e) {
-  console.log('  ⚠️  No stock data file found — skipping stock import')
+  console.log('  ⚠️  No stock data file found or parse error — skipping stock import:', e.message)
 }
 
-// --- IMPORT TOUGHASSETS IMAGES ---
+// ============================================================
+// IMPORT TOUGHASSETS IMAGES
+// ============================================================
 console.log('\n🖼️  Importing ToughAssets images...')
 try {
   db.exec("ALTER TABLE wheels ADD COLUMN ta_image_url TEXT")
