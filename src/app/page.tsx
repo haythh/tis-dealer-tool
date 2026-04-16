@@ -58,9 +58,9 @@ const EXAMPLE_QUERIES = [
 ]
 
 const BRAND_FILTERS = [
-  { name: 'TIS', logo: '/tis-logo-white.svg', width: 44 },
-  { name: 'DTS', logo: '/dts-logo-white.svg', width: 52 },
-  { name: 'TIS Motorsports', logo: '/tismotorsports-logo-white.svg', width: 108 },
+  { name: 'TIS', label: 'TIS' },
+  { name: 'DTS', label: 'DTS' },
+  { name: 'TIS Motorsports', label: 'TIS MOTORSPORTS' },
 ]
 
 function WheelCard({ wheel }: { wheel: Wheel }) {
@@ -87,11 +87,11 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
 
   const brandLogoHeight =
     wheel.brand === 'TIS'
-      ? 30
+      ? 22
       : wheel.brand === 'DTS'
-        ? 45
+        ? 54
         : wheel.brand === 'TIS Motorsports'
-          ? 24
+          ? 19
           : 30
 
   return (
@@ -146,13 +146,13 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       </div>
 
       <div style={{ padding: '16px' }}>
-        <div style={{ marginBottom: '4px', minHeight: '16px', display: 'flex', alignItems: 'center' }}>
+        <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>
           {brandLogoSrc ? (
             <img
               src={brandLogoSrc}
               alt={wheel.brand}
               height={brandLogoHeight}
-              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain' }}
+              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain', margin: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? '0' : undefined, display: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? 'inline-block' : undefined }}
             />
           ) : (
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -436,7 +436,7 @@ export default function Home() {
           )}
 
           <div className="search-animate" style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
-            {BRAND_FILTERS.map(({ name, logo, width }) => (
+            {BRAND_FILTERS.map(({ name, label }) => (
               <button
                 key={name}
                 onClick={() => handleBrandFilter(name)}
@@ -444,11 +444,14 @@ export default function Home() {
                 style={{
                   background: activeBrand === name ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.04)',
                   border: `1px solid ${activeBrand === name ? 'rgba(220,38,38,0.6)' : 'rgba(255,255,255,0.1)'}`,
-                  color: activeBrand === name ? '#dc2626' : '#aaa',
+                  color: '#fff',
                   padding: '10px 16px',
-                  borderRadius: '100px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
                   transition: 'all 0.15s',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -469,20 +472,20 @@ export default function Home() {
                   }
                 }}
               >
-                <img src={logo} alt={name} style={{ height: '22px', width: `${width}px`, objectFit: 'contain', display: 'block' }} />
+                {label}
               </button>
             ))}
           </div>
 
           <div className="search-animate" style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ddd', fontSize: '13px', cursor: 'pointer' }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ddd', fontSize: '13px', cursor: 'pointer', textTransform: 'uppercase' }}>
               <input
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={e => setInStockOnly(e.target.checked)}
                 style={{ accentColor: '#dc2626', cursor: 'pointer' }}
               />
-              In Stock Only
+              IN STOCK ONLY
             </label>
           </div>
 
