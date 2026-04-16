@@ -64,7 +64,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         background: 'rgba(255,255,255,0.04)',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: '12px',
-        overflow: 'hidden',
+        overflow: 'visible',
+        position: 'relative' as const,
         transition: 'border-color 0.2s, transform 0.2s',
       }}
       onMouseEnter={e => {

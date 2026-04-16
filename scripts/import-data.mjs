@@ -392,5 +392,73 @@ sample.forEach(w => {
   console.log(`  ${w.model} | ${w.color_finish} | ${w.bolt_pattern} | ${w.size} | $${w.map_price} | ${w.atd_url}`)
 })
 
+// --- IMPORT STOCK DATA ---
+console.log('\n📦 Importing ATD stock data...')
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN in_stock INTEGER DEFAULT 1")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN stock_pickup INTEGER DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN stock_today INTEGER DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN stock_tomorrow INTEGER DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN stock_national INTEGER DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN total_stock INTEGER DEFAULT 0")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN atd_image_url TEXT")
+} catch {}
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN stock_updated_at TEXT")
+} catch {}
+
+const scrapeFile = join(__dirname, '..', 'data', 'atd-scrape-results.json')
+try {
+  const scrapeData = JSON.parse(readFileSync(scrapeFile, 'utf-8'))
+  const stockUpdate = db.prepare(`
+    UPDATE wheels SET
+      in_stock = ?,
+      stock_pickup = ?,
+      stock_today = ?,
+      stock_tomorrow = ?,
+      stock_national = ?,
+      total_stock = ?,
+      atd_image_url = COALESCE(?, atd_image_url),
+      stock_updated_at = ?
+    WHERE oracle_id = ?
+  `)
+  let stockUpdated = 0
+  const stockTxn = db.transaction(() => {
+    for (const item of scrapeData) {
+      const result = stockUpdate.run(
+        item.inStock ? 1 : 0,
+        item.stockPickup || 0,
+        item.stockToday || 0,
+        item.stockTomorrow || 0,
+        item.stockNational || 0,
+        item.totalStock || 0,
+        item.imageUrl || null,
+        item.scrapedAt || new Date().toISOString(),
+        item.oracleId
+      )
+      if (result.changes > 0) stockUpdated++
+    }
+  })
+  stockTxn()
+  const inStock = db.prepare("SELECT COUNT(*) as c FROM wheels WHERE in_stock = 1 AND stock_updated_at IS NOT NULL").get().c
+  const outStock = db.prepare("SELECT COUNT(*) as c FROM wheels WHERE in_stock = 0 AND stock_updated_at IS NOT NULL").get().c
+  console.log(`  Stock updated: ${stockUpdated}`)
+  console.log(`  In stock: ${inStock} | Out of stock: ${outStock}`)
+} catch (e) {
+  console.log('  ⚠️  No stock data file found — skipping stock import')
+}
+
 db.close()
 console.log('\n✅ Import complete!')
