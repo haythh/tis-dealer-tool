@@ -27,6 +27,7 @@ interface Wheel {
   stock_tomorrow: number | null
   stock_national: number | null
   atd_image_url: string | null
+  ta_image_url: string | null
 }
 
 interface SearchResponse {
@@ -85,9 +86,9 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       )}
       {/* Image */}
       <div style={{ background: '#111', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {(wheel.atd_image_url || wheel.image_url) && !imgError ? (
+        {(wheel.ta_image_url || wheel.atd_image_url || wheel.image_url) && !imgError ? (
           <Image
-            src={(wheel.atd_image_url || wheel.image_url) as string}
+            src={(wheel.ta_image_url || wheel.atd_image_url || wheel.image_url) as string}
             alt={`${wheel.model} ${wheel.color_finish}`}
             fill
             style={{ objectFit: 'contain', padding: '12px' }}

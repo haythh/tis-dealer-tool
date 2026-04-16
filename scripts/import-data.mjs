@@ -464,5 +464,35 @@ try {
   console.log('  ⚠️  No stock data file found — skipping stock import')
 }
 
+// --- IMPORT TOUGHASSETS IMAGES ---
+console.log('\n🖼️  Importing ToughAssets images...')
+try {
+  db.exec("ALTER TABLE wheels ADD COLUMN ta_image_url TEXT")
+} catch {}
+
+try {
+  const taRes = await fetch('https://toughassets.com/api/public/tis/assets')
+  const taData = await taRes.json()
+  const taAssets = (taData.assets || taData).filter(a => a.categoryName === 'Wheels' || a.categoryName === 'Products')
+  const taMapping = {}
+  for (const a of taAssets) {
+    const name = a.originalName.replace(/\.(png|jpg|webp|jpeg)$/i, '')
+    const model = name.split(/[-.\s]/)[0].toUpperCase()
+    const url = a.thumbUrl || `https://toughassets.com/api/file/${a.id}`
+    if (!taMapping[model]) taMapping[model] = url
+  }
+  const taUpdate = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE UPPER(model) = ?')
+  let taUpdated = 0
+  const taTxn = db.transaction(() => {
+    for (const [model, url] of Object.entries(taMapping)) {
+      taUpdated += taUpdate.run(url, model).changes
+    }
+  })
+  taTxn()
+  console.log(`  Mapped ${Object.keys(taMapping).length} models, updated ${taUpdated} wheels`)
+} catch (e) {
+  console.log('  ⚠️  ToughAssets image import failed:', e.message)
+}
+
 db.close()
 console.log('\n✅ Import complete!')
