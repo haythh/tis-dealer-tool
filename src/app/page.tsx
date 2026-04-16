@@ -89,7 +89,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
     wheel.brand === 'TIS'
       ? 22
       : wheel.brand === 'DTS'
-        ? 54
+        ? 22
         : wheel.brand === 'TIS Motorsports'
           ? 19
           : 30
