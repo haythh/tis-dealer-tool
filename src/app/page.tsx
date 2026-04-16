@@ -424,10 +424,10 @@ export default function Home() {
               }}>
                 TIS Wheels × ATDOnline
               </div>
-              <h1 style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                Find the right wheel.
+              <h1 style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.1, textTransform: 'uppercase' }}>
+                FIND THE RIGHT WHEEL FAST.
                 <br />
-                <span style={{ color: '#dc2626' }}>Ship it from ATD.</span>
+                <span style={{ color: '#dc2626' }}>ATD DELIVERS.</span>
               </h1>
               <p style={{ fontSize: '16px', color: '#888', margin: '0 0 40px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
                 Search TIS wheels by vehicle fitment, model, size, or finish and get direct ATDOnline order links.
