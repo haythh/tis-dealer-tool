@@ -428,20 +428,26 @@ try {
   const taData = await taRes.json()
   const taAssets = (taData.assets || taData).filter(a => a.categoryName === 'Wheels' || a.categoryName === 'Products')
 
-  const extractTaModelCandidates = (originalName) => {
-    const baseName = String(originalName || '').replace(/\.(png|jpg|webp|jpeg)$/i, '').trim()
-    if (!baseName) return []
+  const normalizeTaModel = (value) => String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+
+  const extractTaModelCandidates = (asset) => {
+    const candidates = []
+    const addCandidate = (value) => {
+      const cleaned = normalizeTaModel(value)
+      if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
+    }
+
+    const primaryTag = (Array.isArray(asset?.tags) ? asset.tags : [])
+      .find(tag => String(tag || '').trim() && !String(tag).toLowerCase().startsWith('brand:'))
+    if (primaryTag) addCandidate(primaryTag)
+
+    const baseName = String(asset?.originalName || '').replace(/\.(png|jpg|webp|jpeg)$/i, '').trim()
+    if (!baseName) return candidates
 
     const normalized = baseName
       .replace(/^dts[-_\s]*/i, '')
       .replace(/^tis[-_\s]*/i, '')
       .trim()
-
-    const candidates = []
-    const addCandidate = (value) => {
-      const cleaned = String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
-      if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
-    }
 
     const leadingModelMatch = normalized.match(/^([0-9]+[A-Z0-9]*)/i)
     if (leadingModelMatch) addCandidate(leadingModelMatch[1])
@@ -455,29 +461,44 @@ try {
   const taMapping = {}
   for (const a of taAssets) {
     const url = a.thumbUrl || `https://toughassets.com/api/file/${a.id}`
-    for (const model of extractTaModelCandidates(a.originalName)) {
+    for (const model of extractTaModelCandidates(a)) {
       if (!taMapping[model]) taMapping[model] = url
     }
   }
 
-  const taUpdate = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE id = ?')
-  const wheels = db.prepare('SELECT id, model FROM wheels').all()
+  const taUpdateByModel = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE UPPER(model) = ?')
+  const taUpdateById = db.prepare('UPDATE wheels SET ta_image_url = ? WHERE id = ?')
   let taUpdated = 0
 
   const taTxn = db.transaction(() => {
-    for (const wheel of wheels) {
-      const model = String(wheel.model || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
-      if (!model) continue
+    for (const [model, url] of Object.entries(taMapping)) {
+      taUpdated += taUpdateByModel.run(url, model).changes
+    }
 
-      const candidates = [model]
-      if (model.endsWith('B') && model.length > 1) candidates.push(model.slice(0, -1))
-      const fallback = String(wheel.model || '').trim().toUpperCase().split(/[-.\s]/)[0].replace(/[^A-Z0-9]/g, '')
-      if (fallback && !candidates.includes(fallback)) candidates.push(fallback)
+    const wheels = db.prepare('SELECT id, model FROM wheels WHERE ta_image_url IS NULL').all()
+    for (const wheel of wheels) {
+      const rawModel = String(wheel.model || '').trim()
+      if (!rawModel) continue
+
+      const candidates = []
+      const addCandidate = (value) => {
+        const cleaned = normalizeTaModel(value)
+        if (cleaned && !candidates.includes(cleaned)) candidates.push(cleaned)
+      }
+
+      addCandidate(rawModel)
+      addCandidate(rawModel.split(/[-.\s]/)[0])
+      addCandidate(rawModel.replace(/\bDUALLY\b.*$/i, '').trim())
+      addCandidate(rawModel.replace(/\b2\.0\b/ig, '').trim())
+      addCandidate(rawModel.replace(/\bDUALLY\b.*$/i, '').replace(/\b2\.0\b/ig, '').trim())
+      if (normalizeTaModel(rawModel).endsWith('B') && normalizeTaModel(rawModel).length > 1) {
+        addCandidate(normalizeTaModel(rawModel).slice(0, -1))
+      }
 
       const matchedUrl = candidates.map(candidate => taMapping[candidate]).find(Boolean)
       if (!matchedUrl) continue
 
-      taUpdated += taUpdate.run(matchedUrl, wheel.id).changes
+      taUpdated += taUpdateById.run(matchedUrl, wheel.id).changes
     }
   })
   taTxn()
