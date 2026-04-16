@@ -81,12 +81,19 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
 
   const brandLogoSrc =
     wheel.brand === 'TIS'
-      ? '/tis-logo-white.svg'
+      ? '/tis-word-logo.png'
       : wheel.brand === 'DTS'
         ? '/dts-logo-white.svg'
         : wheel.brand === 'TIS Motorsports'
           ? '/tismotorsports-logo-white.svg'
           : null
+
+  const brandLogoHeight =
+    wheel.brand === 'TIS'
+      ? 30
+      : wheel.brand === 'DTS' || wheel.brand === 'TIS Motorsports'
+        ? 45
+        : 30
 
   return (
     <div
@@ -145,8 +152,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             <img
               src={brandLogoSrc}
               alt={wheel.brand}
-              height={30}
-              style={{ height: '30px', width: 'auto', objectFit: 'contain' }}
+              height={brandLogoHeight}
+              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain' }}
             />
           ) : (
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
