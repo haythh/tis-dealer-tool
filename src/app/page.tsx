@@ -57,7 +57,7 @@ interface SearchResponse {
 
 const EXAMPLE_QUERIES = [
   'What fits a 2024 F-150?',
-  '22 inch wheels for RAM 1500',
+  '20" wheels for RAM 1500',
   'TIS 544 in black',
   'DTS wheels 20 inch',
   'Chrome wheels for Chevy Silverado',
@@ -92,7 +92,10 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
   const initialSelected = gallery[0] ?? null
   const [imgError, setImgError] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<GalleryItem | null>(initialSelected)
-  const imageUrl = !imgError ? (selectedMedia?.type === 'video' ? null : (selectedMedia?.fullUrl || selectedMedia?.url || wheel.ta_image_url || wheel.atd_image_url)) : null
+  // Prefer the thumb URL (`url`) over `fullUrl` for images: the ToughAssets
+  // `/api/file/<id>` binary endpoint (fullUrl) is currently unreliable, while
+  // `cdn.toughassets.com/thumbs/...` (url) is served from CDN and stable.
+  const imageUrl = !imgError ? (selectedMedia?.type === 'video' ? null : (selectedMedia?.url || selectedMedia?.fullUrl || wheel.ta_image_url || wheel.atd_image_url)) : null
 
   useEffect(() => {
     setImgError(false)
