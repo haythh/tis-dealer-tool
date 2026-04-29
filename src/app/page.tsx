@@ -82,7 +82,9 @@ const HERO_STATS = [
 
 const SAFE_DEMO_SEARCHES = ['2024 F-150', '2024 Silverado 1500', '2023 RAM 1500', '2024 Tacoma', '2024 Bronco', '6x5.50 20 inch black']
 
-function WheelCard({ wheel }: { wheel: Wheel }) {
+function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'light' }) {
+  const isLightMode = themeMode === 'light'
+
   const parseGallery = (): GalleryItem[] => {
     try {
       const parsed = wheel.ta_images_json ? JSON.parse(wheel.ta_images_json) : []
@@ -149,20 +151,20 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
     <div
       className="wheel-card"
       style={{
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: isLightMode ? '#ffffff' : 'rgba(255,255,255,0.04)',
+        border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'}`,
         borderRadius: '12px',
         overflow: 'visible',
         position: 'relative' as const,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        boxShadow: isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)',
       }}
       onMouseEnter={e => {
         ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(220,38,38,0.4)'
         ;(e.currentTarget as HTMLElement).style.boxShadow = '0 28px 80px rgba(220,38,38,0.12)'
       }}
       onMouseLeave={e => {
-        ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
-        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 20px 60px rgba(0,0,0,0.2)'
+        ;(e.currentTarget as HTMLElement).style.borderColor = isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)'
       }}
     >
       {wheel.in_stock != null && (
@@ -171,7 +173,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         </div>
       )}
 
-      <div style={{ background: '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
         {selectedMedia?.type === 'video' && videoUrl ? (
           <video
             src={videoUrl}
@@ -208,7 +210,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       </div>
 
       {gallery.length > 0 && (
-        <div style={{ display: 'flex', gap: '6px', padding: '8px', background: '#0a0a0a', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '6px', padding: '8px', background: isLightMode ? '#f8f8f8' : '#0a0a0a', overflowX: 'auto' }}>
           {gallery.map((item, index) => {
             const active = selectedMedia?.fullUrl === item.fullUrl && selectedMedia?.type === item.type
             return (
@@ -223,7 +225,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
                   height: '60px',
                   borderRadius: '4px',
                   border: `2px solid ${active ? '#dc2626' : 'rgba(255,255,255,0.14)'}`,
-                  background: '#111',
+                  background: isLightMode ? '#fff' : '#111',
                   padding: 0,
                   cursor: 'pointer',
                   overflow: 'hidden',
@@ -266,11 +268,11 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             </span>
           )}
         </div>
-        <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: '#f1f1f1', lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
           {wheel.model}
           {hasVideo && <span style={{ marginLeft: '8px', fontSize: '10px', color: '#fca5a5', border: '1px solid rgba(220,38,38,0.35)', borderRadius: '999px', padding: '3px 7px', verticalAlign: 'middle', letterSpacing: '0.08em' }}>VIDEO</span>}
         </h3>
-        <p style={{ fontSize: '13px', color: '#999', margin: '0 0 12px' }}>
+        <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>
           {wheel.color_finish}
         </p>
 
@@ -281,9 +283,9 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
             { label: 'Offset', value: wheel.offset_mm ? `${wheel.offset_mm}mm` : '—' },
             { label: 'Hub Bore', value: wheel.hub_bore ? `${wheel.hub_bore}mm` : '—' },
           ].map(({ label, value }) => (
-            <div key={label} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '6px 8px' }}>
-              <div style={{ fontSize: '10px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#ddd', marginTop: '2px' }}>{value || '—'}</div>
+            <div key={label} style={{ background: isLightMode ? '#f5f5f6' : 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '6px 8px' }}>
+              <div style={{ fontSize: '10px', color: isLightMode ? '#74747b' : '#666', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: isLightMode ? '#242428' : '#ddd', marginTop: '2px' }}>{value || '—'}</div>
             </div>
           ))}
         </div>
@@ -291,8 +293,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'baseline' }}>
           {(wheel.msrp || wheel.map_price) != null && (
             <div>
-              <div style={{ fontSize: '10px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
-              <div style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
+              <div style={{ fontSize: '10px', color: isLightMode ? '#52525b' : '#fff', textTransform: 'uppercase', letterSpacing: '0.06em' }}>MAP PRICE</div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: isLightMode ? '#111113' : '#fff' }}>{formatPrice(wheel.msrp || wheel.map_price)}</div>
             </div>
           )}
         </div>
@@ -351,6 +353,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false)
   const [activeBrand, setActiveBrand] = useState<string | null>(null)
   const [inStockOnly, setInStockOnly] = useState(true)
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const inputRef = useRef<HTMLInputElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
 
@@ -472,7 +475,35 @@ export default function Home() {
     <>
       <style jsx global>{`
         body {
-          background: #050506;
+          background: #000000;
+        }
+
+        .theme-dark {
+          --page-bg: #000000;
+          --page-text: #f4f4f5;
+          --muted-text: #b7b7b7;
+          --soft-text: #9a9aa1;
+          --header-bg: rgba(0,0,0,0.74);
+          --header-border: rgba(255,255,255,0.08);
+          --panel-bg: rgba(255,255,255,0.055);
+          --panel-border: rgba(255,255,255,0.11);
+          --search-bg: rgba(255,255,255,0.05);
+          --grid-line: rgba(255,255,255,0.055);
+          --shell-gradient: radial-gradient(circle at 16% 8%, rgba(220,38,38,0.20), transparent 30%), radial-gradient(circle at 86% 0%, rgba(255,255,255,0.08), transparent 24%), linear-gradient(180deg, #000000 0%, #000000 52%, #050505 100%);
+        }
+
+        .theme-light {
+          --page-bg: #f6f6f7;
+          --page-text: #101012;
+          --muted-text: #4e4e55;
+          --soft-text: #696970;
+          --header-bg: rgba(255,255,255,0.82);
+          --header-border: rgba(15,15,18,0.10);
+          --panel-bg: rgba(255,255,255,0.72);
+          --panel-border: rgba(15,15,18,0.10);
+          --search-bg: rgba(255,255,255,0.88);
+          --grid-line: rgba(15,15,18,0.055);
+          --shell-gradient: radial-gradient(circle at 16% 8%, rgba(220,38,38,0.10), transparent 28%), radial-gradient(circle at 86% 0%, rgba(0,0,0,0.06), transparent 22%), linear-gradient(180deg, #ffffff 0%, #f6f6f7 54%, #eeeeef 100%);
         }
 
         .btn-slide {
@@ -529,10 +560,7 @@ export default function Home() {
         .demo-shell {
           position: relative;
           overflow: hidden;
-          background:
-            radial-gradient(circle at 16% 8%, rgba(220,38,38,0.24), transparent 30%),
-            radial-gradient(circle at 86% 0%, rgba(255,255,255,0.10), transparent 24%),
-            linear-gradient(180deg, #09090b 0%, #050506 48%, #0a0a0b 100%);
+          background: var(--shell-gradient);
         }
 
         .demo-shell::before {
@@ -542,8 +570,8 @@ export default function Home() {
           pointer-events: none;
           opacity: 0.28;
           background-image:
-            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
           background-size: 58px 58px;
           mask-image: linear-gradient(to bottom, black, transparent 72%);
         }
@@ -561,8 +589,8 @@ export default function Home() {
           isolation: isolate;
           border-radius: 24px;
           padding: 18px;
-          background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035));
-          border: 1px solid rgba(255,255,255,0.13);
+          background: var(--panel-bg);
+          border: 1px solid var(--panel-border);
           box-shadow: 0 28px 100px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.08);
           backdrop-filter: blur(18px);
         }
@@ -578,8 +606,8 @@ export default function Home() {
         }
 
         .glass-card {
-          background: rgba(255,255,255,0.055);
-          border: 1px solid rgba(255,255,255,0.10);
+          background: var(--panel-bg);
+          border: 1px solid var(--panel-border);
           box-shadow: 0 16px 60px rgba(0,0,0,0.24);
           backdrop-filter: blur(16px);
         }
@@ -612,17 +640,52 @@ export default function Home() {
           left: 130%;
         }
 
+        .theme-toggle {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px;
+          border-radius: 999px;
+          border: 1px solid var(--header-border);
+          background: var(--panel-bg);
+          color: var(--page-text);
+        }
+
+        .theme-toggle button {
+          border: 0;
+          border-radius: 999px;
+          padding: 7px 11px;
+          font-family: inherit;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          cursor: pointer;
+          color: var(--soft-text);
+          background: transparent;
+          transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+        }
+
+        .theme-toggle button.active {
+          background: #dc2626;
+          color: #fff;
+        }
+
+        .theme-toggle button:active {
+          transform: scale(0.97);
+        }
+
         @media (max-width: 720px) {
           .search-frame { padding: 12px; border-radius: 18px; }
           .hero-stats { grid-template-columns: 1fr; }
         }
       `}</style>
-      <div ref={pageRef} className="demo-shell" style={{ minHeight: '100vh', color: '#f1f1f1', fontFamily: 'inherit' }}>
+      <div ref={pageRef} className={`demo-shell theme-${themeMode}`} style={{ minHeight: '100vh', color: 'var(--page-text)', fontFamily: 'inherit' }}>
       <div className="ambient-orb" style={{ width: 260, height: 260, left: -80, top: 120, background: 'rgba(220,38,38,0.24)' }} />
       <div className="ambient-orb" style={{ width: 220, height: 220, right: -70, top: 48, background: 'rgba(255,255,255,0.12)' }} />
       <div className="ambient-orb" style={{ width: 320, height: 320, right: '12%', bottom: 180, background: 'rgba(220,38,38,0.12)' }} />
       <header style={{
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid var(--header-border)',
         padding: '16px 24px',
         display: 'flex',
         alignItems: 'center',
@@ -631,17 +694,23 @@ export default function Home() {
         position: 'relative',
         zIndex: 2,
         backdropFilter: 'blur(14px)',
-        background: 'rgba(5,5,6,0.42)',
+        background: 'var(--header-bg)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto' }} />
-          <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0px', color: '#f1f1f1', textTransform: 'uppercase' }}>
+          <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto', filter: themeMode === 'light' ? 'brightness(0)' : 'none' }} />
+          <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0px', color: 'var(--page-text)', textTransform: 'uppercase' }}>
             WHEEL SEARCH
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#aaa', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          <span style={{ width: 7, height: 7, borderRadius: 999, background: '#22c55e', boxShadow: '0 0 18px rgba(34,197,94,0.85)' }} />
-          ATD demo mode
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <div className="theme-toggle" aria-label="Color mode switch">
+            <button type="button" className={themeMode === 'light' ? 'active' : ''} onClick={() => setThemeMode('light')}>Light</button>
+            <button type="button" className={themeMode === 'dark' ? 'active' : ''} onClick={() => setThemeMode('dark')}>Dark</button>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--soft-text)', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: '#22c55e', boxShadow: '0 0 18px rgba(34,197,94,0.85)' }} />
+            ATD demo mode
+          </div>
         </div>
       </header>
 
@@ -673,14 +742,14 @@ export default function Home() {
                 <br />
                 <span style={{ color: '#dc2626', textShadow: '0 0 48px rgba(220,38,38,0.35)' }}>before the customer leaves.</span>
               </h1>
-              <p className="search-animate" style={{ fontSize: '18px', color: '#b7b7b7', margin: '0 0 28px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+              <p className="search-animate" style={{ fontSize: '18px', color: 'var(--muted-text)', margin: '0 0 28px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
                 A dealer-first wheel finder with visual media, fitment-aware search, live-order intent, and direct ATDOnline handoff.
               </p>
               <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', maxWidth: 520, margin: '0 auto 34px' }}>
                 {HERO_STATS.map(stat => (
                   <div key={stat.label} className="glass-card stat-card">
-                    <div style={{ fontSize: '24px', fontWeight: 900, color: '#fff', letterSpacing: '-0.03em' }}>{stat.value}</div>
-                    <div style={{ fontSize: '10px', color: '#8f8f8f', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>{stat.label}</div>
+                    <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--page-text)', letterSpacing: '-0.03em' }}>{stat.value}</div>
+                    <div style={{ fontSize: '10px', color: 'var(--soft-text)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -696,9 +765,9 @@ export default function Home() {
                 onClick={() => handleBrandFilter(name)}
                 aria-label={`Filter by ${name}`}
                 style={{
-                  background: activeBrand === name ? 'rgba(220,38,38,0.2)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${activeBrand === name ? 'rgba(220,38,38,0.6)' : 'rgba(255,255,255,0.1)'}`,
-                  color: '#fff',
+                  background: activeBrand === name ? 'rgba(220,38,38,0.2)' : 'var(--search-bg)',
+                  border: `1px solid ${activeBrand === name ? 'rgba(220,38,38,0.6)' : 'var(--panel-border)'}`,
+                  color: 'var(--page-text)',
                   padding: '10px 16px',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -721,8 +790,8 @@ export default function Home() {
                 }}
                 onMouseLeave={e => {
                   if (activeBrand !== name) {
-                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.1)'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--search-bg)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--panel-border)'
                   }
                 }}
               >
@@ -751,14 +820,14 @@ export default function Home() {
             <div style={{
               display: 'flex',
               gap: '0',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'var(--search-bg)',
+              border: '1px solid var(--panel-border)',
               borderRadius: '12px',
               overflow: 'hidden',
               transition: 'border-color 0.2s',
             }}
               onFocusCapture={e => (e.currentTarget.style.borderColor = 'rgba(220,38,38,0.5)')}
-              onBlurCapture={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+              onBlurCapture={e => (e.currentTarget.style.borderColor = 'var(--panel-border)')}
             >
               <input
                 ref={inputRef}
@@ -772,7 +841,7 @@ export default function Home() {
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#f1f1f1',
+                  color: 'var(--page-text)',
                   fontSize: '16px',
                   padding: '16px 20px',
                   fontFamily: 'inherit',
@@ -817,9 +886,9 @@ export default function Home() {
                   className="demo-pill"
                   onClick={() => handleSearch(q)}
                   style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: '#aaa',
+                    background: 'var(--search-bg)',
+                    border: '1px solid var(--panel-border)',
+                    color: 'var(--soft-text)',
                     padding: '7px 14px',
                     borderRadius: '100px',
                     fontSize: '13px',
@@ -833,9 +902,9 @@ export default function Home() {
                     ;(e.currentTarget as HTMLButtonElement).style.color = '#f1f1f1'
                   }}
                   onMouseLeave={e => {
-                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#aaa'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--search-bg)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--panel-border)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--soft-text)'
                   }}
                 >
                   {q}
@@ -882,7 +951,7 @@ export default function Home() {
             )}
 
             {result?.notice && (
-              <div className="intent-banner" style={{ margin: '-10px 0 24px', padding: '12px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.10)', color: '#cfcfcf', fontSize: 13, lineHeight: 1.5 }}>
+              <div className="intent-banner" style={{ margin: '-10px 0 24px', padding: '12px 14px', borderRadius: 12, background: 'var(--panel-bg)', border: '1px solid var(--panel-border)', color: 'var(--muted-text)', fontSize: 13, lineHeight: 1.5 }}>
                 {result.notice}
               </div>
             )}
@@ -922,7 +991,7 @@ export default function Home() {
                 <p style={{ fontSize: '13px' }}>Try a different year, model, or size.</p>
                 <div style={{ marginTop: 18, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
                   {(result.suggested_queries || SAFE_DEMO_SEARCHES).map(q => (
-                    <button key={q} className="demo-pill" onClick={() => handleSearch(q)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#ddd', borderRadius: 999, padding: '8px 13px', cursor: 'pointer' }}>
+                    <button key={q} className="demo-pill" onClick={() => handleSearch(q)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--panel-border)', color: '#ddd', borderRadius: 999, padding: '8px 13px', cursor: 'pointer' }}>
                       {q}
                     </button>
                   ))}
@@ -933,7 +1002,7 @@ export default function Home() {
             {!loading && result && result.wheels.length > 0 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', paddingBottom: '60px' }}>
                 {result.wheels.map(wheel => (
-                  <WheelCard key={wheel.id} wheel={wheel} />
+                  <WheelCard key={wheel.id} wheel={wheel} themeMode={themeMode} />
                 ))}
               </div>
             )}
