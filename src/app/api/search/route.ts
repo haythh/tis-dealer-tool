@@ -11,6 +11,49 @@ interface ParsedQuery {
   brand: string | null
 }
 
+type FitmentStatus = 'exact' | 'bolt_pattern' | 'demo_fallback' | 'catalog_search'
+
+function selectedWheelFields() {
+  return 'id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at'
+}
+
+function demoFallbackWheels(db: ReturnType<typeof getDb>, parsed: ParsedQuery, inStockOnly: boolean): Wheel[] {
+  const conditions = ['ta_image_url IS NOT NULL']
+  const params: (string | number)[] = []
+
+  if (parsed.brand) {
+    conditions.push('UPPER(brand) = UPPER(?)')
+    params.push(parsed.brand)
+  }
+
+  if (parsed.size) {
+    conditions.push('size LIKE ?')
+    params.push(`%${parsed.size}%`)
+  }
+
+  if (parsed.finish) {
+    conditions.push('LOWER(color_finish) LIKE LOWER(?)')
+    params.push(`%${parsed.finish}%`)
+  }
+
+  const stockCondition = inStockOnly ? 'AND in_stock = 1' : ''
+  const q = `
+    SELECT ${selectedWheelFields()}
+    FROM wheels
+    WHERE ${conditions.join(' AND ')} ${stockCondition}
+    ORDER BY
+      CASE WHEN ta_images_json LIKE '%"type":"video"%' THEN 0 ELSE 1 END,
+      COALESCE(total_stock, 0) DESC,
+      map_price ASC
+    LIMIT 36
+  `
+
+  const wheels = db.prepare(q).all(...params) as Wheel[]
+  if (wheels.length || !inStockOnly) return wheels
+
+  return demoFallbackWheels(db, parsed, false)
+}
+
 async function parseQueryWithGemini(query: string): Promise<ParsedQuery> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey || apiKey === 'your_gemini_api_key_here') {
@@ -31,7 +74,8 @@ Return this exact JSON structure:
   "wheelModel": "<wheel model number/name or null>",
   "size": "<diameter in inches as string or null>",
   "finish": "<color or finish description or null>",
-  "boltPattern": "<bolt pattern like 6x5.50 or null>"
+  "boltPattern": "<bolt pattern like 6x5.50 or null>",
+  "brand": "TIS, DTS, TIS Motorsports, or null"
 }
 
 Rules:
@@ -85,6 +129,16 @@ function parseQueryFallback(query: string): ParsedQuery {
     'nissan': 'Nissan', 'titan': 'Nissan', 'frontier': 'Nissan',
     'honda': 'Honda', 'ridgeline': 'Honda', 'pilot': 'Honda',
     'tesla': 'Tesla', 'cybertruck': 'Tesla',
+    'bmw': 'BMW', 'x3': 'BMW', 'x5': 'BMW', 'x7': 'BMW',
+    'mercedes': 'Mercedes-Benz', 'mercedes-benz': 'Mercedes-Benz', 'g wagon': 'Mercedes-Benz', 'g-wagon': 'Mercedes-Benz', 'sprinter': 'Mercedes-Benz',
+    'audi': 'Audi', 'q5': 'Audi', 'q7': 'Audi', 'q8': 'Audi',
+    'lexus': 'Lexus', 'gx': 'Lexus', 'lx': 'Lexus',
+    'cadillac': 'Cadillac', 'escalade': 'Cadillac',
+    'lincoln': 'Lincoln', 'navigator': 'Lincoln',
+    'rivian': 'Rivian', 'r1t': 'Rivian', 'r1s': 'Rivian',
+    'hyundai': 'Hyundai', 'santa cruz': 'Hyundai', 'palisade': 'Hyundai',
+    'kia': 'Kia', 'telluride': 'Kia',
+    'porsche': 'Porsche', 'cayenne': 'Porsche',
   }
 
   let detectedMake: string | null = null
@@ -95,27 +149,43 @@ function parseQueryFallback(query: string): ParsedQuery {
   else if (q.includes('grand cherokee')) { detectedMake = 'Jeep'; detectedModel = 'Grand Cherokee' }
 
   if (!detectedMake) {
+    const modelMap: Record<string, string> = {
+      'f-150': 'F-150', 'f150': 'F-150', 'f-250': 'F-250', 'f-350': 'F-350',
+      'ranger': 'Ranger', 'bronco': 'Bronco', 'explorer': 'Explorer',
+      'expedition': 'Expedition', 'mustang': 'Mustang',
+      'silverado': 'Silverado', 'colorado': 'Colorado', 'tahoe': 'Tahoe',
+      'suburban': 'Suburban', 'camaro': 'Camaro', 'corvette': 'Corvette',
+      'sierra': 'Sierra', 'canyon': 'Canyon', 'yukon': 'Yukon',
+      'challenger': 'Challenger', 'charger': 'Charger',
+      'tacoma': 'Tacoma', 'tundra': 'Tundra', '4runner': '4Runner',
+      'sequoia': 'Sequoia',
+      'wrangler': 'Wrangler', 'gladiator': 'Gladiator',
+      'titan': 'Titan', 'frontier': 'Frontier',
+      'ridgeline': 'Ridgeline', 'pilot': 'Pilot',
+      'cybertruck': 'Cybertruck',
+      'x3': 'X3', 'x5': 'X5', 'x7': 'X7',
+      'g wagon': 'G Wagon', 'g-wagon': 'G Wagon', 'sprinter': 'Sprinter',
+      'q5': 'Q5', 'q7': 'Q7', 'q8': 'Q8',
+      'gx': 'GX', 'lx': 'LX', 'escalade': 'Escalade', 'navigator': 'Navigator',
+      'r1t': 'R1T', 'r1s': 'R1S', 'santa cruz': 'Santa Cruz', 'palisade': 'Palisade',
+      'telluride': 'Telluride', 'cayenne': 'Cayenne',
+    }
+
     for (const [keyword, make] of Object.entries(makes)) {
       if (q.includes(keyword)) {
         detectedMake = make
         // Try to detect model
-        const modelMap: Record<string, string> = {
-          'f-150': 'F-150', 'f150': 'F-150', 'f-250': 'F-250', 'f-350': 'F-350',
-          'ranger': 'Ranger', 'bronco': 'Bronco', 'explorer': 'Explorer',
-          'expedition': 'Expedition', 'mustang': 'Mustang',
-          'silverado': 'Silverado', 'colorado': 'Colorado', 'tahoe': 'Tahoe',
-          'suburban': 'Suburban', 'camaro': 'Camaro', 'corvette': 'Corvette',
-          'sierra': 'Sierra', 'canyon': 'Canyon', 'yukon': 'Yukon',
-          'challenger': 'Challenger', 'charger': 'Charger',
-          'tacoma': 'Tacoma', 'tundra': 'Tundra', '4runner': '4Runner',
-          'sequoia': 'Sequoia',
-          'wrangler': 'Wrangler', 'gladiator': 'Gladiator',
-          'titan': 'Titan', 'frontier': 'Frontier',
-          'ridgeline': 'Ridgeline', 'pilot': 'Pilot',
-          'cybertruck': 'Cybertruck',
-        }
         if (modelMap[keyword]) detectedModel = modelMap[keyword]
         break
+      }
+    }
+
+    if (detectedMake && !detectedModel) {
+      for (const [keyword, model] of Object.entries(modelMap)) {
+        if (q.includes(keyword)) {
+          detectedModel = model
+          break
+        }
       }
     }
   }
@@ -180,6 +250,9 @@ export async function POST(request: NextRequest) {
     const db = getDb()
 
     let wheels: Wheel[] = []
+    let fitmentStatus: FitmentStatus = 'catalog_search'
+    let notice: string | null = null
+    let matchedBoltPatterns: string[] = []
 
     // Strategy: if vehicle detected, look up bolt pattern first
     if (parsed.vehicle && (parsed.vehicle.make || parsed.vehicle.model)) {
@@ -204,14 +277,15 @@ export async function POST(request: NextRequest) {
 
       const vehicleRows = db.prepare(vehicleQuery).all(...vehicleParams) as { bolt_pattern: string }[]
       const boltPatterns = vehicleRows.map(r => r.bolt_pattern)
+      matchedBoltPatterns = [...new Set(boltPatterns)]
 
       if (boltPatterns.length > 0) {
+        fitmentStatus = 'bolt_pattern'
         // Get all normalized variants
         const allPatterns = [...new Set(boltPatterns.flatMap(bp => normalizeBoltPattern(bp)))]
-        const placeholders = allPatterns.map(() => '?').join(',')
 
         const bpConditions = allPatterns.map(p => `UPPER(bolt_pattern) LIKE UPPER('%${p.replace(/'/g, "''")}%')`).join(' OR ')
-        let wheelQuery = `SELECT id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at FROM wheels WHERE (${bpConditions})`
+        let wheelQuery = `SELECT ${selectedWheelFields()} FROM wheels WHERE (${bpConditions})`
         const wheelParams: (string | number)[] = []
 
         if (parsed.size) {
@@ -236,6 +310,14 @@ export async function POST(request: NextRequest) {
 
         wheelQuery += ' ORDER BY map_price ASC LIMIT 100'
         wheels = db.prepare(wheelQuery).all(...wheelParams) as Wheel[]
+        if (wheels.length > 0) {
+          fitmentStatus = 'exact'
+          notice = `Demo fitment matched ${parsed.vehicle.year || ''} ${parsed.vehicle.make} ${parsed.vehicle.model} by bolt pattern${matchedBoltPatterns.length ? ` (${matchedBoltPatterns.join(', ')})` : ''}. Confirm final fitment with ATDOnline.`
+        }
+      } else {
+        fitmentStatus = 'demo_fallback'
+        notice = `That vehicle is not in the demo fitment table yet. Showing high-impact TIS/DTS wheels instead — for the demo, search by bolt pattern or try F-150, Silverado, RAM 1500, Tacoma, Tundra, Wrangler, or Bronco.`
+        wheels = demoFallbackWheels(db, parsed, inStockOnly)
       }
     }
 
@@ -266,23 +348,37 @@ export async function POST(request: NextRequest) {
       }
 
       if (conditions.length > 0) {
-        const q = `SELECT id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at FROM wheels WHERE ${conditions.join(' AND ')}${inStockOnly ? ' AND in_stock = 1' : ''} ORDER BY map_price ASC LIMIT 100`
+        const q = `SELECT ${selectedWheelFields()} FROM wheels WHERE ${conditions.join(' AND ')}${inStockOnly ? ' AND in_stock = 1' : ''} ORDER BY map_price ASC LIMIT 100`
         wheels = db.prepare(q).all(...params) as Wheel[]
       } else {
         // Full text fallback, search model, brand, finish
         const searchTerm = `%${query}%`
         wheels = db.prepare(`
-          SELECT id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at FROM wheels 
+          SELECT ${selectedWheelFields()} FROM wheels
           WHERE (model LIKE ? OR brand LIKE ? OR color_finish LIKE ? OR fitment_category LIKE ?)${inStockOnly ? ' AND in_stock = 1' : ''}
           ORDER BY map_price ASC LIMIT 100
         `).all(searchTerm, searchTerm, searchTerm, searchTerm) as Wheel[]
       }
+
+      if (wheels.length > 0 && fitmentStatus !== 'exact') {
+        fitmentStatus = parsed.boltPattern ? 'bolt_pattern' : 'catalog_search'
+      }
+    }
+
+    if (wheels.length === 0 && parsed.vehicle) {
+      fitmentStatus = 'demo_fallback'
+      notice = notice || 'No exact demo match found. Showing popular media-rich wheels so the demo stays useful instead of dead-ending.'
+      wheels = demoFallbackWheels(db, parsed, inStockOnly)
     }
 
     return NextResponse.json({
       wheels,
       query_parsed: parsed,
       total: wheels.length,
+      fitment_status: fitmentStatus,
+      matched_bolt_patterns: matchedBoltPatterns,
+      notice,
+      suggested_queries: ['2024 F-150', '2024 Silverado 1500', '2023 RAM 1500', '2024 Tacoma', '2024 Bronco', '6x5.50 20 inch black'],
     })
   } catch (error) {
     console.error('Search error:', error)

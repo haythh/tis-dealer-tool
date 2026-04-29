@@ -52,6 +52,10 @@ interface SearchResponse {
     brand: string | null
   }
   total: number
+  fitment_status?: 'exact' | 'bolt_pattern' | 'demo_fallback' | 'catalog_search'
+  matched_bolt_patterns?: string[]
+  notice?: string | null
+  suggested_queries?: string[]
   error?: string
 }
 
@@ -70,11 +74,25 @@ const BRAND_FILTERS = [
   { name: 'TIS Motorsports', label: 'TIS MOTORSPORTS' },
 ]
 
+const HERO_STATS = [
+  { value: '1,590', label: 'Wheel SKUs' },
+  { value: '83', label: 'Demo fitments' },
+  { value: '265', label: 'Video-rich SKUs' },
+]
+
+const SAFE_DEMO_SEARCHES = ['2024 F-150', '2024 Silverado 1500', '2023 RAM 1500', '2024 Tacoma', '2024 Bronco', '6x5.50 20 inch black']
+
 function WheelCard({ wheel }: { wheel: Wheel }) {
   const parseGallery = (): GalleryItem[] => {
     try {
       const parsed = wheel.ta_images_json ? JSON.parse(wheel.ta_images_json) : []
-      if (Array.isArray(parsed) && parsed.length) return parsed.slice(0, 4)
+      if (Array.isArray(parsed) && parsed.length) {
+        const priority: Record<GalleryItem['type'], number> = { face: 0, angle: 1, video: 2, topangle: 3, other: 4 }
+        return parsed
+          .filter(item => item?.url || item?.fullUrl)
+          .sort((a, b) => (priority[a.type as GalleryItem['type']] ?? 9) - (priority[b.type as GalleryItem['type']] ?? 9))
+          .slice(0, 5)
+      }
     } catch {}
 
     if (wheel.ta_image_url) {
@@ -96,6 +114,8 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
   // `/api/file/<id>` binary endpoint (fullUrl) is currently unreliable, while
   // `cdn.toughassets.com/thumbs/...` (url) is served from CDN and stable.
   const imageUrl = !imgError ? (selectedMedia?.type === 'video' ? null : (selectedMedia?.url || selectedMedia?.fullUrl || wheel.ta_image_url || wheel.atd_image_url)) : null
+  const videoUrl = selectedMedia?.type === 'video' ? selectedMedia.fullUrl : null
+  const hasVideo = gallery.some(item => item.type === 'video')
 
   useEffect(() => {
     setImgError(false)
@@ -152,10 +172,15 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
       )}
 
       <div style={{ background: '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        {selectedMedia?.type === 'video' ? (
+        {selectedMedia?.type === 'video' && videoUrl ? (
           <video
-            src={selectedMedia.fullUrl}
+            src={videoUrl}
+            poster={selectedMedia.url}
             controls
+            muted
+            loop
+            playsInline
+            preload="metadata"
             style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
           />
         ) : imageUrl ? (
@@ -215,6 +240,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     </div>
+                    <span style={{ position: 'absolute', bottom: 3, left: 4, right: 4, borderRadius: '3px', background: 'rgba(220,38,38,0.88)', color: '#fff', fontSize: '8px', fontWeight: 900, letterSpacing: '0.08em', padding: '2px 0' }}>VIDEO</span>
                   </>
                 ) : (
                   <img src={item.url} alt={`${wheel.model} ${item.type} thumbnail`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -242,6 +268,7 @@ function WheelCard({ wheel }: { wheel: Wheel }) {
         </div>
         <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: '#f1f1f1', lineHeight: 1.3 }}>
           {wheel.model}
+          {hasVideo && <span style={{ marginLeft: '8px', fontSize: '10px', color: '#fca5a5', border: '1px solid rgba(220,38,38,0.35)', borderRadius: '999px', padding: '3px 7px', verticalAlign: 'middle', letterSpacing: '0.08em' }}>VIDEO</span>}
         </h3>
         <p style={{ fontSize: '13px', color: '#999', margin: '0 0 12px' }}>
           {wheel.color_finish}
@@ -346,6 +373,35 @@ export default function Home() {
       stagger: 0.1,
       ease: 'power3.out',
     })
+
+    gsap.to('.ambient-orb', {
+      y: i => (i % 2 === 0 ? -28 : 24),
+      x: i => (i % 2 === 0 ? 18 : -18),
+      scale: i => (i % 2 === 0 ? 1.08 : 0.94),
+      duration: 5.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      stagger: 0.5,
+    })
+
+    gsap.from('.stat-card', {
+      y: 22,
+      opacity: 0,
+      duration: 0.7,
+      stagger: 0.08,
+      delay: 0.25,
+      ease: 'power3.out',
+    })
+
+    gsap.to('.search-glow', {
+      opacity: 0.75,
+      scale: 1.04,
+      duration: 2.2,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    })
   }, { scope: pageRef })
 
   useGSAP(() => {
@@ -354,6 +410,7 @@ export default function Home() {
     gsap.from('.wheel-card', {
       y: 50,
       opacity: 0,
+      scale: 0.97,
       duration: 0.6,
       stagger: 0.08,
       ease: 'power3.out',
@@ -414,6 +471,10 @@ export default function Home() {
   return (
     <>
       <style jsx global>{`
+        body {
+          background: #050506;
+        }
+
         .btn-slide {
           background: #1a1a1a;
           color: #e8e8e8;
@@ -464,14 +525,113 @@ export default function Home() {
           display: block;
           width: 100%;
         }
+
+        .demo-shell {
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(circle at 16% 8%, rgba(220,38,38,0.24), transparent 30%),
+            radial-gradient(circle at 86% 0%, rgba(255,255,255,0.10), transparent 24%),
+            linear-gradient(180deg, #09090b 0%, #050506 48%, #0a0a0b 100%);
+        }
+
+        .demo-shell::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.28;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+          background-size: 58px 58px;
+          mask-image: linear-gradient(to bottom, black, transparent 72%);
+        }
+
+        .ambient-orb {
+          position: absolute;
+          pointer-events: none;
+          border-radius: 999px;
+          filter: blur(12px);
+          opacity: 0.72;
+        }
+
+        .search-frame {
+          position: relative;
+          isolation: isolate;
+          border-radius: 24px;
+          padding: 18px;
+          background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035));
+          border: 1px solid rgba(255,255,255,0.13);
+          box-shadow: 0 28px 100px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.08);
+          backdrop-filter: blur(18px);
+        }
+
+        .search-glow {
+          position: absolute;
+          inset: -2px;
+          z-index: -1;
+          border-radius: 26px;
+          background: linear-gradient(90deg, rgba(220,38,38,0.55), rgba(255,255,255,0.08), rgba(220,38,38,0.25));
+          filter: blur(18px);
+          opacity: 0.35;
+        }
+
+        .glass-card {
+          background: rgba(255,255,255,0.055);
+          border: 1px solid rgba(255,255,255,0.10);
+          box-shadow: 0 16px 60px rgba(0,0,0,0.24);
+          backdrop-filter: blur(16px);
+        }
+
+        .stat-card {
+          border-radius: 16px;
+          padding: 14px 16px;
+          min-width: 128px;
+          text-align: left;
+        }
+
+        .demo-pill {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .demo-pill::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -75%;
+          width: 40%;
+          height: 100%;
+          transform: skewX(-20deg);
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+          transition: left 500ms ease;
+        }
+
+        .demo-pill:hover::after {
+          left: 130%;
+        }
+
+        @media (max-width: 720px) {
+          .search-frame { padding: 12px; border-radius: 18px; }
+          .hero-stats { grid-template-columns: 1fr; }
+        }
       `}</style>
-      <div ref={pageRef} style={{ minHeight: '100vh', background: '#0a0a0b', color: '#f1f1f1', fontFamily: 'inherit' }}>
+      <div ref={pageRef} className="demo-shell" style={{ minHeight: '100vh', color: '#f1f1f1', fontFamily: 'inherit' }}>
+      <div className="ambient-orb" style={{ width: 260, height: 260, left: -80, top: 120, background: 'rgba(220,38,38,0.24)' }} />
+      <div className="ambient-orb" style={{ width: 220, height: 220, right: -70, top: 48, background: 'rgba(255,255,255,0.12)' }} />
+      <div className="ambient-orb" style={{ width: 320, height: 320, right: '12%', bottom: 180, background: 'rgba(220,38,38,0.12)' }} />
       <header style={{
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         padding: '16px 24px',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
         gap: '12px',
+        position: 'relative',
+        zIndex: 2,
+        backdropFilter: 'blur(14px)',
+        background: 'rgba(5,5,6,0.42)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto' }} />
@@ -479,43 +639,57 @@ export default function Home() {
             WHEEL SEARCH
           </span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#aaa', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ width: 7, height: 7, borderRadius: 999, background: '#22c55e', boxShadow: '0 0 18px rgba(34,197,94,0.85)' }} />
+          ATD demo mode
+        </div>
       </header>
 
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+      <main style={{ maxWidth: '1220px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
         <div style={{
           textAlign: 'center',
-          padding: hasSearched ? '32px 0 24px' : '80px 0 40px',
+          padding: hasSearched ? '32px 0 24px' : '76px 0 42px',
           transition: 'padding 0.4s ease',
         }}>
           {!hasSearched && (
             <>
               <div className="search-animate" style={{
                 display: 'inline-block',
-                background: 'rgba(220,38,38,0.12)',
-                border: '1px solid rgba(220,38,38,0.25)',
+                background: 'linear-gradient(90deg, rgba(220,38,38,0.18), rgba(255,255,255,0.07))',
+                border: '1px solid rgba(220,38,38,0.32)',
                 borderRadius: '100px',
-                padding: '6px 14px',
+                padding: '7px 16px',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#dc2626',
+                color: '#fecaca',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 marginBottom: '24px',
               }}>
-                TIS Wheels × ATDOnline
+                TIS Wheels × ATDOnline concept preview
               </div>
-              <h1 style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.1, textTransform: 'uppercase' }}>
-                FIND THE RIGHT WHEEL FAST.
+              <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 86px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: '-0.055em', lineHeight: 0.92, textTransform: 'uppercase' }}>
+                Find the right wheel
                 <br />
-                <span style={{ color: '#dc2626' }}>ATD DELIVERS.</span>
+                <span style={{ color: '#dc2626', textShadow: '0 0 48px rgba(220,38,38,0.35)' }}>before the customer leaves.</span>
               </h1>
-              <p style={{ fontSize: '16px', color: '#888', margin: '0 0 40px', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
-                Search TIS wheels by vehicle fitment, model, size, or finish and get direct ATDOnline order links.
+              <p className="search-animate" style={{ fontSize: '18px', color: '#b7b7b7', margin: '0 0 28px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+                A dealer-first wheel finder with visual media, fitment-aware search, live-order intent, and direct ATDOnline handoff.
               </p>
+              <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', maxWidth: 520, margin: '0 auto 34px' }}>
+                {HERO_STATS.map(stat => (
+                  <div key={stat.label} className="glass-card stat-card">
+                    <div style={{ fontSize: '24px', fontWeight: 900, color: '#fff', letterSpacing: '-0.03em' }}>{stat.value}</div>
+                    <div style={{ fontSize: '10px', color: '#8f8f8f', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
             </>
           )}
 
-          <div className="search-animate" style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
+          <div className="search-animate search-frame" style={{ maxWidth: 800, margin: '0 auto' }}>
+            <div className="search-glow" />
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
             {BRAND_FILTERS.map(({ name, label }) => (
               <button
                 key={name}
@@ -557,7 +731,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="search-animate" style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
             <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ddd', fontSize: '13px', cursor: 'pointer', textTransform: 'uppercase' }}>
               <input
                 type="checkbox"
@@ -569,7 +743,7 @@ export default function Home() {
             </label>
           </div>
 
-          <div className="search-animate" style={{
+          <div style={{
             maxWidth: '640px',
             margin: '0 auto',
             position: 'relative',
@@ -637,9 +811,10 @@ export default function Home() {
 
           {!hasSearched && (
             <div style={{ marginTop: '20px', display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {EXAMPLE_QUERIES.map(q => (
+              {[...EXAMPLE_QUERIES, ...SAFE_DEMO_SEARCHES].filter((q, index, arr) => arr.indexOf(q) === index).map(q => (
                 <button
                   key={q}
+                  className="demo-pill"
                   onClick={() => handleSearch(q)}
                   style={{
                     background: 'rgba(255,255,255,0.04)',
@@ -668,6 +843,7 @@ export default function Home() {
               ))}
             </div>
           )}
+          </div>
         </div>
 
         {hasSearched && (
@@ -676,18 +852,22 @@ export default function Home() {
               <div
                 className="intent-banner"
                 style={{
-                  background: 'rgba(220,38,38,0.08)',
-                  border: '1px solid rgba(220,38,38,0.15)',
-                  borderRadius: '8px',
-                  padding: '10px 16px',
+                  background: result.fitment_status === 'demo_fallback' ? 'rgba(245,158,11,0.10)' : 'rgba(220,38,38,0.08)',
+                  border: `1px solid ${result.fitment_status === 'demo_fallback' ? 'rgba(245,158,11,0.24)' : 'rgba(220,38,38,0.15)'}`,
+                  borderRadius: '14px',
+                  padding: '12px 16px',
                   marginBottom: '24px',
                   fontSize: '13px',
-                  color: '#dc2626',
+                  color: result.fitment_status === 'demo_fallback' ? '#fcd34d' : '#fca5a5',
                   display: 'flex',
                   gap: '16px',
                   flexWrap: 'wrap',
+                  alignItems: 'center',
                 }}
               >
+                <span style={{ color: '#fff', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 11 }}>
+                  {result.fitment_status === 'exact' ? 'Fitment demo match' : result.fitment_status === 'demo_fallback' ? 'Demo-safe fallback' : 'Catalog search'}
+                </span>
                 {result.query_parsed.vehicle && (
                   <span>{result.query_parsed.vehicle.year} {result.query_parsed.vehicle.make} {result.query_parsed.vehicle.model}</span>
                 )}
@@ -696,7 +876,14 @@ export default function Home() {
                 {result.query_parsed.finish && <span>Finish: {result.query_parsed.finish}</span>}
                 {result.query_parsed.boltPattern && <span>Bolt: {result.query_parsed.boltPattern}</span>}
                 {result.query_parsed.brand && <span>Brand: {result.query_parsed.brand}</span>}
+                {result.matched_bolt_patterns && result.matched_bolt_patterns.length > 0 && <span>Bolt data: {result.matched_bolt_patterns.join(', ')}</span>}
                 <span style={{ marginLeft: 'auto', color: '#aaa' }}>{result.total} result{result.total !== 1 ? 's' : ''}</span>
+              </div>
+            )}
+
+            {result?.notice && (
+              <div className="intent-banner" style={{ margin: '-10px 0 24px', padding: '12px 14px', borderRadius: 12, background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.10)', color: '#cfcfcf', fontSize: 13, lineHeight: 1.5 }}>
+                {result.notice}
               </div>
             )}
 
@@ -733,6 +920,13 @@ export default function Home() {
               <div style={{ textAlign: 'center', padding: '60px 0', color: '#555' }}>
                 <p style={{ fontSize: '16px', marginBottom: '8px', color: '#777' }}>No wheels found for that search.</p>
                 <p style={{ fontSize: '13px' }}>Try a different year, model, or size.</p>
+                <div style={{ marginTop: 18, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {(result.suggested_queries || SAFE_DEMO_SEARCHES).map(q => (
+                    <button key={q} className="demo-pill" onClick={() => handleSearch(q)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#ddd', borderRadius: 999, padding: '8px 13px', cursor: 'pointer' }}>
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
