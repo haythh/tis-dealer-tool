@@ -836,6 +836,13 @@ export default function Home() {
     handleSearch(query || 'wheels', next)
   }
 
+  const handleAllBrandFilter = () => {
+    setActiveBrand(null)
+    if (activeBrand || hasSearched || query.trim()) {
+      handleSearch(query || 'wheels', null)
+    }
+  }
+
   const isHomeView = activeTab === 'home' && !hasSearched && !result && !loading
   const isResultsView = !isHomeView
   const isLightMode = themeMode === 'light'
@@ -1213,6 +1220,43 @@ export default function Home() {
             {isHomeView ? (
               <>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <button
+              key="ALL"
+              onClick={handleAllBrandFilter}
+              aria-label="Show all wheel brands"
+              style={{
+                background: activeBrand === null ? 'rgba(220,38,38,0.2)' : 'var(--search-bg)',
+                border: `1px solid ${activeBrand === null ? 'rgba(220,38,38,0.6)' : 'var(--panel-border)'}`,
+                color: 'var(--page-text)',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: '14px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                transition: 'all 0.15s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '44px',
+                minWidth: '72px',
+              }}
+              onMouseEnter={e => {
+                if (activeBrand !== null) {
+                  ;(e.currentTarget as HTMLButtonElement).style.background = isLightMode ? 'rgba(15,15,18,0.06)' : 'rgba(255,255,255,0.15)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = isLightMode ? 'rgba(15,15,18,0.16)' : 'rgba(255,255,255,0.2)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeBrand !== null) {
+                  ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--search-bg)'
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--panel-border)'
+                }
+              }}
+            >
+              All
+            </button>
             {BRAND_FILTERS.map(({ name, label }) => (
               <button
                 key={name}
@@ -1400,6 +1444,9 @@ export default function Home() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+                  <button type="button" onClick={handleAllBrandFilter} aria-label="Show all wheel brands" style={wheelChipStyle(activeBrand === null)}>
+                    All
+                  </button>
                   {BRAND_FILTERS.map(({ name, label }) => (
                     <button key={name} type="button" onClick={() => handleBrandFilter(name)} aria-label={`Filter by ${name}`} style={wheelChipStyle(activeBrand === name)}>
                       {label}
