@@ -807,9 +807,7 @@ export default function Home() {
                 TIS Wheels × ATDOnline concept preview
               </div>
               <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 86px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: '-0.055em', lineHeight: 0.92, textTransform: 'uppercase' }}>
-                Find the right wheel
-                <br />
-                <span style={{ color: '#dc2626', textShadow: '0 0 48px rgba(220,38,38,0.35)' }}>before the customer leaves.</span>
+                FIND THE WHEEL YOU NEED FAST AND EASY
               </h1>
               <p className="search-animate" style={{ fontSize: '18px', color: 'var(--muted-text)', margin: '0 0 28px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
                 A dealer-first wheel finder with visual media, fitment-aware search, live-order intent, and direct ATDOnline handoff.
