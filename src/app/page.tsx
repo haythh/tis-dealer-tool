@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, type CSSProperties } from 'react'
 import Image from 'next/image'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import officialWheelVideos from '@/data/official-wheel-videos.json'
+import tisTiresData from '@/data/tis-tires.json'
 
 gsap.registerPlugin(useGSAP)
 
@@ -60,6 +61,40 @@ interface SearchResponse {
   error?: string
 }
 
+interface Tire {
+  id: string
+  line: 'RT1' | 'TT1'
+  name: string
+  terrain: string
+  sourceUrl: string
+  heroImageUrl: string
+  logoUrl: string
+  itemNo: string | null
+  size: string
+  rimDiameter: number | null
+  tirePly: number | null
+  loadRange: string | null
+  loadIndex: string | null
+  speedRating: string | null
+  sidewall: string | null
+  treadDepth: number | null
+  tireDiameter: number | null
+  sectionWidth: number | null
+  minRimWidth: number | null
+  maxRimWidth: number | null
+  singleMaxLoad: string | null
+  dualMaxLoad: string | null
+  maxTirePressure: number | null
+  weight: number | null
+  retailPrice: number | 'TBD' | null
+}
+
+type TireData = {
+  counts: Record<string, number>
+  generatedAt: string
+  tires: Tire[]
+}
+
 const EXAMPLE_QUERIES = [
   'What fits a 2024 F-150?',
   '20" wheels for RAM 1500',
@@ -85,6 +120,7 @@ type OfficialWheelVideo = {
 }
 
 const officialVideosByCode = officialWheelVideos.videosByCode as Record<string, OfficialWheelVideo>
+const tireData = tisTiresData as TireData
 
 function wheelModelVideoCodes(model: string) {
   const compact = model.toUpperCase().replace(/[^A-Z0-9.]/g, '')
@@ -394,12 +430,165 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
   )
 }
 
+function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
+  const [query, setQuery] = useState('')
+  const [activeLine, setActiveLine] = useState<'ALL' | 'RT1' | 'TT1'>('ALL')
+  const [activeRim, setActiveRim] = useState<number | 'ALL'>('ALL')
+  const isLightMode = themeMode === 'light'
+
+  const tires = tireData.tires
+  const rimDiameters = Array.from(new Set(tires.map(tire => tire.rimDiameter).filter((rim): rim is number => typeof rim === 'number'))).sort((a, b) => a - b)
+  const lineCounts = tires.reduce<Record<string, number>>((acc, tire) => {
+    acc[tire.line] = (acc[tire.line] || 0) + 1
+    return acc
+  }, {})
+
+  const normalizedQuery = query.trim().toLowerCase()
+  const filteredTires = tires.filter(tire => {
+    if (activeLine !== 'ALL' && tire.line !== activeLine) return false
+    if (activeRim !== 'ALL' && tire.rimDiameter !== activeRim) return false
+    if (!normalizedQuery) return true
+
+    return [
+      tire.line,
+      tire.name,
+      tire.terrain,
+      tire.itemNo,
+      tire.size,
+      tire.loadRange,
+      tire.loadIndex,
+      tire.speedRating,
+      tire.singleMaxLoad,
+    ].filter(Boolean).join(' ').toLowerCase().includes(normalizedQuery)
+  })
+
+  const formatPrice = (price: Tire['retailPrice']) => {
+    if (price == null) return null
+    if (price === 'TBD') return 'TBD'
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price)
+  }
+
+  const chipStyle = (active: boolean): CSSProperties => ({
+    background: active ? 'rgba(220,38,38,0.22)' : 'var(--search-bg)',
+    border: `1px solid ${active ? 'rgba(220,38,38,0.62)' : 'var(--panel-border)'}`,
+    color: active ? '#fff' : 'var(--page-text)',
+    padding: '10px 14px',
+    borderRadius: '999px',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    fontSize: '13px',
+    fontWeight: 800,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+  })
+
+  return (
+    <div style={{ padding: '44px 0 64px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+        <div className="search-animate" style={{ display: 'inline-block', border: '1px solid rgba(220,38,38,0.32)', borderRadius: 999, padding: '7px 16px', fontSize: 12, fontWeight: 800, color: '#fecaca', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
+          TIS Tires × Hercules specs
+        </div>
+        <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
+          TIRE SEARCH
+        </h1>
+        <p className="search-animate" style={{ fontSize: 18, color: 'var(--muted-text)', margin: '0 auto', maxWidth: 680, lineHeight: 1.6 }}>
+          Search RT1 rugged-terrain and TT1 mud-terrain specs by size, wheel diameter, load range, item number, or ply.
+        </p>
+      </div>
+
+      <div className="search-frame" style={{ maxWidth: 960, margin: '0 auto 24px' }}>
+        <div className="search-glow" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) auto', gap: 12, alignItems: 'center' }}>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search 35x12.50, 20, 98824, Load E..."
+            style={{ background: 'var(--search-bg)', border: '1px solid var(--panel-border)', borderRadius: 12, color: 'var(--page-text)', fontSize: 16, padding: '15px 18px', fontFamily: 'inherit', outline: 'none', minWidth: 0 }}
+          />
+          <span style={{ color: 'var(--soft-text)', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+            {filteredTires.length} / {tires.length} tires
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+          {(['ALL', 'RT1', 'TT1'] as const).map(line => (
+            <button key={line} type="button" onClick={() => setActiveLine(line)} style={chipStyle(activeLine === line)}>
+              {line === 'ALL' ? `All (${tires.length})` : `${line} (${lineCounts[line] || 0})`}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+          <button type="button" onClick={() => setActiveRim('ALL')} style={chipStyle(activeRim === 'ALL')}>All diameters</button>
+          {rimDiameters.map(rim => (
+            <button key={rim} type="button" onClick={() => setActiveRim(rim)} style={chipStyle(activeRim === rim)}>{rim}&quot;</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+        {filteredTires.map(tire => {
+          const price = formatPrice(tire.retailPrice)
+          return (
+            <div key={tire.id} className="wheel-card" style={{ background: isLightMode ? '#fff' : 'rgba(255,255,255,0.04)', border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 12, overflow: 'hidden', boxShadow: isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ height: 180, background: '#050505', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <img src={tire.heroImageUrl} alt={tire.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.82 }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.72))' }} />
+                <div style={{ position: 'absolute', left: 14, bottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ background: '#dc2626', color: '#fff', borderRadius: 999, padding: '5px 10px', fontSize: 11, fontWeight: 900, letterSpacing: '0.08em' }}>{tire.line}</span>
+                  <span style={{ color: '#f4f4f5', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{tire.terrain}</span>
+                </div>
+              </div>
+
+              <div style={{ padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'start', marginBottom: 10 }}>
+                  <div>
+                    <h3 style={{ fontSize: 24, fontWeight: 900, margin: 0, color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.1 }}>{tire.size}</h3>
+                    <p style={{ fontSize: 13, color: isLightMode ? '#62626a' : '#999', margin: '6px 0 0' }}>
+                      {tire.itemNo ? `Item ${tire.itemNo}` : tire.name}
+                    </p>
+                  </div>
+                  {price && <div style={{ textAlign: 'right', color: isLightMode ? '#111113' : '#fff', fontWeight: 900, fontSize: 18 }}>{price}</div>}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+                  {[
+                    { label: 'Rim', value: tire.rimDiameter ? `${tire.rimDiameter}\"` : '—' },
+                    { label: 'Ply / Range', value: [tire.tirePly, tire.loadRange].filter(Boolean).join(' / ') || '—' },
+                    { label: 'Load / Speed', value: [tire.loadIndex, tire.speedRating].filter(Boolean).join(' / ') || '—' },
+                    { label: 'Tread', value: tire.treadDepth ? `${tire.treadDepth}/32\"` : '—' },
+                    { label: 'Diameter', value: tire.tireDiameter ? `${tire.tireDiameter}\"` : '—' },
+                    { label: 'Weight', value: tire.weight ? `${tire.weight} lb` : '—' },
+                    { label: 'Rim Width', value: tire.minRimWidth && tire.maxRimWidth ? `${tire.minRimWidth}-${tire.maxRimWidth}\"` : '—' },
+                    { label: 'Max Load', value: tire.singleMaxLoad || '—' },
+                  ].map(({ label, value }) => (
+                    <div key={label} style={{ background: isLightMode ? '#f5f5f6' : 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '7px 8px' }}>
+                      <div style={{ fontSize: 10, color: isLightMode ? '#74747b' : '#666', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: isLightMode ? '#242428' : '#ddd', marginTop: 2 }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <a href={tire.sourceUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit' }}>
+                  <span style={{ position: 'relative', zIndex: 2 }}>View TIS specs</span>
+                </a>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<SearchResponse | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [activeBrand, setActiveBrand] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'wheel' | 'tire'>('wheel')
   const [inStockOnly, setInStockOnly] = useState(true)
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -519,7 +708,7 @@ export default function Home() {
     handleSearch(query || 'wheels', next)
   }
 
-  const isResultsView = Boolean(result) || loading
+  const isResultsView = activeTab === 'tire' || Boolean(result) || loading
 
   return (
     <>
@@ -763,9 +952,33 @@ export default function Home() {
           <a href="/" aria-label="TIS Dealer Tool home" style={{ display: 'inline-flex', alignItems: 'center' }}>
             <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto', filter: themeMode === 'light' ? 'brightness(0)' : 'none' }} />
           </a>
-          <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0px', color: 'var(--page-text)', textTransform: 'uppercase' }}>
-            WHEEL SEARCH
-          </span>
+          <nav aria-label="Dealer tool sections" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            {([
+              ['wheel', 'Wheel Search'],
+              ['tire', 'Tire Search'],
+            ] as const).map(([tab, label]) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  background: activeTab === tab ? '#dc2626' : 'transparent',
+                  border: `1px solid ${activeTab === tab ? 'rgba(220,38,38,0.8)' : 'var(--header-border)'}`,
+                  borderRadius: 999,
+                  color: activeTab === tab ? '#fff' : 'var(--page-text)',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  fontSize: 12,
+                  fontWeight: 900,
+                  letterSpacing: '0.05em',
+                  padding: '8px 12px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <div className="theme-toggle" aria-label="Color mode switch">
@@ -780,6 +993,8 @@ export default function Home() {
       </header>
 
       <main style={{ maxWidth: '1220px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+        {activeTab === 'wheel' ? (
+          <>
         <div style={{
           textAlign: 'center',
           padding: hasSearched ? '32px 0 24px' : '76px 0 42px',
@@ -1062,6 +1277,10 @@ export default function Home() {
               </div>
             )}
           </div>
+        )}
+          </>
+        ) : (
+          <TireSearchPanel themeMode={themeMode} />
         )}
       </main>
     </div>

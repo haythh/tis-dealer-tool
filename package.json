@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "import-data": "node scripts/import-data.mjs",
-    "scrape-videos": "node scripts/scrape-official-wheel-videos.mjs"
+    "scrape-videos": "node scripts/scrape-official-wheel-videos.mjs",
+    "scrape-tires": "node scripts/scrape-tis-tires.mjs"
   },
   "keywords": [],
   "author": "",
