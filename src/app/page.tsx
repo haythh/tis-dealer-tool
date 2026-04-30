@@ -1358,9 +1358,9 @@ export default function Home() {
                       </span>
                     ) : <span style={{ position: 'relative', zIndex: 2 }}>Search</span>}
                   </button>
-                  <span className="wheel-search-count" style={{ color: 'var(--soft-text)', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                    {loading ? 'Searching' : result ? `${result.total} result${result.total !== 1 ? 's' : ''}` : 'Catalog ready'}
-                  </span>
+                  <button type="button" onClick={() => setInStockOnly(value => !value)} style={{ ...wheelChipStyle(inStockOnly), minHeight: 52, whiteSpace: 'nowrap' }}>
+                    In stock only
+                  </button>
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
@@ -1369,11 +1369,6 @@ export default function Home() {
                       {label}
                     </button>
                   ))}
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-                  <button type="button" onClick={() => setInStockOnly(true)} style={wheelChipStyle(inStockOnly)}>In stock only</button>
-                  <button type="button" onClick={() => setInStockOnly(false)} style={wheelChipStyle(!inStockOnly)}>All inventory</button>
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16, alignItems: 'center' }}>
