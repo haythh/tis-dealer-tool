@@ -3,7 +3,7 @@ import { getDb, normalizeBoltPattern, type Wheel, type Vehicle } from '@/lib/db'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 interface ParsedQuery {
-  vehicle: { year: number; make: string; model: string } | null
+  vehicle: { year: number | null; make: string; model: string } | null
   wheelModel: string | null
   size: string | null
   finish: string | null
@@ -202,7 +202,7 @@ function parseQueryFallback(query: string): ParsedQuery {
   }
 
   if (detectedMake) {
-    parsed.vehicle = { year: year || 0, make: detectedMake, model: detectedModel || '' }
+    parsed.vehicle = { year, make: detectedMake, model: detectedModel || '' }
   }
 
   // Extract size (diameter)

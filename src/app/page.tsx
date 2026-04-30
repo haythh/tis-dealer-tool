@@ -46,7 +46,7 @@ interface GalleryItem {
 interface SearchResponse {
   wheels: Wheel[]
   query_parsed: {
-    vehicle: { year: number; make: string; model: string } | null
+    vehicle: { year: number | null; make: string; model: string } | null
     wheelModel: string | null
     size: string | null
     finish: string | null
@@ -1519,7 +1519,7 @@ export default function Home() {
               >
                 <div style={{ color: '#fff', fontSize: 'clamp(20px, 2.5vw, 32px)', fontWeight: 950, lineHeight: 1.08, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   {result.query_parsed.vehicle
-                    ? `${result.query_parsed.vehicle.year} ${result.query_parsed.vehicle.make} ${result.query_parsed.vehicle.model}`
+                    ? [result.query_parsed.vehicle.year && result.query_parsed.vehicle.year > 0 ? result.query_parsed.vehicle.year : null, result.query_parsed.vehicle.make, result.query_parsed.vehicle.model].filter(Boolean).join(' ')
                     : [result.query_parsed.brand, result.query_parsed.wheelModel, result.query_parsed.size ? `${result.query_parsed.size}\"` : null, result.query_parsed.finish].filter(Boolean).join(' ')}
                   {(result.matched_bolt_patterns?.length || result.query_parsed.boltPattern) ? (
                     <span> · {result.matched_bolt_patterns?.length ? result.matched_bolt_patterns.join(', ') : result.query_parsed.boltPattern}</span>
