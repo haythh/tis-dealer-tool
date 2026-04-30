@@ -436,11 +436,154 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
   )
 }
 
+function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light' }) {
+  const isLightMode = themeMode === 'light'
+  const tireImages = tire.imageUrls?.length ? tire.imageUrls : [tire.heroImageUrl].filter(Boolean)
+  const [selectedImage, setSelectedImage] = useState(tireImages[0] || '')
+  const [imgError, setImgError] = useState(false)
+
+  useEffect(() => {
+    setSelectedImage(tireImages[0] || '')
+    setImgError(false)
+  }, [tire.id, tire.heroImageUrl, tire.imageUrls?.join('|')])
+
+  const imageUrl = !imgError ? selectedImage : ''
+  const formatPrice = (price: Tire['retailPrice']) => {
+    if (price == null) return null
+    if (price === 'TBD') return 'TBD'
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price)
+  }
+  const price = formatPrice(tire.retailPrice)
+
+  return (
+    <div
+      className="wheel-card"
+      style={{
+        background: isLightMode ? '#ffffff' : 'rgba(255,255,255,0.04)',
+        border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'}`,
+        borderRadius: '12px',
+        overflow: 'visible',
+        position: 'relative',
+        boxShadow: isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)',
+      }}
+      onMouseEnter={e => {
+        ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(220,38,38,0.4)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 28px 80px rgba(220,38,38,0.12)'
+      }}
+      onMouseLeave={e => {
+        ;(e.currentTarget as HTMLElement).style.borderColor = isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)'
+      }}
+    >
+      <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={`${tire.line} ${tire.size}`}
+            loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', opacity: 0.3 }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span style={{ fontSize: '11px', fontFamily: 'inherit' }}>No image</span>
+          </div>
+        )}
+      </div>
+
+      {tireImages.length > 0 && (
+        <div style={{ display: 'flex', gap: '6px', padding: '8px', background: isLightMode ? '#f8f8f8' : '#0a0a0a', overflowX: 'auto' }}>
+          {tireImages.map((image, index) => {
+            const active = selectedImage === image
+            return (
+              <button
+                key={`${image}-${index}`}
+                onClick={() => {
+                  setImgError(false)
+                  setSelectedImage(image)
+                }}
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '4px',
+                  border: `2px solid ${active ? '#dc2626' : 'rgba(255,255,255,0.14)'}`,
+                  background: isLightMode ? '#fff' : '#111',
+                  padding: 0,
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  flex: '0 0 auto',
+                }}
+                aria-label={`Show ${tire.line} ${tire.size} angle ${index + 1}`}
+              >
+                <img src={image} alt={`${tire.line} ${tire.size} thumbnail ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      <div style={{ padding: '16px' }}>
+        <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>
+          <img src="/tis-word-logo.png" alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block' }} />
+        </div>
+        <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
+          {tire.line} {tire.size}
+        </h3>
+        <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>
+          {tire.terrain}
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+          {[
+            { label: 'Size', value: tire.size },
+            { label: 'Load Range', value: [tire.tirePly, tire.loadRange].filter(Boolean).join(' / ') || '—' },
+            { label: 'Load / Speed', value: [tire.loadIndex, tire.speedRating].filter(Boolean).join(' / ') || '—' },
+            { label: 'Tread Depth', value: tire.treadDepth ? `${tire.treadDepth}/32\"` : '—' },
+          ].map(({ label, value }) => (
+            <div key={label} style={{ background: isLightMode ? '#f5f5f6' : 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '6px 8px' }}>
+              <div style={{ fontSize: '10px', color: isLightMode ? '#74747b' : '#666', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: isLightMode ? '#242428' : '#ddd', marginTop: '2px' }}>{value || '—'}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'baseline' }}>
+          {price && (
+            <div>
+              <div style={{ fontSize: '10px', color: isLightMode ? '#52525b' : '#fff', textTransform: 'uppercase', letterSpacing: '0.06em' }}>RETAIL PRICE</div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: isLightMode ? '#111113' : '#fff' }}>{price}</div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ fontSize: '11px', color: '#555', marginBottom: '12px' }}>
+          SKU: {tire.atdProductNumber || tire.itemNo || '—'}
+          {tire.itemNo && tire.atdProductNumber && tire.itemNo !== tire.atdProductNumber && <span style={{ marginLeft: '8px', color: '#444' }}>ITEM: {tire.itemNo}</span>}
+        </div>
+
+        {tire.atdUrl ? (
+          <a href={tire.atdUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit' }}>
+            <span style={{ position: 'relative', zIndex: 2 }}>Check Your Price on ATDOnline</span>
+          </a>
+        ) : (
+          <div style={{ display: 'block', background: 'rgba(255,255,255,0.06)', color: '#666', textAlign: 'center', padding: '10px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 500 }}>
+            ATD link pending
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
   const [query, setQuery] = useState('')
   const [activeLine, setActiveLine] = useState<'ALL' | 'RT1' | 'TT1'>('ALL')
   const [activeRim, setActiveRim] = useState<number | 'ALL'>('ALL')
-  const isLightMode = themeMode === 'light'
 
   const tires = tireData.tires
   const rimDiameters = Array.from(new Set(tires.map(tire => tire.rimDiameter).filter((rim): rim is number => typeof rim === 'number'))).sort((a, b) => a - b)
@@ -467,12 +610,6 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
       tire.singleMaxLoad,
     ].filter(Boolean).join(' ').toLowerCase().includes(normalizedQuery)
   })
-
-  const formatPrice = (price: Tire['retailPrice']) => {
-    if (price == null) return null
-    if (price === 'TBD') return 'TBD'
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price)
-  }
 
   const chipStyle = (active: boolean): CSSProperties => ({
     background: active ? 'rgba(220,38,38,0.22)' : 'var(--search-bg)',
@@ -534,63 +671,9 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-        {filteredTires.map(tire => {
-          const price = formatPrice(tire.retailPrice)
-          const tireImages = tire.imageUrls?.length ? tire.imageUrls : [tire.heroImageUrl]
-          const tireImage = tireImages[0]
-          return (
-            <div key={tire.id} className="wheel-card" style={{ background: isLightMode ? '#fff' : 'rgba(255,255,255,0.04)', border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 12, overflow: 'hidden', boxShadow: isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)' }}>
-              <div style={{ height: 220, background: isLightMode ? 'radial-gradient(circle at 50% 40%, #ffffff, #eeeeef 72%)' : 'radial-gradient(circle at 50% 42%, #1c1c1f, #050505 72%)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img src={tireImage} alt={`${tire.name} ${tire.size}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '14px', opacity: 1 }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.52))', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', left: 14, bottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ background: '#dc2626', color: '#fff', borderRadius: 999, padding: '5px 10px', fontSize: 11, fontWeight: 900, letterSpacing: '0.08em' }}>{tire.line}</span>
-                  <span style={{ color: '#f4f4f5', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{tire.terrain}</span>
-                </div>
-              </div>
-
-              <div style={{ padding: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'start', marginBottom: 10 }}>
-                  <div>
-                    <h3 style={{ fontSize: 24, fontWeight: 900, margin: 0, color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.1 }}>{tire.size}</h3>
-                    <p style={{ fontSize: 13, color: isLightMode ? '#62626a' : '#999', margin: '6px 0 0' }}>
-                      {tire.itemNo ? `Item ${tire.itemNo}` : tire.name}
-                    </p>
-                  </div>
-                  {price && <div style={{ textAlign: 'right', color: isLightMode ? '#111113' : '#fff', fontWeight: 900, fontSize: 18 }}>{price}</div>}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
-                  {[
-                    { label: 'Rim', value: tire.rimDiameter ? `${tire.rimDiameter}\"` : '—' },
-                    { label: 'Ply / Range', value: [tire.tirePly, tire.loadRange].filter(Boolean).join(' / ') || '—' },
-                    { label: 'Load / Speed', value: [tire.loadIndex, tire.speedRating].filter(Boolean).join(' / ') || '—' },
-                    { label: 'Tread', value: tire.treadDepth ? `${tire.treadDepth}/32\"` : '—' },
-                    { label: 'Diameter', value: tire.tireDiameter ? `${tire.tireDiameter}\"` : '—' },
-                    { label: 'Weight', value: tire.weight ? `${tire.weight} lb` : '—' },
-                    { label: 'Rim Width', value: tire.minRimWidth && tire.maxRimWidth ? `${tire.minRimWidth}-${tire.maxRimWidth}\"` : '—' },
-                    { label: 'Max Load', value: tire.singleMaxLoad || '—' },
-                  ].map(({ label, value }) => (
-                    <div key={label} style={{ background: isLightMode ? '#f5f5f6' : 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '7px 8px' }}>
-                      <div style={{ fontSize: 10, color: isLightMode ? '#74747b' : '#666', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: isLightMode ? '#242428' : '#ddd', marginTop: 2 }}>{value}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {tire.atdUrl ? (
-                  <a href={tire.atdUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit' }}>
-                    <span style={{ position: 'relative', zIndex: 2 }}>Check Your Price on ATDOnline</span>
-                  </a>
-                ) : (
-                  <div style={{ display: 'block', background: 'rgba(255,255,255,0.06)', color: '#666', textAlign: 'center', padding: '10px 16px', borderRadius: 8, fontSize: 14, fontWeight: 700 }}>
-                    ATD link pending
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })}
+        {filteredTires.map(tire => (
+          <TireCard key={tire.id} tire={tire} themeMode={themeMode} />
+        ))}
       </div>
     </div>
   )
