@@ -679,7 +679,7 @@ export default function Home() {
   const [result, setResult] = useState<SearchResponse | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [activeBrand, setActiveBrand] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'wheel' | 'tire'>('wheel')
+  const [activeTab, setActiveTab] = useState<'home' | 'wheel' | 'tire'>('home')
   const [inStockOnly, setInStockOnly] = useState(true)
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -766,6 +766,7 @@ export default function Home() {
     if (!searchQuery.trim() && !brand) return
 
     if (q) setQuery(q)
+    setActiveTab('wheel')
     setLoading(true)
     setHasSearched(true)
 
@@ -799,8 +800,22 @@ export default function Home() {
     handleSearch(query || 'wheels', next)
   }
 
-  const isResultsView = activeTab === 'tire' || Boolean(result) || loading
+  const isHomeView = activeTab === 'home' && !hasSearched && !result && !loading
+  const isResultsView = !isHomeView
   const isLightMode = themeMode === 'light'
+  const wheelChipStyle = (active: boolean): CSSProperties => ({
+    background: active ? (isLightMode ? 'rgba(220,38,38,0.12)' : 'rgba(220,38,38,0.22)') : 'var(--search-bg)',
+    border: `1px solid ${active ? 'rgba(220,38,38,0.62)' : 'var(--panel-border)'}`,
+    color: active ? (isLightMode ? '#991b1b' : '#fff') : 'var(--page-text)',
+    padding: '10px 14px',
+    borderRadius: '14px',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    fontSize: '13px',
+    fontWeight: 800,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+  })
 
   return (
     <>
@@ -1023,9 +1038,19 @@ export default function Home() {
           transform: scale(0.97);
         }
 
+        .wheel-search-grid {
+          display: grid;
+          grid-template-columns: minmax(240px, 1fr) auto auto;
+          gap: 12px;
+          align-items: center;
+        }
+
         @media (max-width: 720px) {
           .search-frame { padding: 12px; border-radius: 18px; }
           .hero-stats { grid-template-columns: 1fr; }
+          .wheel-search-grid { grid-template-columns: 1fr; }
+          .wheel-search-grid .btn-slide { width: 100%; border-radius: 12px; }
+          .wheel-search-count { justify-self: flex-start; }
         }
       `}</style>
       <div ref={pageRef} className={`demo-shell theme-${themeMode}${isResultsView ? ' results-view' : ''}`} style={{ minHeight: '100vh', color: 'var(--page-text)', fontFamily: 'inherit' }}>
@@ -1045,7 +1070,18 @@ export default function Home() {
         background: 'var(--header-bg)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <a href="/" aria-label="TIS Dealer Tool home" style={{ display: 'inline-flex', alignItems: 'center' }}>
+          <a
+            href="/"
+            aria-label="TIS Dealer Tool home"
+            onClick={e => {
+              e.preventDefault()
+              setActiveTab('home')
+              setHasSearched(false)
+              setResult(null)
+              setLoading(false)
+            }}
+            style={{ display: 'inline-flex', alignItems: 'center' }}
+          >
             <img src={themeMode === 'light' ? '/tislogo-lightmode.png' : '/tis-logo.png'} alt="TIS" style={{ height: '28px', width: 'auto' }} />
           </a>
           <nav aria-label="Dealer tool sections" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -1089,14 +1125,14 @@ export default function Home() {
       </header>
 
       <main style={{ maxWidth: '1220px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
-        {activeTab === 'wheel' ? (
+        {activeTab !== 'tire' ? (
           <>
         <div style={{
           textAlign: 'center',
-          padding: hasSearched ? '32px 0 24px' : '76px 0 42px',
+          padding: isHomeView ? '76px 0 42px' : '44px 0 28px',
           transition: 'padding 0.4s ease',
         }}>
-          {!hasSearched && (
+          {isHomeView && (
             <>
               <div className="search-animate" style={{
                 display: 'inline-block',
@@ -1122,8 +1158,24 @@ export default function Home() {
             </>
           )}
 
-          <div className="search-animate search-frame" style={{ maxWidth: 800, margin: '0 auto' }}>
+          {!isHomeView && (
+            <>
+              <div className="search-animate" style={{ display: 'inline-block', border: '1px solid rgba(220,38,38,0.32)', borderRadius: 999, padding: '7px 16px', fontSize: 12, fontWeight: 800, color: isLightMode ? '#991b1b' : '#fecaca', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
+                TIS Wheels × ATDOnline catalog
+              </div>
+              <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
+                WHEEL SEARCH
+              </h1>
+              <p className="search-animate" style={{ fontSize: 18, color: 'var(--muted-text)', margin: '0 auto', maxWidth: 700, lineHeight: 1.6 }}>
+                Search TIS, DTS, and TIS Motorsports wheels by vehicle, model, size, finish, bolt pattern, or part number.
+              </p>
+            </>
+          )}
+
+          <div className="search-animate search-frame" style={{ maxWidth: isHomeView ? 800 : 960, margin: '0 auto' }}>
             <div className="search-glow" />
+            {isHomeView ? (
+              <>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
             {BRAND_FILTERS.map(({ name, label }) => (
               <button
@@ -1278,6 +1330,54 @@ export default function Home() {
               ))}
             </div>
           )}
+              </>
+            ) : (
+              <>
+                <div className="wheel-search-grid">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Search 2024 F-150, TIS 544, 20x9, 6x5.50..."
+                    style={{ background: 'var(--search-bg)', border: '1px solid var(--panel-border)', borderRadius: 12, color: 'var(--page-text)', fontSize: 16, padding: '15px 18px', fontFamily: 'inherit', outline: 'none', minWidth: 0 }}
+                  />
+                  <button
+                    onClick={() => handleSearch()}
+                    disabled={loading || (!query.trim() && !activeBrand)}
+                    className="btn-slide"
+                    style={{ borderRadius: 12, boxShadow: 'none', minWidth: 112, fontFamily: 'inherit', letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '15px 20px' }}
+                  >
+                    {loading ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative', zIndex: 2 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 0.8s linear infinite' }}>
+                          <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                        </svg>
+                        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+                      </span>
+                    ) : <span style={{ position: 'relative', zIndex: 2 }}>Search</span>}
+                  </button>
+                  <span className="wheel-search-count" style={{ color: 'var(--soft-text)', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                    {loading ? 'Searching' : result ? `${result.total} result${result.total !== 1 ? 's' : ''}` : 'Catalog ready'}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+                  {BRAND_FILTERS.map(({ name, label }) => (
+                    <button key={name} type="button" onClick={() => handleBrandFilter(name)} aria-label={`Filter by ${name}`} style={wheelChipStyle(activeBrand === name)}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+                  <button type="button" onClick={() => setInStockOnly(true)} style={wheelChipStyle(inStockOnly)}>In stock only</button>
+                  <button type="button" onClick={() => setInStockOnly(false)} style={wheelChipStyle(!inStockOnly)}>All inventory</button>
+                </div>
+              
+              </>
+            )}
           </div>
         </div>
 
