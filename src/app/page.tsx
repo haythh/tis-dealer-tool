@@ -116,6 +116,12 @@ const BRAND_FILTERS = [
   { name: 'TIS Motorsports', label: 'TIS MOTORSPORTS' },
 ]
 
+const BRAND_LOGO_ASSETS: Record<string, { dark: string; light: string; height: number }> = {
+  TIS: { dark: '/tis-word-logo.png', light: '/tislogo-lightmode.png', height: 22 },
+  DTS: { dark: '/dts-logo-white.png', light: '/dts-logo-black.png', height: 22 },
+  'TIS Motorsports': { dark: '/tismotorsports-word-logo.png', light: '/tismotorsports-word-logo-black.png', height: 19 },
+}
+
 const SAFE_DEMO_SEARCHES = ['2024 F-150', '2024 Silverado 1500', '2023 RAM 1500', '2024 Tacoma', '2024 Bronco', '6x5.50 20 inch black']
 
 type OfficialWheelVideo = {
@@ -219,23 +225,9 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)
   }
 
-  const brandLogoSrc =
-    wheel.brand === 'TIS'
-      ? '/tis-word-logo.png'
-      : wheel.brand === 'DTS'
-        ? '/dts-logo-white.png'
-        : wheel.brand === 'TIS Motorsports'
-          ? '/tismotorsports-word-logo.png'
-          : null
-
-  const brandLogoHeight =
-    wheel.brand === 'TIS'
-      ? 22
-      : wheel.brand === 'DTS'
-        ? 22
-        : wheel.brand === 'TIS Motorsports'
-          ? 19
-          : 30
+  const brandLogo = BRAND_LOGO_ASSETS[wheel.brand]
+  const brandLogoSrc = brandLogo ? (isLightMode ? brandLogo.light : brandLogo.dark) : null
+  const brandLogoHeight = brandLogo?.height ?? 30
 
   return (
     <div
@@ -350,7 +342,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
               src={brandLogoSrc}
               alt={wheel.brand}
               height={brandLogoHeight}
-              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain', margin: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? '0' : undefined, display: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? 'inline-block' : undefined, filter: isLightMode ? 'brightness(0)' : 'none' }}
+              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain', margin: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? '0' : undefined, display: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? 'inline-block' : undefined }}
             />
           ) : (
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -529,7 +521,7 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
 
       <div style={{ padding: '16px' }}>
         <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>
-          <img src="/tis-word-logo.png" alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block', filter: isLightMode ? 'brightness(0)' : 'none' }} />
+          <img src={isLightMode ? BRAND_LOGO_ASSETS.TIS.light : BRAND_LOGO_ASSETS.TIS.dark} alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block' }} />
         </div>
         <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
           {tire.line} {tire.size}
@@ -1054,7 +1046,7 @@ export default function Home() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <a href="/" aria-label="TIS Dealer Tool home" style={{ display: 'inline-flex', alignItems: 'center' }}>
-            <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto', filter: themeMode === 'light' ? 'brightness(0)' : 'none' }} />
+            <img src={themeMode === 'light' ? '/tislogo-lightmode.png' : '/tis-logo.png'} alt="TIS" style={{ height: '28px', width: 'auto' }} />
           </a>
           <nav aria-label="Dealer tool sections" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             {([
