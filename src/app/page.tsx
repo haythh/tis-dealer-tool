@@ -593,19 +593,22 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
 }
 
 function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
+  const [searchInput, setSearchInput] = useState('')
   const [query, setQuery] = useState('')
   const [activeLine, setActiveLine] = useState<'ALL' | 'RT1' | 'TT1'>('ALL')
   const [activeRim, setActiveRim] = useState<number | 'ALL'>('ALL')
+  const [inStockOnly, setInStockOnly] = useState(true)
 
   const tires = tireData.tires
-  const rimDiameters = Array.from(new Set(tires.map(tire => tire.rimDiameter).filter((rim): rim is number => typeof rim === 'number'))).sort((a, b) => a - b)
-  const lineCounts = tires.reduce<Record<string, number>>((acc, tire) => {
+  const stockFilteredTires = tires.filter(tire => !inStockOnly || tire.inStock === true)
+  const rimDiameters = Array.from(new Set(stockFilteredTires.map(tire => tire.rimDiameter).filter((rim): rim is number => typeof rim === 'number'))).sort((a, b) => a - b)
+  const lineCounts = stockFilteredTires.reduce<Record<string, number>>((acc, tire) => {
     acc[tire.line] = (acc[tire.line] || 0) + 1
     return acc
   }, {})
 
   const normalizedQuery = query.trim().toLowerCase()
-  const filteredTires = tires.filter(tire => {
+  const filteredTires = stockFilteredTires.filter(tire => {
     if (activeLine !== 'ALL' && tire.line !== activeLine) return false
     if (activeRim !== 'ALL' && tire.rimDiameter !== activeRim) return false
     if (!normalizedQuery) return true
@@ -639,6 +642,8 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
     textTransform: 'uppercase',
   })
 
+  const runSearch = () => setQuery(searchInput)
+
   return (
     <div style={{ padding: '44px 0 64px' }}>
       <div style={{ textAlign: 'center', marginBottom: '28px' }}>
@@ -655,23 +660,34 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
 
       <div className="search-frame" style={{ maxWidth: 960, margin: '0 auto 24px' }}>
         <div className="search-glow" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) auto', gap: 12, alignItems: 'center' }}>
+        <div className="wheel-search-grid">
           <input
             type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') runSearch()
+            }}
             placeholder="Search 35x12.50, 20, 98824, Load E..."
             style={{ background: 'var(--search-bg)', border: '1px solid var(--panel-border)', borderRadius: 12, color: 'var(--page-text)', fontSize: 16, padding: '15px 18px', fontFamily: 'inherit', outline: 'none', minWidth: 0 }}
           />
-          <span style={{ color: 'var(--soft-text)', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-            {filteredTires.length} / {tires.length} tires
-          </span>
+          <button
+            type="button"
+            onClick={runSearch}
+            className="btn-slide"
+            style={{ borderRadius: 12, boxShadow: 'none', minWidth: 112, fontFamily: 'inherit', letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '15px 20px' }}
+          >
+            <span style={{ position: 'relative', zIndex: 2 }}>Search</span>
+          </button>
+          <button type="button" onClick={() => setInStockOnly(value => !value)} style={{ ...chipStyle(inStockOnly), minHeight: 52, whiteSpace: 'nowrap' }}>
+            In stock only
+          </button>
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
           {(['ALL', 'RT1', 'TT1'] as const).map(line => (
             <button key={line} type="button" onClick={() => setActiveLine(line)} style={chipStyle(activeLine === line)}>
-              {line === 'ALL' ? `All (${tires.length})` : `${line} (${lineCounts[line] || 0})`}
+              {line === 'ALL' ? `All (${stockFilteredTires.length})` : `${line} (${lineCounts[line] || 0})`}
             </button>
           ))}
         </div>
