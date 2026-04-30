@@ -125,21 +125,23 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
       if (Array.isArray(parsed) && parsed.length) {
         const priority: Record<GalleryItem['type'], number> = { face: 0, angle: 1, topangle: 2, other: 3, video: 4 }
         const officialVideo = officialVideoForWheel(wheel)
-        const mediaItems = parsed
+        const sortedMedia = parsed
           .filter(item => item?.url || item?.fullUrl)
-          .filter(item => officialVideo ? item.type !== 'video' : true)
-          .sort((a, b) => (priority[a.type as GalleryItem['type']] ?? 9) - (priority[b.type as GalleryItem['type']] ?? 9))
-          .slice(0, officialVideo ? 4 : 5) as GalleryItem[]
+          .sort((a, b) => (priority[a.type as GalleryItem['type']] ?? 9) - (priority[b.type as GalleryItem['type']] ?? 9)) as GalleryItem[]
+        const imageItems = sortedMedia.filter(item => item.type !== 'video')
 
         if (officialVideo) {
-          const poster = mediaItems.find(item => item.type !== 'video')?.url || wheel.ta_image_url || wheel.atd_image_url || ''
+          const visibleImages = imageItems.slice(0, 4)
+          const poster = visibleImages[0]?.url || wheel.ta_image_url || wheel.atd_image_url || ''
           return [
+            ...visibleImages,
             { url: poster, type: 'video', fullUrl: officialVideo.videoUrl },
-            ...mediaItems,
           ]
         }
 
-        return mediaItems.slice(0, 5)
+        const videoItems = sortedMedia.filter(item => item.type === 'video')
+        const visibleImages = imageItems.slice(0, videoItems.length ? 4 : 5)
+        return [...visibleImages, ...videoItems].slice(0, 5)
       }
     } catch {}
 
@@ -148,8 +150,8 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
 
     if (officialVideo) {
       return [
-        { url: fallbackImage || '', type: 'video', fullUrl: officialVideo.videoUrl },
         ...(fallbackImage ? [{ url: fallbackImage, type: 'other' as const, fullUrl: fallbackImage }] : []),
+        { url: fallbackImage || '', type: 'video', fullUrl: officialVideo.videoUrl },
       ]
     }
 
@@ -225,7 +227,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
         </div>
       )}
 
-      <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+      <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
         {selectedMedia?.type === 'video' && videoUrl ? (
           <video
             src={videoUrl}
@@ -235,7 +237,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
             loop
             playsInline
             preload="metadata"
-            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.12)', transformOrigin: 'center center' }}
           />
         ) : imageUrl ? (
           <Image
