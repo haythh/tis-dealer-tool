@@ -616,7 +616,7 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
     border: `1px solid ${active ? 'rgba(220,38,38,0.62)' : 'var(--panel-border)'}`,
     color: active ? '#fff' : 'var(--page-text)',
     padding: '10px 14px',
-    borderRadius: '999px',
+    borderRadius: '14px',
     cursor: 'pointer',
     fontFamily: 'inherit',
     fontSize: '13px',
