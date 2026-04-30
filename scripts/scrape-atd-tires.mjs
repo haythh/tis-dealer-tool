@@ -6,7 +6,9 @@
  *   ATD_COOKIE='name=value; name2=value2' npm run scrape-atd-tires
  *
  * Output updates src/data/tis-tires.json with:
- *   atdProductNumber, atdSupplierNumber, atdUrl, atdScrapedAt
+ *   atdProductNumber, atdSupplierNumber, atdUrl, ATD price fields,
+ *   stockPickup, stockToday, stockTomorrow, stockNational, totalStock, inStock,
+ *   stockUpdatedAt, atdScrapedAt
  */
 
 import { readFileSync, writeFileSync } from 'fs'
@@ -107,6 +109,69 @@ function pickBestCandidate(tire, products) {
     .sort((a, b) => b.score - a.score)[0]?.product || null
 }
 
+function isLoginHtml(text) {
+  const compact = String(text || '').replace(/\s+/g, ' ')
+  return /<form[^>]+(?:login|logon|j_spring_security_check)/i.test(compact)
+    || /Welcome[^<]{0,120}LOG IN/i.test(compact)
+    || /name=["']?j_username/i.test(compact)
+    || /id=["']?loginForm/i.test(compact)
+}
+
+function textFromHtml(html) {
+  return String(html || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '\n')
+    .replace(/<style[\s\S]*?<\/style>/gi, '\n')
+    .replace(/<[^>]+>/g, '\n')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\r/g, '\n')
+}
+
+function extractStockQuantity(text, label) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const beforeLabel = new RegExp(`(\\d+)\\s*(?:\\n|\\s)*${escaped}`, 'i').exec(text)
+  if (beforeLabel) return Number.parseInt(beforeLabel[1], 10)
+
+  const afterLabel = new RegExp(`${escaped}\\s*(?:\\n|\\s)*(\\d+)`, 'i').exec(text)
+  if (afterLabel) return Number.parseInt(afterLabel[1], 10)
+
+  return null
+}
+
+function extractStockFromHtml(html) {
+  const text = textFromHtml(html)
+  const stockPickup = extractStockQuantity(text, 'Pickup')
+  const stockToday = extractStockQuantity(text, 'Today')
+  const stockTomorrow = extractStockQuantity(text, 'Tomorrow')
+  const stockNational = extractStockQuantity(text, 'National')
+  const hasStockSignal = [stockPickup, stockToday, stockTomorrow, stockNational].some(value => value != null) || /Pickup|Today|Tomorrow|National/i.test(text)
+
+  if (!hasStockSignal) {
+    return {
+      inStock: null,
+      stockPickup: null,
+      stockToday: null,
+      stockTomorrow: null,
+      stockNational: null,
+      totalStock: null,
+    }
+  }
+
+  const normalized = {
+    stockPickup: stockPickup || 0,
+    stockToday: stockToday || 0,
+    stockTomorrow: stockTomorrow || 0,
+    stockNational: stockNational || 0,
+  }
+  const totalStock = normalized.stockPickup + normalized.stockToday + normalized.stockTomorrow + normalized.stockNational
+
+  return {
+    ...normalized,
+    totalStock,
+    inStock: totalStock > 0,
+  }
+}
+
 async function requestJson(path) {
   const response = await fetch(`${BASE_URL}${path}`, {
     redirect: 'manual',
@@ -126,7 +191,7 @@ async function requestJson(path) {
   }
 
   const text = await response.text()
-  if (response.status === 401 || response.status === 403 || /<form[^>]+login|password/i.test(text)) {
+  if (response.status === 401 || response.status === 403 || isLoginHtml(text)) {
     throw new Error('ATD_SESSION_EXPIRED')
   }
   if (!response.ok) throw new Error(`ATD HTTP ${response.status}`)
@@ -157,7 +222,9 @@ async function requestDetailProduct(productNumber, tire) {
   if (!response.ok) return null
 
   const html = await response.text()
-  if (/<form[^>]+login|password/i.test(html)) throw new Error('ATD_SESSION_EXPIRED')
+  if (isLoginHtml(html)) throw new Error('ATD_SESSION_EXPIRED')
+
+  const stock = extractStockFromHtml(html)
 
   const title = (html.match(/<h1[^>]*>([^<]+)/i) || html.match(/<title[^>]*>([^<]+)/i) || [])[1]?.trim() || ''
   const titleText = normalize(title)
@@ -174,6 +241,7 @@ async function requestDetailProduct(productNumber, tire) {
     supplierNumber: productNumber,
     description: title,
     displayableBrandAndStyle: title,
+    ...stock,
   }
 }
 
@@ -220,9 +288,16 @@ function applyAtdMatch(tire, match) {
     atdProductNumber: productNumber || null,
     atdSupplierNumber: supplierNumber,
     atdUrl: productNumber ? `${BASE_URL}/p/${encodeURIComponent(productNumber)}/detailPage` : null,
-    atdProductName: product.displayableBrandAndStyle || product.description || product.name || null,
-    atdNetPrice: product.netPrice ?? product.netPriceLocalized?.value ?? null,
-    atdRetailPrice: product.retailPrice ?? product.retailPriceLocalized?.value ?? null,
+    atdProductName: product.displayableBrandAndStyle || product.description || product.name || tire.atdProductName || null,
+    atdNetPrice: product.netPrice ?? product.netPriceLocalized?.value ?? tire.atdNetPrice ?? null,
+    atdRetailPrice: product.retailPrice ?? product.retailPriceLocalized?.value ?? tire.atdRetailPrice ?? null,
+    inStock: product.inStock ?? null,
+    stockPickup: product.stockPickup ?? null,
+    stockToday: product.stockToday ?? null,
+    stockTomorrow: product.stockTomorrow ?? null,
+    stockNational: product.stockNational ?? null,
+    totalStock: product.totalStock ?? null,
+    stockUpdatedAt: product.totalStock != null ? new Date().toISOString() : tire.stockUpdatedAt || null,
     atdLookupTerm: match.term,
     atdLookupStatus: productNumber ? 'found' : 'found_without_product_number',
     atdScrapedAt: new Date().toISOString(),

@@ -93,6 +93,13 @@ interface Tire {
   atdProductNumber?: string | null
   atdSupplierNumber?: string | null
   atdLookupStatus?: string | null
+  inStock?: boolean | null
+  stockPickup?: number | null
+  stockToday?: number | null
+  stockTomorrow?: number | null
+  stockNational?: number | null
+  totalStock?: number | null
+  stockUpdatedAt?: string | null
 }
 
 type TireData = {
@@ -468,6 +475,11 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
       }}
     >
       <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        {tire.inStock != null && (
+          <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: tire.inStock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: tire.inStock ? '#22c55e' : '#ef4444', border: `1px solid ${tire.inStock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
+            {tire.inStock ? `${tire.totalStock || ''} in stock` : 'Out of stock'}
+          </div>
+        )}
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -552,6 +564,14 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
             </div>
           )}
         </div>
+
+        {tire.inStock != null && tire.totalStock != null && tire.totalStock > 0 && (
+          <div style={{ fontSize: '11px', color: '#888', marginTop: '6px' }}>
+            {tire.stockTomorrow ? `${tire.stockTomorrow} tomorrow` : ''}
+            {tire.stockTomorrow && tire.stockNational ? ' · ' : ''}
+            {tire.stockNational ? `${tire.stockNational} national (3-5 days)` : ''}
+          </div>
+        )}
 
         <div style={{ fontSize: '11px', color: '#555', marginBottom: '12px' }}>
           SKU: {tire.atdProductNumber || tire.itemNo || '—'}
