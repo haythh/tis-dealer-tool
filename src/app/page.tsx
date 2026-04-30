@@ -87,6 +87,8 @@ interface Tire {
   maxTirePressure: number | null
   weight: number | null
   retailPrice: number | 'TBD' | null
+  imageUrls?: string[]
+  imageMatch?: string
   atdUrl?: string | null
   atdProductNumber?: string | null
   atdSupplierNumber?: string | null
@@ -534,11 +536,13 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
         {filteredTires.map(tire => {
           const price = formatPrice(tire.retailPrice)
+          const tireImages = tire.imageUrls?.length ? tire.imageUrls : [tire.heroImageUrl]
+          const tireImage = tireImages[0]
           return (
             <div key={tire.id} className="wheel-card" style={{ background: isLightMode ? '#fff' : 'rgba(255,255,255,0.04)', border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.08)'}`, borderRadius: 12, overflow: 'hidden', boxShadow: isLightMode ? '0 20px 50px rgba(15,15,18,0.08)' : '0 20px 60px rgba(0,0,0,0.2)' }}>
-              <div style={{ height: 180, background: '#050505', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img src={tire.heroImageUrl} alt={tire.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.82 }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.72))' }} />
+              <div style={{ height: 220, background: isLightMode ? 'radial-gradient(circle at 50% 40%, #ffffff, #eeeeef 72%)' : 'radial-gradient(circle at 50% 42%, #1c1c1f, #050505 72%)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <img src={tireImage} alt={`${tire.name} ${tire.size}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '14px', opacity: 1 }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.52))', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', left: 14, bottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ background: '#dc2626', color: '#fff', borderRadius: 999, padding: '5px 10px', fontSize: 11, fontWeight: 900, letterSpacing: '0.08em' }}>{tire.line}</span>
                   <span style={{ color: '#f4f4f5', fontSize: 12, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{tire.terrain}</span>

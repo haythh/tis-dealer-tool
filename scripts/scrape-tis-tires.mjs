@@ -5,6 +5,41 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 
+const RT1_IMAGES = [
+  '/tire-images/rt1/angle-1.webp',
+  '/tire-images/rt1/angle-2.webp',
+  '/tire-images/rt1/angle-3.webp',
+]
+
+const TT1_IMAGES_BY_BASE_SIZE = {
+  '33X12.50R17': ['/tire-images/tt1/33x12-50r17/face.webp', '/tire-images/tt1/33x12-50r17/angle.webp'],
+  '35X12.50R20': ['/tire-images/tt1/35x12-50r20/face.webp', '/tire-images/tt1/35x12-50r20/angle.webp'],
+  '35X12.50R22': ['/tire-images/tt1/35x12-50r22/face.webp', '/tire-images/tt1/35x12-50r22/angle.webp'],
+  '37X13.50R20': ['/tire-images/tt1/37x13-50r20/face.webp', '/tire-images/tt1/37x13-50r20/angle.webp'],
+  '37X13.50R22': ['/tire-images/tt1/37x13-50r22/face.webp', '/tire-images/tt1/37x13-50r22/angle.webp'],
+  '37X13.50R24': ['/tire-images/tt1/37x13-50r24/face.webp', '/tire-images/tt1/37x13-50r24/angle.webp', '/tire-images/tt1/37x13-50r24/tread.webp'],
+  '37X13.50R26': ['/tire-images/tt1/37x13-50r26/face.webp', '/tire-images/tt1/37x13-50r26/angle.webp', '/tire-images/tt1/37x13-50r26/tread.webp'],
+}
+
+function baseTireSize(size) {
+  return String(size || '')
+    .toUpperCase()
+    .replace(/LT/g, '')
+    .replace(/\/\d+$/, '')
+    .replace(/XL$/, '')
+    .replace(/^P(?=\d)/, '')
+    .trim()
+}
+
+function localTireImagesFor(line, size) {
+  if (line === 'RT1') return { imageUrls: RT1_IMAGES, imageMatch: 'rt1-shared' }
+
+  const match = TT1_IMAGES_BY_BASE_SIZE[baseTireSize(size)]
+  if (match) return { imageUrls: match, imageMatch: baseTireSize(size) }
+
+  return { imageUrls: TT1_IMAGES_BY_BASE_SIZE['35X12.50R20'], imageMatch: 'fallback-35X12.50R20' }
+}
+
 const SOURCES = [
   {
     line: 'RT1',
@@ -85,13 +120,16 @@ async function scrapeSource(source) {
 
   return dataRows.map(values => {
     const row = Object.fromEntries(source.columns.map((key, index) => [key, values[index] || '']))
+    const localImages = localTireImagesFor(source.line, row.size)
     const normalized = {
       id: tireId(source.line, row),
       line: source.line,
       name: source.name,
       terrain: source.terrain,
       sourceUrl: source.sourceUrl,
-      heroImageUrl: source.heroImageUrl,
+      heroImageUrl: localImages.imageUrls[0] || source.heroImageUrl,
+      imageUrls: localImages.imageUrls,
+      imageMatch: localImages.imageMatch,
       logoUrl: source.logoUrl,
       itemNo: row.itemNo || null,
       size: row.size,
@@ -127,7 +165,12 @@ const byLine = tires.reduce((acc, tire) => {
 const output = {
   generatedAt,
   source: 'tiswheels.com RT1/TT1 spec tables',
-  counts: { total: tires.length, ...byLine },
+  counts: {
+    total: tires.length,
+    ...byLine,
+    imageExactOrShared: tires.filter(tire => tire.imageMatch !== 'fallback-35X12.50R20').length,
+    imageFallback: tires.filter(tire => tire.imageMatch === 'fallback-35X12.50R20').length,
+  },
   tires,
 }
 

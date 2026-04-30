@@ -6,7 +6,9 @@
     "RT1": 41,
     "TT1": 19,
     "atdFound": 60,
-    "atdMissing": 0
+    "atdMissing": 0,
+    "imageExactOrShared": 48,
+    "imageFallback": 12
   },
   "tires": [
     {
@@ -15,7 +17,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98824",
       "size": "LT295/55R20/10",
@@ -43,7 +45,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98824",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98833.1",
@@ -51,7 +59,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98833.1",
       "size": "33X12.50R22LT/12",
@@ -75,7 +83,13 @@
       "atdProductNumber": "98833.1",
       "atdSupplierNumber": "98833.1",
       "atdUrl": "https://atdonline.com/p/98833.1/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98801",
@@ -83,7 +97,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98801",
       "size": "265/50R20XL",
@@ -111,7 +125,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98801",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98802",
@@ -119,7 +139,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98802",
       "size": "275/55R20XL",
@@ -147,7 +167,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98802",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98803",
@@ -155,7 +181,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98803",
       "size": "275/60R20",
@@ -183,7 +209,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98803",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98804.1",
@@ -191,7 +223,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98804.1",
       "size": "P285/55R20XL",
@@ -219,7 +251,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98804.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98806",
@@ -227,7 +265,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98806",
       "size": "275/50R22XL",
@@ -255,7 +293,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98806",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98812.1",
@@ -263,7 +307,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98812.1",
       "size": "LT275/65R18/10",
@@ -291,7 +335,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98812.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98794.1",
@@ -299,7 +349,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98794.1",
       "size": "265/70R16XL",
@@ -327,7 +377,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98794.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98795",
@@ -335,7 +391,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98795",
       "size": "265/65R17XL",
@@ -359,7 +415,13 @@
       "atdProductNumber": "98795",
       "atdSupplierNumber": "98795",
       "atdUrl": "https://atdonline.com/p/98795/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98796.1",
@@ -367,7 +429,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98796.1",
       "size": "265/70R17",
@@ -395,7 +457,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98796.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98800",
@@ -403,7 +471,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98800",
       "size": "275/65R18",
@@ -431,7 +499,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98800",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98814",
@@ -439,7 +513,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98814",
       "size": "LT285/65R18/10",
@@ -467,7 +541,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98814",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98818",
@@ -475,7 +555,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98818",
       "size": "LT265/60R20/10",
@@ -503,7 +583,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98818",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98807",
@@ -511,7 +597,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98807",
       "size": "285/45R22XL",
@@ -539,7 +625,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98807",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98813",
@@ -547,7 +639,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98813",
       "size": "LT275/70R18/10",
@@ -575,7 +667,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98813",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98810",
@@ -583,7 +681,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98810",
       "size": "LT285/70R17/10",
@@ -611,7 +709,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98810",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98834",
@@ -619,7 +723,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98834",
       "size": "35X12.50R22LT/12",
@@ -647,7 +751,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98834",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98831",
@@ -655,7 +765,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98831",
       "size": "35X12.50R20LT/12",
@@ -683,7 +793,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98831",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98797",
@@ -691,7 +807,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98797",
       "size": "P285/70R17",
@@ -719,7 +835,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98797",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98816",
@@ -727,7 +849,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98816",
       "size": "LT285/75R18/10",
@@ -755,7 +877,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98816",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98827",
@@ -763,7 +891,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98827",
       "size": "LT305/55R20/12",
@@ -791,7 +919,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98827",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98811",
@@ -799,7 +933,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98811",
       "size": "LT315/70R17/12",
@@ -827,7 +961,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98811",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98815",
@@ -835,7 +975,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98815",
       "size": "LT285/70R18/10",
@@ -859,7 +999,13 @@
       "atdProductNumber": "98815",
       "atdSupplierNumber": "98815",
       "atdUrl": "https://atdonline.com/p/98815/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98826",
@@ -867,7 +1013,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98826",
       "size": "LT295/65R20/10",
@@ -895,7 +1041,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98826",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98832",
@@ -903,7 +1055,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98832",
       "size": "37X12.50R20LT/10",
@@ -931,7 +1083,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98832",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98817",
@@ -939,7 +1097,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98817",
       "size": "LT295/70R18/10",
@@ -967,7 +1125,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98817",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98821",
@@ -975,7 +1139,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98821",
       "size": "LT275/65R20/10",
@@ -1003,7 +1167,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98821",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98798",
@@ -1011,7 +1181,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98798",
       "size": "265/60R18XL",
@@ -1039,7 +1209,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98798",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98799",
@@ -1047,7 +1223,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98799",
       "size": "265/65R18XL",
@@ -1075,7 +1251,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98799",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98805",
@@ -1083,7 +1265,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98805",
       "size": "305/55R20",
@@ -1111,7 +1293,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98805",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98808.1",
@@ -1119,7 +1307,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98808.1",
       "size": "LT265/75R16/10",
@@ -1147,7 +1335,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98808.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98809",
@@ -1155,7 +1349,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98809",
       "size": "LT265/70R17/10",
@@ -1183,7 +1377,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98809",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98819",
@@ -1191,7 +1391,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98819",
       "size": "LT275/55R20/10",
@@ -1219,7 +1419,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98819",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98820",
@@ -1227,7 +1433,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98820",
       "size": "LT275/60R20/10",
@@ -1255,7 +1461,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98820",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98822",
@@ -1263,7 +1475,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98822",
       "size": "LT285/55R20/10",
@@ -1291,7 +1503,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98822",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98823.1",
@@ -1299,7 +1517,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98823.1",
       "size": "LT285/60R20/10",
@@ -1327,7 +1545,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98823.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98825",
@@ -1335,7 +1559,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98825",
       "size": "LT295/60R20/10",
@@ -1363,7 +1587,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98825",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98828",
@@ -1371,7 +1601,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98828",
       "size": "35X12.50R18LT/12",
@@ -1399,7 +1629,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98828",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98829.1",
@@ -1407,7 +1643,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98829.1",
       "size": "33X12.50R20LT/12",
@@ -1435,7 +1671,13 @@
       "atdRetailPrice": null,
       "atdLookupTerm": "98829.1",
       "atdLookupStatus": "mapped_from_atd_product_number",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "RT1-98830",
@@ -1443,7 +1685,7 @@
       "name": "TIS RT1 by Hercules",
       "terrain": "Rugged Terrain",
       "sourceUrl": "https://tiswheels.com/rt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2025/04/rt1-web-block-copy-3.webp",
+      "heroImageUrl": "/tire-images/rt1/angle-1.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/rt1-smalllogo.webp",
       "itemNo": "98830",
       "size": "35X11.50R20LT/10",
@@ -1467,7 +1709,13 @@
       "atdProductNumber": "98830",
       "atdSupplierNumber": "98830",
       "atdUrl": "https://atdonline.com/p/98830/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "rt1-shared",
+      "imageUrls": [
+        "/tire-images/rt1/angle-1.webp",
+        "/tire-images/rt1/angle-2.webp",
+        "/tire-images/rt1/angle-3.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X12.50R17-10",
@@ -1475,7 +1723,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/33x12-50r17/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X12.50R17/10",
@@ -1499,7 +1747,12 @@
       "atdProductNumber": "98529.1",
       "atdSupplierNumber": "98529.1",
       "atdUrl": "https://atdonline.com/p/98529.1/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "33X12.50R17",
+      "imageUrls": [
+        "/tire-images/tt1/33x12-50r17/face.webp",
+        "/tire-images/tt1/33x12-50r17/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X12.50R17-10",
@@ -1507,7 +1760,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X12.50R17/10",
@@ -1531,7 +1784,12 @@
       "atdProductNumber": "98530",
       "atdSupplierNumber": "98530",
       "atdUrl": "https://atdonline.com/p/98530/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X12.50R18-12",
@@ -1539,7 +1797,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X12.50R18/12",
@@ -1563,7 +1821,12 @@
       "atdProductNumber": "98531",
       "atdSupplierNumber": "98531",
       "atdUrl": "https://atdonline.com/p/98531/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X12.50R18-12",
@@ -1571,7 +1834,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X12.50R18/12",
@@ -1595,7 +1858,12 @@
       "atdProductNumber": "98534",
       "atdSupplierNumber": "98534",
       "atdUrl": "https://atdonline.com/p/98534/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X12.50R20-12",
@@ -1603,7 +1871,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X12.50R20/12",
@@ -1627,7 +1895,12 @@
       "atdProductNumber": "98528",
       "atdSupplierNumber": "98528",
       "atdUrl": "https://atdonline.com/p/98528/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X14.50R20-12",
@@ -1635,7 +1908,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X14.50R20/12",
@@ -1659,7 +1932,12 @@
       "atdProductNumber": "98533.1",
       "atdSupplierNumber": "98533.1",
       "atdUrl": "https://atdonline.com/p/98533.1/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X12.50R20-12",
@@ -1667,7 +1945,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X12.50R20/12",
@@ -1691,7 +1969,12 @@
       "atdProductNumber": "98527",
       "atdSupplierNumber": "98527",
       "atdUrl": "https://atdonline.com/p/98527/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X14.50R20-12",
@@ -1699,7 +1982,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X14.50R20/12",
@@ -1723,7 +2006,12 @@
       "atdProductNumber": "98537",
       "atdSupplierNumber": "98537",
       "atdUrl": "https://atdonline.com/p/98537/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-37X12.50R20-10",
@@ -1731,7 +2019,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "37X12.50R20/10",
@@ -1755,7 +2043,12 @@
       "atdProductNumber": "98526",
       "atdSupplierNumber": "98526",
       "atdUrl": "https://atdonline.com/p/98526/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-37X13.50R20-12",
@@ -1763,7 +2056,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/37x13-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "37X13.50R20/12",
@@ -1787,7 +2080,12 @@
       "atdProductNumber": "98532",
       "atdSupplierNumber": "98532",
       "atdUrl": "https://atdonline.com/p/98532/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "37X13.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/37x13-50r20/face.webp",
+        "/tire-images/tt1/37x13-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X12.50R22-12",
@@ -1795,7 +2093,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X12.50R22/12",
@@ -1819,7 +2117,12 @@
       "atdProductNumber": "98535",
       "atdSupplierNumber": "98535",
       "atdUrl": "https://atdonline.com/p/98535/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X14.50R22-12",
@@ -1827,7 +2130,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X14.50R22/12",
@@ -1851,7 +2154,12 @@
       "atdProductNumber": "98541",
       "atdSupplierNumber": "98541",
       "atdUrl": "https://atdonline.com/p/98541/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X12.50R22-12",
@@ -1859,7 +2167,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r22/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X12.50R22/12",
@@ -1883,7 +2191,12 @@
       "atdProductNumber": "98536",
       "atdSupplierNumber": "98536",
       "atdUrl": "https://atdonline.com/p/98536/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "35X12.50R22",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r22/face.webp",
+        "/tire-images/tt1/35x12-50r22/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-37X13.50R22-12",
@@ -1891,7 +2204,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/37x13-50r22/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "37X13.50R22/12",
@@ -1915,7 +2228,12 @@
       "atdProductNumber": "98538",
       "atdSupplierNumber": "98538",
       "atdUrl": "https://atdonline.com/p/98538/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "37X13.50R22",
+      "imageUrls": [
+        "/tire-images/tt1/37x13-50r22/face.webp",
+        "/tire-images/tt1/37x13-50r22/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-33X14.50R24-10",
@@ -1923,7 +2241,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "33X14.50R24/10",
@@ -1947,7 +2265,12 @@
       "atdProductNumber": "98542",
       "atdSupplierNumber": "98542",
       "atdUrl": "https://atdonline.com/p/98542/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X15.50R24-10",
@@ -1955,7 +2278,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X15.50R24/10",
@@ -1979,7 +2302,12 @@
       "atdProductNumber": "98544",
       "atdSupplierNumber": "98544",
       "atdUrl": "https://atdonline.com/p/98544/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-37X13.50R24-12",
@@ -1987,7 +2315,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/37x13-50r24/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "37X13.50R24/12",
@@ -2011,7 +2339,13 @@
       "atdProductNumber": "98540",
       "atdSupplierNumber": "98540",
       "atdUrl": "https://atdonline.com/p/98540/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "37X13.50R24",
+      "imageUrls": [
+        "/tire-images/tt1/37x13-50r24/face.webp",
+        "/tire-images/tt1/37x13-50r24/angle.webp",
+        "/tire-images/tt1/37x13-50r24/tread.webp"
+      ]
     },
     {
       "id": "TT1-TT1-35X13.50R26-10",
@@ -2019,7 +2353,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/35x12-50r20/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "35X13.50R26/10",
@@ -2043,7 +2377,12 @@
       "atdProductNumber": "98543",
       "atdSupplierNumber": "98543",
       "atdUrl": "https://atdonline.com/p/98543/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "fallback-35X12.50R20",
+      "imageUrls": [
+        "/tire-images/tt1/35x12-50r20/face.webp",
+        "/tire-images/tt1/35x12-50r20/angle.webp"
+      ]
     },
     {
       "id": "TT1-TT1-37X13.50R26-12",
@@ -2051,7 +2390,7 @@
       "name": "TIS TT1 by Hercules",
       "terrain": "Mud Terrain",
       "sourceUrl": "https://tiswheels.com/tt1/",
-      "heroImageUrl": "https://tiswheels.com/wp-content/uploads/2022/03/tistires.webp",
+      "heroImageUrl": "/tire-images/tt1/37x13-50r26/face.webp",
       "logoUrl": "https://tiswheels.com/wp-content/uploads/2023/01/TT1-smallwhite.webp",
       "itemNo": null,
       "size": "37X13.50R26/12",
@@ -2075,8 +2414,15 @@
       "atdProductNumber": "98539",
       "atdSupplierNumber": "98539",
       "atdUrl": "https://atdonline.com/p/98539/detailPage",
-      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+      "imageMatch": "37X13.50R26",
+      "imageUrls": [
+        "/tire-images/tt1/37x13-50r26/face.webp",
+        "/tire-images/tt1/37x13-50r26/angle.webp",
+        "/tire-images/tt1/37x13-50r26/tread.webp"
+      ]
     }
   ],
-  "atdScrapedAt": "2026-04-30T08:57:01.461Z"
+  "atdScrapedAt": "2026-04-30T08:57:01.461Z",
+  "imagesUpdatedAt": "2026-04-30T09:11:45.229Z"
 }
