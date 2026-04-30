@@ -1172,7 +1172,7 @@ export default function Home() {
             </>
           )}
 
-          <div className="search-animate search-frame" style={{ maxWidth: isHomeView ? 800 : 960, margin: '0 auto' }}>
+          <div className="search-animate search-frame" style={{ maxWidth: isHomeView ? 800 : 960, margin: isHomeView ? '0 auto' : '30px auto 0' }}>
             <div className="search-glow" />
             {isHomeView ? (
               <>
@@ -1374,6 +1374,43 @@ export default function Home() {
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
                   <button type="button" onClick={() => setInStockOnly(true)} style={wheelChipStyle(inStockOnly)}>In stock only</button>
                   <button type="button" onClick={() => setInStockOnly(false)} style={wheelChipStyle(!inStockOnly)}>All inventory</button>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16, alignItems: 'center' }}>
+                  <span style={{ color: 'var(--soft-text)', fontSize: 11, fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', marginRight: 2 }}>
+                    Examples
+                  </span>
+                  {[...EXAMPLE_QUERIES, ...SAFE_DEMO_SEARCHES].filter((q, index, arr) => arr.indexOf(q) === index).map(q => (
+                    <button
+                      key={q}
+                      type="button"
+                      className="demo-pill"
+                      onClick={() => handleSearch(q)}
+                      style={{
+                        background: 'var(--search-bg)',
+                        border: '1px solid var(--panel-border)',
+                        color: 'var(--soft-text)',
+                        padding: '7px 12px',
+                        borderRadius: '12px',
+                        fontSize: 12,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        transition: 'all 0.15s',
+                      }}
+                      onMouseEnter={e => {
+                        ;(e.currentTarget as HTMLButtonElement).style.background = isLightMode ? 'rgba(15,15,18,0.06)' : 'rgba(255,255,255,0.15)'
+                        ;(e.currentTarget as HTMLButtonElement).style.borderColor = isLightMode ? 'rgba(15,15,18,0.16)' : 'rgba(255,255,255,0.2)'
+                        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--page-text)'
+                      }}
+                      onMouseLeave={e => {
+                        ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--search-bg)'
+                        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--panel-border)'
+                        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--soft-text)'
+                      }}
+                    >
+                      {q}
+                    </button>
+                  ))}
                 </div>
               
               </>
