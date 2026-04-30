@@ -523,6 +523,8 @@ export default function Home() {
     handleSearch(query || 'wheels', next)
   }
 
+  const isResultsView = Boolean(result) || loading
+
   return (
     <>
       <style jsx global>{`
@@ -615,6 +617,10 @@ export default function Home() {
           background: var(--shell-gradient);
         }
 
+        .demo-shell.results-view {
+          background: #000000;
+        }
+
         .demo-shell::before {
           content: '';
           position: absolute;
@@ -628,12 +634,21 @@ export default function Home() {
           mask-image: linear-gradient(to bottom, black, transparent 72%);
         }
 
+        .demo-shell.results-view::before {
+          opacity: 0;
+        }
+
         .ambient-orb {
           position: absolute;
           pointer-events: none;
           border-radius: 999px;
           filter: blur(12px);
           opacity: 0.72;
+        }
+
+        .demo-shell.results-view .ambient-orb,
+        .demo-shell.results-view .search-glow {
+          display: none;
         }
 
         .search-frame {
@@ -732,7 +747,7 @@ export default function Home() {
           .hero-stats { grid-template-columns: 1fr; }
         }
       `}</style>
-      <div ref={pageRef} className={`demo-shell theme-${themeMode}`} style={{ minHeight: '100vh', color: 'var(--page-text)', fontFamily: 'inherit' }}>
+      <div ref={pageRef} className={`demo-shell theme-${themeMode}${isResultsView ? ' results-view' : ''}`} style={{ minHeight: '100vh', color: 'var(--page-text)', fontFamily: 'inherit' }}>
       <div className="ambient-orb" style={{ width: 260, height: 260, left: -80, top: 120, background: 'rgba(220,38,38,0.24)' }} />
       <div className="ambient-orb" style={{ width: 220, height: 220, right: -70, top: 48, background: 'rgba(255,255,255,0.12)' }} />
       <div className="ambient-orb" style={{ width: 320, height: 320, right: '12%', bottom: 180, background: 'rgba(220,38,38,0.12)' }} />
