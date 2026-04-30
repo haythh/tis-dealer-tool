@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
+import officialWheelVideos from '@/data/official-wheel-videos.json'
 
 gsap.registerPlugin(useGSAP)
 
@@ -77,10 +78,43 @@ const BRAND_FILTERS = [
 const HERO_STATS = [
   { value: '1,590', label: 'Wheel SKUs' },
   { value: '83', label: 'Demo fitments' },
-  { value: '265', label: 'Video-rich SKUs' },
+  { value: '67', label: 'Official finish videos' },
 ]
 
 const SAFE_DEMO_SEARCHES = ['2024 F-150', '2024 Silverado 1500', '2023 RAM 1500', '2024 Tacoma', '2024 Bronco', '6x5.50 20 inch black']
+
+type OfficialWheelVideo = {
+  code: string
+  videoUrl: string
+  pageUrl: string
+  sourceSite: string
+}
+
+const officialVideosByCode = officialWheelVideos.videosByCode as Record<string, OfficialWheelVideo>
+
+function wheelModelVideoCodes(model: string) {
+  const compact = model.toUpperCase().replace(/[^A-Z0-9.]/g, '')
+  const candidates = new Set<string>([
+    compact,
+    compact.replace('2.0', '2'),
+    compact.replace(/DUALLYINNER|DUALLY/g, ''),
+    compact.replace(/DUALLYINNER|DUALLY/g, '').replace('2.0', '2'),
+  ])
+
+  const base = compact.match(/^(\d{3}[A-Z0-9]*)/)
+  if (base) candidates.add(base[1])
+
+  return [...candidates].filter(Boolean)
+}
+
+function officialVideoForWheel(wheel: Wheel) {
+  for (const code of wheelModelVideoCodes(wheel.model)) {
+    const video = officialVideosByCode[code]
+    if (video) return video
+  }
+
+  return null
+}
 
 function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'light' }) {
   const isLightMode = themeMode === 'light'
@@ -89,20 +123,38 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
     try {
       const parsed = wheel.ta_images_json ? JSON.parse(wheel.ta_images_json) : []
       if (Array.isArray(parsed) && parsed.length) {
-        const priority: Record<GalleryItem['type'], number> = { face: 0, angle: 1, video: 2, topangle: 3, other: 4 }
-        return parsed
+        const priority: Record<GalleryItem['type'], number> = { face: 0, angle: 1, topangle: 2, other: 3, video: 4 }
+        const officialVideo = officialVideoForWheel(wheel)
+        const mediaItems = parsed
           .filter(item => item?.url || item?.fullUrl)
+          .filter(item => officialVideo ? item.type !== 'video' : true)
           .sort((a, b) => (priority[a.type as GalleryItem['type']] ?? 9) - (priority[b.type as GalleryItem['type']] ?? 9))
-          .slice(0, 5)
+          .slice(0, officialVideo ? 4 : 5) as GalleryItem[]
+
+        if (officialVideo) {
+          const poster = mediaItems.find(item => item.type !== 'video')?.url || wheel.ta_image_url || wheel.atd_image_url || ''
+          return [
+            { url: poster, type: 'video', fullUrl: officialVideo.videoUrl },
+            ...mediaItems,
+          ]
+        }
+
+        return mediaItems.slice(0, 5)
       }
     } catch {}
 
-    if (wheel.ta_image_url) {
-      return [{ url: wheel.ta_image_url, type: 'other', fullUrl: wheel.ta_image_url }]
+    const fallbackImage = wheel.ta_image_url || wheel.atd_image_url
+    const officialVideo = officialVideoForWheel(wheel)
+
+    if (officialVideo) {
+      return [
+        { url: fallbackImage || '', type: 'video', fullUrl: officialVideo.videoUrl },
+        ...(fallbackImage ? [{ url: fallbackImage, type: 'other' as const, fullUrl: fallbackImage }] : []),
+      ]
     }
 
-    if (wheel.atd_image_url) {
-      return [{ url: wheel.atd_image_url, type: 'other', fullUrl: wheel.atd_image_url }]
+    if (fallbackImage) {
+      return [{ url: fallbackImage, type: 'other', fullUrl: fallbackImage }]
     }
 
     return []

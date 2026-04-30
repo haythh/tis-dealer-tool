@@ -1,0 +1,776 @@
+{
+  "generatedAt": "2026-04-29T23:58:28.977Z",
+  "sources": [
+    "https://tiswheels.com",
+    "https://www.dropstars.com"
+  ],
+  "totalVideos": 67,
+  "totalWheelModels": 81,
+  "matchedWheelModels": 71,
+  "missing": [
+    {
+      "brand": "TIS",
+      "model": "535B",
+      "candidates": [
+        "535B"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "544GB",
+      "candidates": [
+        "544GB"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "554BMR",
+      "candidates": [
+        "554BMR"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "555SB",
+      "candidates": [
+        "555SB"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "556BB",
+      "candidates": [
+        "556BB"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "560C",
+      "candidates": [
+        "560C"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "560MRL",
+      "candidates": [
+        "560MRL"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "563BS",
+      "candidates": [
+        "563BS"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "565BM",
+      "candidates": [
+        "565BM"
+      ]
+    },
+    {
+      "brand": "TIS",
+      "model": "565BSM",
+      "candidates": [
+        "565BSM"
+      ]
+    }
+  ],
+  "failures": [
+    {
+      "pageUrl": "https://tiswheels.com/535-2/",
+      "error": "404 Not Found"
+    },
+    {
+      "pageUrl": "https://tiswheels.com/535/",
+      "error": "404 Not Found"
+    },
+    {
+      "pageUrl": "https://tiswheels.com/547-2/",
+      "error": "404 Not Found"
+    },
+    {
+      "pageUrl": "https://www.dropstars.com/602-2/",
+      "error": "404 Not Found"
+    }
+  ],
+  "videosByCode": {
+    "504B": {
+      "code": "504B",
+      "brand": "TIS Motorsports",
+      "models": [
+        "504B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/504b-web.mp4",
+      "pageUrl": "https://tiswheels.com/504-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "504BZ": {
+      "code": "504BZ",
+      "brand": "TIS Motorsports",
+      "models": [
+        "504BZ"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/504bz-web.mp4",
+      "pageUrl": "https://tiswheels.com/504-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "504MB": {
+      "code": "504MB",
+      "brand": "TIS Motorsports",
+      "models": [
+        "504MB"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/504mb-web.mp4",
+      "pageUrl": "https://tiswheels.com/504-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "504MS": {
+      "code": "504MS",
+      "brand": "TIS Motorsports",
+      "models": [
+        "504MS"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/504ms-web.mp4",
+      "pageUrl": "https://tiswheels.com/504-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "504S": {
+      "code": "504S",
+      "brand": "TIS Motorsports",
+      "models": [
+        "504S"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/504s-web.mp4",
+      "pageUrl": "https://tiswheels.com/504-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "505B": {
+      "code": "505B",
+      "brand": "TIS Motorsports",
+      "models": [
+        "505B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/505b-web.mp4",
+      "pageUrl": "https://tiswheels.com/505-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "505C": {
+      "code": "505C",
+      "brand": "TIS Motorsports",
+      "models": [
+        "505C"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/505c-web.mp4",
+      "pageUrl": "https://tiswheels.com/505-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "505S": {
+      "code": "505S",
+      "brand": "TIS Motorsports",
+      "models": [
+        "505S"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/505s-web.mp4",
+      "pageUrl": "https://tiswheels.com/505-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "506B": {
+      "code": "506B",
+      "brand": "TIS Motorsports",
+      "models": [
+        "506B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/506b-web.mp4",
+      "pageUrl": "https://tiswheels.com/506-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "506C": {
+      "code": "506C",
+      "brand": "TIS Motorsports",
+      "models": [
+        "506C"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/506c-web.mp4",
+      "pageUrl": "https://tiswheels.com/506-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "506GM": {
+      "code": "506GM",
+      "brand": "TIS Motorsports",
+      "models": [
+        "506GM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/506gm-web.mp4",
+      "pageUrl": "https://tiswheels.com/506-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "507B": {
+      "code": "507B",
+      "brand": "TIS Motorsports",
+      "models": [
+        "507B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/507b-web.mp4",
+      "pageUrl": "https://tiswheels.com/507-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "507S": {
+      "code": "507S",
+      "brand": "TIS Motorsports",
+      "models": [
+        "507S"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/06/507S-web.mp4",
+      "pageUrl": "https://tiswheels.com/507-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "508BB": {
+      "code": "508BB",
+      "brand": "TIS Motorsports",
+      "models": [
+        "508BB"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2026/04/508bb-webvideo.mp4",
+      "pageUrl": "https://tiswheels.com/508-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "508BM": {
+      "code": "508BM",
+      "brand": "TIS Motorsports",
+      "models": [
+        "508BM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2026/04/508BM-webvideo.mp4",
+      "pageUrl": "https://tiswheels.com/508-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544B": {
+      "code": "544B",
+      "brand": "TIS",
+      "models": [
+        "544B",
+        "544B Dually",
+        "544B Dually Inner"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/08/544B-STUDIO.mp4",
+      "pageUrl": "https://tiswheels.com/544-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544BM": {
+      "code": "544BM",
+      "brand": "TIS",
+      "models": [
+        "544BM",
+        "544BM Dually"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/08/544BM-STUDIO.mp4",
+      "pageUrl": "https://tiswheels.com/544-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544BM2": {
+      "code": "544BM2",
+      "brand": "TIS",
+      "models": [
+        "544BM 2.0"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/544BM2-WEBVID.mp4",
+      "pageUrl": "https://tiswheels.com/544bm2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544BSM": {
+      "code": "544BSM",
+      "brand": "TIS",
+      "models": [
+        "544BSM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/08/544BSM-STUDIO.mp4",
+      "pageUrl": "https://tiswheels.com/544-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544C": {
+      "code": "544C",
+      "brand": "TIS",
+      "models": [
+        "544C",
+        "544C Dually"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/08/544C-STUDIO.mp4",
+      "pageUrl": "https://tiswheels.com/544-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544MB": {
+      "code": "544MB",
+      "brand": "TIS",
+      "models": [
+        "544MB"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/08/544MB-STUDIO.mp4",
+      "pageUrl": "https://tiswheels.com/544-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "544RB": {
+      "code": "544RB",
+      "brand": "TIS",
+      "models": [
+        "544RB"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/05/544rb-web2.mov",
+      "pageUrl": "https://tiswheels.com/544-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "547B": {
+      "code": "547B",
+      "brand": "TIS",
+      "models": [
+        "547B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2026/01/547b-webani.mp4",
+      "pageUrl": "https://tiswheels.com/547/",
+      "sourceSite": "tiswheels.com"
+    },
+    "547BM": {
+      "code": "547BM",
+      "brand": "TIS",
+      "models": [
+        "547BM"
+      ],
+      "videoUrl": "https://tiswheels.wpengine.com/wp-content/uploads/2021/03/547bm-combined-web.mp4",
+      "pageUrl": "https://tiswheels.com/547/",
+      "sourceSite": "tiswheels.com"
+    },
+    "547BM2": {
+      "code": "547BM2",
+      "brand": "TIS",
+      "models": [
+        "547BM 2.0"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2025/03/547BM2-WEBVID.mp4",
+      "pageUrl": "https://tiswheels.com/547bm2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "547C": {
+      "code": "547C",
+      "brand": "TIS",
+      "models": [
+        "547C"
+      ],
+      "videoUrl": "https://tiswheels.wpengine.com/wp-content/uploads/2021/03/547c-combined-web.mp4",
+      "pageUrl": "https://tiswheels.com/547/",
+      "sourceSite": "tiswheels.com"
+    },
+    "548BM": {
+      "code": "548BM",
+      "brand": "TIS",
+      "models": [
+        "548BM"
+      ],
+      "videoUrl": "https://tiswheels.wpengine.com/wp-content/uploads/2021/03/548bm-combined-web.mp4",
+      "pageUrl": "https://tiswheels.com/wheels-2/548/",
+      "sourceSite": "tiswheels.com"
+    },
+    "553B": {
+      "code": "553B",
+      "brand": "TIS",
+      "models": [
+        "553B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/09/553B.mp4",
+      "pageUrl": "https://tiswheels.com/553-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "553BM": {
+      "code": "553BM",
+      "brand": "TIS",
+      "models": [
+        "553BM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/09/553BM-WEB.mp4",
+      "pageUrl": "https://tiswheels.com/553/",
+      "sourceSite": "tiswheels.com"
+    },
+    "554B": {
+      "code": "554B",
+      "brand": "TIS",
+      "models": [
+        "554B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/10/554b-web.mp4",
+      "pageUrl": "https://tiswheels.com/554-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "554BM": {
+      "code": "554BM",
+      "brand": "TIS",
+      "models": [
+        "554BM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/10/554bm-web.mp4",
+      "pageUrl": "https://tiswheels.com/554-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "555A": {
+      "code": "555A",
+      "brand": "TIS",
+      "models": [
+        "555A"
+      ],
+      "videoUrl": "https://tiswheels.wpengine.com/wp-content/uploads/2021/03/555a-combined-1.mp4",
+      "pageUrl": "https://tiswheels.com/555-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "555MRT": {
+      "code": "555MRT",
+      "brand": "TIS",
+      "models": [
+        "555MRT"
+      ],
+      "videoUrl": "https://tiswheels.wpengine.com/wp-content/uploads/2021/03/555mrt-combined-web.mp4",
+      "pageUrl": "https://tiswheels.com/555-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "556AB": {
+      "code": "556AB",
+      "brand": "TIS",
+      "models": [
+        "556AB"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/04/556ab-web.mov",
+      "pageUrl": "https://tiswheels.com/556-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "556BA": {
+      "code": "556BA",
+      "brand": "TIS",
+      "models": [
+        "556BA"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/04/556ba-web.mov",
+      "pageUrl": "https://tiswheels.com/556-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "556SB": {
+      "code": "556SB",
+      "brand": "TIS",
+      "models": [
+        "556SB"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/04/556sb-web.mov",
+      "pageUrl": "https://tiswheels.com/556-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "560B": {
+      "code": "560B",
+      "brand": "TIS",
+      "models": [
+        "560B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2021/11/560b-COMBINED_web.mp4",
+      "pageUrl": "https://tiswheels.com/560-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "560BM": {
+      "code": "560BM",
+      "brand": "TIS",
+      "models": [
+        "560BM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2021/11/560BM-COMBINED_web.mp4",
+      "pageUrl": "https://tiswheels.com/560-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "561B": {
+      "code": "561B",
+      "brand": "TIS",
+      "models": [
+        "561B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2022/01/561b-COMBINED_web.mp4",
+      "pageUrl": "https://tiswheels.com/561-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "563B": {
+      "code": "563B",
+      "brand": "TIS",
+      "models": [
+        "563B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/10/563b-web.mp4",
+      "pageUrl": "https://tiswheels.com/563-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "563BZ": {
+      "code": "563BZ",
+      "brand": "TIS",
+      "models": [
+        "563BZ"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/04/563bz-fix.mov",
+      "pageUrl": "https://tiswheels.com/563-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "565B": {
+      "code": "565B",
+      "brand": "TIS",
+      "models": [
+        "565B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/10/565b-web.mp4",
+      "pageUrl": "https://tiswheels.com/565-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "565C": {
+      "code": "565C",
+      "brand": "TIS",
+      "models": [
+        "565C"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2023/10/565c-web.mp4",
+      "pageUrl": "https://tiswheels.com/565-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "566B": {
+      "code": "566B",
+      "brand": "TIS",
+      "models": [
+        "566B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/07/566b-web.mp4",
+      "pageUrl": "https://tiswheels.com/566-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "566BM": {
+      "code": "566BM",
+      "brand": "TIS",
+      "models": [
+        "566BM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/07/566bm-web.mp4",
+      "pageUrl": "https://tiswheels.com/566-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "566BSM": {
+      "code": "566BSM",
+      "brand": "TIS",
+      "models": [
+        "566BSM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/07/566bsm-web.mp4",
+      "pageUrl": "https://tiswheels.com/566-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "566C": {
+      "code": "566C",
+      "brand": "TIS",
+      "models": [
+        "566C"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2024/07/566c-web.mp4",
+      "pageUrl": "https://tiswheels.com/566-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "567B": {
+      "code": "567B",
+      "brand": "TIS",
+      "models": [
+        "567B"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2026/01/567B-WEBVID.mp4",
+      "pageUrl": "https://tiswheels.com/567-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "567BM": {
+      "code": "567BM",
+      "brand": "TIS",
+      "models": [
+        "567BM"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2026/01/567BM-WEBVID.mp4",
+      "pageUrl": "https://tiswheels.com/567-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "567C": {
+      "code": "567C",
+      "brand": "TIS",
+      "models": [
+        "567C"
+      ],
+      "videoUrl": "https://tiswheels.com/wp-content/uploads/2026/01/567C-WEBVID.mp4",
+      "pageUrl": "https://tiswheels.com/567-2/",
+      "sourceSite": "tiswheels.com"
+    },
+    "602BZB": {
+      "code": "602BZB",
+      "brand": "DTS",
+      "models": [
+        "602BZB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/602bzb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/602/",
+      "sourceSite": "dropstars.com"
+    },
+    "602MS": {
+      "code": "602MS",
+      "brand": "DTS",
+      "models": [
+        "602MS"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/602ms-web.mp4",
+      "pageUrl": "https://www.dropstars.com/602/",
+      "sourceSite": "dropstars.com"
+    },
+    "602SB": {
+      "code": "602SB",
+      "brand": "DTS",
+      "models": [
+        "602SB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/602sb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/602/",
+      "sourceSite": "dropstars.com"
+    },
+    "603MS": {
+      "code": "603MS",
+      "brand": "DTS",
+      "models": [
+        "603MS"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/603ms-web.mp4",
+      "pageUrl": "https://www.dropstars.com/603-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "603SB": {
+      "code": "603SB",
+      "brand": "DTS",
+      "models": [
+        "603SB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/603sb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/603-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "604AB": {
+      "code": "604AB",
+      "brand": "DTS",
+      "models": [
+        "604AB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/604ab-web.mp4",
+      "pageUrl": "https://www.dropstars.com/604-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "604BZB": {
+      "code": "604BZB",
+      "brand": "DTS",
+      "models": [
+        "604BZB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/604bzb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/604-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "604SB": {
+      "code": "604SB",
+      "brand": "DTS",
+      "models": [
+        "604SB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/604sb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/604-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "605SB": {
+      "code": "605SB",
+      "brand": "DTS",
+      "models": [
+        "605SB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/605sb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/605-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "606BZ": {
+      "code": "606BZ",
+      "brand": "DTS",
+      "models": [
+        "606BZ"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/606bz-web.mp4",
+      "pageUrl": "https://www.dropstars.com/606-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "606MS": {
+      "code": "606MS",
+      "brand": "DTS",
+      "models": [
+        "606MS"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/08/606ms-web.mp4",
+      "pageUrl": "https://www.dropstars.com/606-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "606SB": {
+      "code": "606SB",
+      "brand": "DTS",
+      "models": [
+        "606SB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/09/606sb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/606-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "607BZ": {
+      "code": "607BZ",
+      "brand": "DTS",
+      "models": [
+        "607BZ"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/09/607bz-web.mp4",
+      "pageUrl": "https://www.dropstars.com/607-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "607SB": {
+      "code": "607SB",
+      "brand": "DTS",
+      "models": [
+        "607SB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2025/09/607sb-web.mp4",
+      "pageUrl": "https://www.dropstars.com/607-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "608BB": {
+      "code": "608BB",
+      "brand": "DTS",
+      "models": [
+        "608BB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2026/01/dts-608bb-webvid.mp4",
+      "pageUrl": "https://www.dropstars.com/608-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "608MS": {
+      "code": "608MS",
+      "brand": "DTS",
+      "models": [
+        "608MS"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2026/01/dts-608ms-webvid.mp4",
+      "pageUrl": "https://www.dropstars.com/608-2/",
+      "sourceSite": "dropstars.com"
+    },
+    "608MSB": {
+      "code": "608MSB",
+      "brand": "DTS",
+      "models": [
+        "608MSB"
+      ],
+      "videoUrl": "https://www.dropstars.com/wp-content/uploads/2026/01/dts608mbs-webvid.mp4",
+      "pageUrl": "https://www.dropstars.com/608-2/",
+      "sourceSite": "dropstars.com"
+    }
+  }
+}
