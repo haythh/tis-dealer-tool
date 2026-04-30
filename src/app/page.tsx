@@ -87,6 +87,10 @@ interface Tire {
   maxTirePressure: number | null
   weight: number | null
   retailPrice: number | 'TBD' | null
+  atdUrl?: string | null
+  atdProductNumber?: string | null
+  atdSupplierNumber?: string | null
+  atdLookupStatus?: string | null
 }
 
 type TireData = {
@@ -570,9 +574,15 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
                   ))}
                 </div>
 
-                <a href={tire.sourceUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit' }}>
-                  <span style={{ position: 'relative', zIndex: 2 }}>View TIS specs</span>
-                </a>
+                {tire.atdUrl ? (
+                  <a href={tire.atdUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit' }}>
+                    <span style={{ position: 'relative', zIndex: 2 }}>Check Your Price on ATDOnline</span>
+                  </a>
+                ) : (
+                  <div style={{ display: 'block', background: 'rgba(255,255,255,0.06)', color: '#666', textAlign: 'center', padding: '10px 16px', borderRadius: 8, fontSize: 14, fontWeight: 700 }}>
+                    ATD link pending
+                  </div>
+                )}
               </div>
             </div>
           )

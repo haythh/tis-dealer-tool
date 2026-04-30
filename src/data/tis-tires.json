@@ -4,7 +4,9 @@
   "counts": {
     "total": 60,
     "RT1": 41,
-    "TT1": 19
+    "TT1": 19,
+    "atdFound": 60,
+    "atdMissing": 0
   },
   "tires": [
     {
@@ -32,7 +34,16 @@
       "dualMaxLoad": "3085@80",
       "maxTirePressure": 80,
       "weight": 62.3,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98824",
+      "atdSupplierNumber": "98824",
+      "atdUrl": "https://atdonline.com/p/98824/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 228.59,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98824",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98833.1",
@@ -59,7 +70,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 62.8,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98833.1",
+      "atdSupplierNumber": "98833.1",
+      "atdUrl": "https://atdonline.com/p/98833.1/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98801",
@@ -86,7 +102,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 43.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98801",
+      "atdSupplierNumber": "98801",
+      "atdUrl": "https://atdonline.com/p/98801/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 141.22,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98801",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98802",
@@ -113,7 +138,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 47.6,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98802",
+      "atdSupplierNumber": "98802",
+      "atdUrl": "https://atdonline.com/p/98802/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 139,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98802",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98803",
@@ -140,7 +174,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 51,
       "weight": 47.2,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98803",
+      "atdSupplierNumber": "98803",
+      "atdUrl": "https://atdonline.com/p/98803/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 151.38,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98803",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98804.1",
@@ -167,7 +210,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 49,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98804.1",
+      "atdSupplierNumber": "98804.1",
+      "atdUrl": "https://atdonline.com/p/98804.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 151.38,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98804.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98806",
@@ -194,7 +246,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 45.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98806",
+      "atdSupplierNumber": "98806",
+      "atdUrl": "https://atdonline.com/p/98806/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 177.79,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98806",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98812.1",
@@ -221,7 +282,16 @@
       "dualMaxLoad": "3085@80",
       "maxTirePressure": 80,
       "weight": 56.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98812.1",
+      "atdSupplierNumber": "98812.1",
+      "atdUrl": "https://atdonline.com/p/98812.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 171.7,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98812.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98794.1",
@@ -248,7 +318,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 46.7,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98794.1",
+      "atdSupplierNumber": "98794.1",
+      "atdUrl": "https://atdonline.com/p/98794.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 120.9,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98794.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98795",
@@ -275,7 +354,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 40.2,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98795",
+      "atdSupplierNumber": "98795",
+      "atdUrl": "https://atdonline.com/p/98795/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98796.1",
@@ -302,7 +386,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 51,
       "weight": 43.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98796.1",
+      "atdSupplierNumber": "98796.1",
+      "atdUrl": "https://atdonline.com/p/98796.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 119,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98796.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98800",
@@ -329,7 +422,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 51,
       "weight": 45,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98800",
+      "atdSupplierNumber": "98800",
+      "atdUrl": "https://atdonline.com/p/98800/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 129,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98800",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98814",
@@ -356,7 +458,16 @@
       "dualMaxLoad": "3305@80",
       "maxTirePressure": 80,
       "weight": 58.3,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98814",
+      "atdSupplierNumber": "98814",
+      "atdUrl": "https://atdonline.com/p/98814/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 202.17,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98814",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98818",
@@ -383,7 +494,16 @@
       "dualMaxLoad": "2910@80",
       "maxTirePressure": 80,
       "weight": 56,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98818",
+      "atdSupplierNumber": "98818",
+      "atdUrl": "https://atdonline.com/p/98818/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 181.86,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98818",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98807",
@@ -410,7 +530,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 44.7,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98807",
+      "atdSupplierNumber": "98807",
+      "atdUrl": "https://atdonline.com/p/98807/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 171.7,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98807",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98813",
@@ -437,7 +566,16 @@
       "dualMaxLoad": "3305@80",
       "maxTirePressure": 80,
       "weight": 58.5,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98813",
+      "atdSupplierNumber": "98813",
+      "atdUrl": "https://atdonline.com/p/98813/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 159,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98813",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98810",
@@ -464,7 +602,16 @@
       "dualMaxLoad": "3415@80",
       "maxTirePressure": 80,
       "weight": 57.9,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98810",
+      "atdSupplierNumber": "98810",
+      "atdUrl": "https://atdonline.com/p/98810/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 159,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98810",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98834",
@@ -491,7 +638,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 70.3,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98834",
+      "atdSupplierNumber": "98834",
+      "atdUrl": "https://atdonline.com/p/98834/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 228.59,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98834",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98831",
@@ -518,7 +674,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 70.6,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98831",
+      "atdSupplierNumber": "98831",
+      "atdUrl": "https://atdonline.com/p/98831/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 222.5,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98831",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98797",
@@ -545,7 +710,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 51,
       "weight": 48.7,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98797",
+      "atdSupplierNumber": "98797",
+      "atdUrl": "https://atdonline.com/p/98797/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 157.47,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98797",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98816",
@@ -572,7 +746,16 @@
       "dualMaxLoad": "3750@80",
       "maxTirePressure": 80,
       "weight": 69.5,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98816",
+      "atdSupplierNumber": "98816",
+      "atdUrl": "https://atdonline.com/p/98816/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 202.17,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98816",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98827",
@@ -599,7 +782,16 @@
       "dualMaxLoad": "3305@80",
       "maxTirePressure": 80,
       "weight": 63.9,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98827",
+      "atdSupplierNumber": "98827",
+      "atdUrl": "https://atdonline.com/p/98827/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 242.82,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98827",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98811",
@@ -626,7 +818,16 @@
       "dualMaxLoad": "3640@80",
       "maxTirePressure": 80,
       "weight": 70.8,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98811",
+      "atdSupplierNumber": "98811",
+      "atdUrl": "https://atdonline.com/p/98811/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 222.5,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98811",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98815",
@@ -653,7 +854,12 @@
       "dualMaxLoad": "3525@80",
       "maxTirePressure": 80,
       "weight": 59.9,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98815",
+      "atdSupplierNumber": "98815",
+      "atdUrl": "https://atdonline.com/p/98815/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98826",
@@ -680,7 +886,16 @@
       "dualMaxLoad": "3750@80",
       "maxTirePressure": 80,
       "weight": 69.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98826",
+      "atdSupplierNumber": "98826",
+      "atdUrl": "https://atdonline.com/p/98826/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 252.97,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98826",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98832",
@@ -707,7 +922,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 81.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98832",
+      "atdSupplierNumber": "98832",
+      "atdUrl": "https://atdonline.com/p/98832/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 252.97,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98832",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98817",
@@ -734,7 +958,16 @@
       "dualMaxLoad": "3750@80",
       "maxTirePressure": 80,
       "weight": 69.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98817",
+      "atdSupplierNumber": "98817",
+      "atdUrl": "https://atdonline.com/p/98817/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 202.17,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98817",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98821",
@@ -761,7 +994,16 @@
       "dualMaxLoad": "3415@80",
       "maxTirePressure": 80,
       "weight": 60.9,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98821",
+      "atdSupplierNumber": "98821",
+      "atdUrl": "https://atdonline.com/p/98821/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 222.5,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98821",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98798",
@@ -788,7 +1030,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 41.5,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98798",
+      "atdSupplierNumber": "98798",
+      "atdUrl": "https://atdonline.com/p/98798/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 141.22,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98798",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98799",
@@ -815,7 +1066,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 50,
       "weight": 43.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98799",
+      "atdSupplierNumber": "98799",
+      "atdUrl": "https://atdonline.com/p/98799/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 141.22,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98799",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98805",
@@ -842,7 +1102,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 51,
       "weight": 51.6,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98805",
+      "atdSupplierNumber": "98805",
+      "atdUrl": "https://atdonline.com/p/98805/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 192.01,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98805",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98808.1",
@@ -869,7 +1138,16 @@
       "dualMaxLoad": "3085@80",
       "maxTirePressure": 80,
       "weight": 56.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98808.1",
+      "atdSupplierNumber": "98808.1",
+      "atdUrl": "https://atdonline.com/p/98808.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 129,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98808.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98809",
@@ -896,7 +1174,16 @@
       "dualMaxLoad": "3085@80",
       "maxTirePressure": 80,
       "weight": 54.5,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98809",
+      "atdSupplierNumber": "98809",
+      "atdUrl": "https://atdonline.com/p/98809/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 119,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98809",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98819",
@@ -923,7 +1210,16 @@
       "dualMaxLoad": "2835@80",
       "maxTirePressure": 80,
       "weight": 53.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98819",
+      "atdSupplierNumber": "98819",
+      "atdUrl": "https://atdonline.com/p/98819/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 177.79,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98819",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98820",
@@ -950,7 +1246,16 @@
       "dualMaxLoad": "3085@80",
       "maxTirePressure": 80,
       "weight": 59.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98820",
+      "atdSupplierNumber": "98820",
+      "atdUrl": "https://atdonline.com/p/98820/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 192.01,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98820",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98822",
@@ -977,7 +1282,16 @@
       "dualMaxLoad": "3000@80",
       "maxTirePressure": 80,
       "weight": 61.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98822",
+      "atdSupplierNumber": "98822",
+      "atdUrl": "https://atdonline.com/p/98822/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 202.17,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98822",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98823.1",
@@ -1004,7 +1318,16 @@
       "dualMaxLoad": "3305@80",
       "maxTirePressure": 80,
       "weight": 61.6,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98823.1",
+      "atdSupplierNumber": "98823.1",
+      "atdUrl": "https://atdonline.com/p/98823.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 212.33,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98823.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98825",
@@ -1031,7 +1354,16 @@
       "dualMaxLoad": "3415@80",
       "maxTirePressure": 80,
       "weight": 65.9,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98825",
+      "atdSupplierNumber": "98825",
+      "atdUrl": "https://atdonline.com/p/98825/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 228.59,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98825",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98828",
@@ -1058,7 +1390,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 74.1,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98828",
+      "atdSupplierNumber": "98828",
+      "atdUrl": "https://atdonline.com/p/98828/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 212.33,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98828",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98829.1",
@@ -1085,7 +1426,16 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 69.5,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdProductNumber": "98829.1",
+      "atdSupplierNumber": "98829.1",
+      "atdUrl": "https://atdonline.com/p/98829.1/detailPage",
+      "atdProductName": "Hercules, TIS Offroad RT1",
+      "atdNetPrice": 202.17,
+      "atdRetailPrice": null,
+      "atdLookupTerm": "98829.1",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "RT1-98830",
@@ -1112,7 +1462,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 71.4,
-      "retailPrice": null
+      "retailPrice": null,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98830",
+      "atdSupplierNumber": "98830",
+      "atdUrl": "https://atdonline.com/p/98830/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X12.50R17-10",
@@ -1139,7 +1494,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 70.61,
-      "retailPrice": 320
+      "retailPrice": 320,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98529.1",
+      "atdSupplierNumber": "98529.1",
+      "atdUrl": "https://atdonline.com/p/98529.1/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X12.50R17-10",
@@ -1166,7 +1526,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 74.58,
-      "retailPrice": 342
+      "retailPrice": 342,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98530",
+      "atdSupplierNumber": "98530",
+      "atdUrl": "https://atdonline.com/p/98530/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X12.50R18-12",
@@ -1193,7 +1558,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 73.92,
-      "retailPrice": 324
+      "retailPrice": 324,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98531",
+      "atdSupplierNumber": "98531",
+      "atdUrl": "https://atdonline.com/p/98531/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X12.50R18-12",
@@ -1220,7 +1590,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 77.04,
-      "retailPrice": 345
+      "retailPrice": 345,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98534",
+      "atdSupplierNumber": "98534",
+      "atdUrl": "https://atdonline.com/p/98534/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X12.50R20-12",
@@ -1247,7 +1622,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 74.51,
-      "retailPrice": 340
+      "retailPrice": 340,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98528",
+      "atdSupplierNumber": "98528",
+      "atdUrl": "https://atdonline.com/p/98528/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X14.50R20-12",
@@ -1274,7 +1654,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 82.99,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98533.1",
+      "atdSupplierNumber": "98533.1",
+      "atdUrl": "https://atdonline.com/p/98533.1/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X12.50R20-12",
@@ -1301,7 +1686,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 81.31,
-      "retailPrice": 354
+      "retailPrice": 354,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98527",
+      "atdSupplierNumber": "98527",
+      "atdUrl": "https://atdonline.com/p/98527/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X14.50R20-12",
@@ -1328,7 +1718,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 89.88,
-      "retailPrice": 416
+      "retailPrice": 416,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98537",
+      "atdSupplierNumber": "98537",
+      "atdUrl": "https://atdonline.com/p/98537/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-37X12.50R20-10",
@@ -1355,7 +1750,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 84.86,
-      "retailPrice": 444
+      "retailPrice": 444,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98526",
+      "atdSupplierNumber": "98526",
+      "atdUrl": "https://atdonline.com/p/98526/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-37X13.50R20-12",
@@ -1382,7 +1782,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 89.69,
-      "retailPrice": 452
+      "retailPrice": 452,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98532",
+      "atdSupplierNumber": "98532",
+      "atdUrl": "https://atdonline.com/p/98532/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X12.50R22-12",
@@ -1409,7 +1814,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 74.46,
-      "retailPrice": 360
+      "retailPrice": 360,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98535",
+      "atdSupplierNumber": "98535",
+      "atdUrl": "https://atdonline.com/p/98535/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X14.50R22-12",
@@ -1436,7 +1846,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 90,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98541",
+      "atdSupplierNumber": "98541",
+      "atdUrl": "https://atdonline.com/p/98541/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X12.50R22-12",
@@ -1463,7 +1878,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 80.24,
-      "retailPrice": 355
+      "retailPrice": 355,
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98536",
+      "atdSupplierNumber": "98536",
+      "atdUrl": "https://atdonline.com/p/98536/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-37X13.50R22-12",
@@ -1490,7 +1910,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 91.42,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98538",
+      "atdSupplierNumber": "98538",
+      "atdUrl": "https://atdonline.com/p/98538/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-33X14.50R24-10",
@@ -1517,7 +1942,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 90,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98542",
+      "atdSupplierNumber": "98542",
+      "atdUrl": "https://atdonline.com/p/98542/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X15.50R24-10",
@@ -1544,7 +1974,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 90,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98544",
+      "atdSupplierNumber": "98544",
+      "atdUrl": "https://atdonline.com/p/98544/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-37X13.50R24-12",
@@ -1571,7 +2006,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 90.8,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98540",
+      "atdSupplierNumber": "98540",
+      "atdUrl": "https://atdonline.com/p/98540/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-35X13.50R26-10",
@@ -1598,7 +2038,12 @@
       "dualMaxLoad": null,
       "maxTirePressure": 65,
       "weight": 90,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98543",
+      "atdSupplierNumber": "98543",
+      "atdUrl": "https://atdonline.com/p/98543/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     },
     {
       "id": "TT1-TT1-37X13.50R26-12",
@@ -1625,7 +2070,13 @@
       "dualMaxLoad": null,
       "maxTirePressure": 80,
       "weight": 90.6,
-      "retailPrice": "TBD"
+      "retailPrice": "TBD",
+      "atdLookupStatus": "mapped_from_atd_product_number",
+      "atdProductNumber": "98539",
+      "atdSupplierNumber": "98539",
+      "atdUrl": "https://atdonline.com/p/98539/detailPage",
+      "atdScrapedAt": "2026-04-30T08:57:01.461Z"
     }
-  ]
+  ],
+  "atdScrapedAt": "2026-04-30T08:57:01.461Z"
 }
