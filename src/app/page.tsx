@@ -75,12 +75,6 @@ const BRAND_FILTERS = [
   { name: 'TIS Motorsports', label: 'TIS MOTORSPORTS' },
 ]
 
-const HERO_STATS = [
-  { value: '1,590', label: 'Wheel SKUs' },
-  { value: '83', label: 'Demo fitments' },
-  { value: '67', label: 'Official finish videos' },
-]
-
 const SAFE_DEMO_SEARCHES = ['2024 F-150', '2024 Silverado 1500', '2023 RAM 1500', '2024 Tacoma', '2024 Bronco', '6x5.50 20 inch black']
 
 type OfficialWheelVideo = {
@@ -766,7 +760,9 @@ export default function Home() {
         background: 'var(--header-bg)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto', filter: themeMode === 'light' ? 'brightness(0)' : 'none' }} />
+          <a href="/" aria-label="TIS Dealer Tool home" style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <img src="/tis-logo.png" alt="TIS" style={{ height: '28px', width: 'auto', filter: themeMode === 'light' ? 'brightness(0)' : 'none' }} />
+          </a>
           <span style={{ fontSize: '16px', fontWeight: 600, letterSpacing: '0px', color: 'var(--page-text)', textTransform: 'uppercase' }}>
             WHEEL SEARCH
           </span>
@@ -806,20 +802,12 @@ export default function Home() {
               }}>
                 TIS Wheels × ATDOnline concept preview
               </div>
-              <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 86px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: '-0.055em', lineHeight: 0.92, textTransform: 'uppercase' }}>
+              <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 86px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
                 FIND THE WHEEL YOU NEED FAST AND EASY
               </h1>
-              <p className="search-animate" style={{ fontSize: '18px', color: 'var(--muted-text)', margin: '0 0 28px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+              <p className="search-animate" style={{ fontSize: '18px', color: 'var(--muted-text)', margin: '0 0 34px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
                 A dealer-first wheel finder with visual media, fitment-aware search, live-order intent, and direct ATDOnline handoff.
               </p>
-              <div className="hero-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', maxWidth: 520, margin: '0 auto 34px' }}>
-                {HERO_STATS.map(stat => (
-                  <div key={stat.label} className="glass-card stat-card">
-                    <div style={{ fontSize: '24px', fontWeight: 900, color: 'var(--page-text)', letterSpacing: '-0.03em' }}>{stat.value}</div>
-                    <div style={{ fontSize: '10px', color: 'var(--soft-text)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>{stat.label}</div>
-                  </div>
-                ))}
-              </div>
             </>
           )}
 
