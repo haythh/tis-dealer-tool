@@ -350,7 +350,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
               src={brandLogoSrc}
               alt={wheel.brand}
               height={brandLogoHeight}
-              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain', margin: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? '0' : undefined, display: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? 'inline-block' : undefined }}
+              style={{ height: `${brandLogoHeight}px`, width: 'auto', objectFit: 'contain', margin: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? '0' : undefined, display: wheel.brand === 'TIS Motorsports' || wheel.brand === 'TIS' ? 'inline-block' : undefined, filter: isLightMode ? 'brightness(0)' : 'none' }}
             />
           ) : (
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
@@ -420,8 +420,8 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
         ) : (
           <div style={{
             display: 'block',
-            background: 'rgba(255,255,255,0.06)',
-            color: '#666',
+            background: isLightMode ? 'rgba(15,15,18,0.05)' : 'rgba(255,255,255,0.06)',
+            color: isLightMode ? '#52525b' : '#666',
             textAlign: 'center',
             padding: '10px 16px',
             borderRadius: '8px',
@@ -529,7 +529,7 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
 
       <div style={{ padding: '16px' }}>
         <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>
-          <img src="/tis-word-logo.png" alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block' }} />
+          <img src="/tis-word-logo.png" alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block', filter: isLightMode ? 'brightness(0)' : 'none' }} />
         </div>
         <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
           {tire.line} {tire.size}
@@ -571,7 +571,7 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
             <span style={{ position: 'relative', zIndex: 2 }}>Check Your Price on ATDOnline</span>
           </a>
         ) : (
-          <div style={{ display: 'block', background: 'rgba(255,255,255,0.06)', color: '#666', textAlign: 'center', padding: '10px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 500 }}>
+          <div style={{ display: 'block', background: isLightMode ? 'rgba(15,15,18,0.05)' : 'rgba(255,255,255,0.06)', color: isLightMode ? '#52525b' : '#666', textAlign: 'center', padding: '10px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 500 }}>
             ATD link pending
           </div>
         )}
@@ -611,10 +611,12 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
     ].filter(Boolean).join(' ').toLowerCase().includes(normalizedQuery)
   })
 
+  const isLightMode = themeMode === 'light'
+
   const chipStyle = (active: boolean): CSSProperties => ({
-    background: active ? 'rgba(220,38,38,0.22)' : 'var(--search-bg)',
+    background: active ? (isLightMode ? 'rgba(220,38,38,0.12)' : 'rgba(220,38,38,0.22)') : 'var(--search-bg)',
     border: `1px solid ${active ? 'rgba(220,38,38,0.62)' : 'var(--panel-border)'}`,
-    color: active ? '#fff' : 'var(--page-text)',
+    color: active ? (isLightMode ? '#991b1b' : '#fff') : 'var(--page-text)',
     padding: '10px 14px',
     borderRadius: '14px',
     cursor: 'pointer',
@@ -628,7 +630,7 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
   return (
     <div style={{ padding: '44px 0 64px' }}>
       <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-        <div className="search-animate" style={{ display: 'inline-block', border: '1px solid rgba(220,38,38,0.32)', borderRadius: 999, padding: '7px 16px', fontSize: 12, fontWeight: 800, color: '#fecaca', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
+        <div className="search-animate" style={{ display: 'inline-block', border: '1px solid rgba(220,38,38,0.32)', borderRadius: 999, padding: '7px 16px', fontSize: 12, fontWeight: 800, color: isLightMode ? '#991b1b' : '#fecaca', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
           TIS Tires × Hercules specs
         </div>
         <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
@@ -806,12 +808,13 @@ export default function Home() {
   }
 
   const isResultsView = activeTab === 'tire' || Boolean(result) || loading
+  const isLightMode = themeMode === 'light'
 
   return (
     <>
       <style jsx global>{`
         body {
-          background: #000000;
+          background: #f6f6f7;
         }
 
         .theme-dark {
@@ -899,8 +902,12 @@ export default function Home() {
           background: var(--shell-gradient);
         }
 
-        .demo-shell.results-view {
-          background: #000000;
+        .theme-dark.results-view {
+          background: #050505;
+        }
+
+        .theme-light.results-view {
+          background: linear-gradient(180deg, #f7f7f8 0%, #f1f1f2 100%);
         }
 
         .demo-shell::before {
@@ -1107,7 +1114,7 @@ export default function Home() {
                 padding: '7px 16px',
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#fecaca',
+                color: isLightMode ? '#991b1b' : '#fecaca',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 marginBottom: '24px',
@@ -1151,8 +1158,8 @@ export default function Home() {
                 }}
                 onMouseEnter={e => {
                   if (activeBrand !== name) {
-                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)'
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = isLightMode ? 'rgba(15,15,18,0.06)' : 'rgba(255,255,255,0.15)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = isLightMode ? 'rgba(15,15,18,0.16)' : 'rgba(255,255,255,0.2)'
                   }
                 }}
                 onMouseLeave={e => {
@@ -1168,7 +1175,7 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ddd', fontSize: '13px', cursor: 'pointer', textTransform: 'uppercase' }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--page-text)', fontSize: '13px', cursor: 'pointer', textTransform: 'uppercase' }}>
               <input
                 type="checkbox"
                 checked={inStockOnly}
@@ -1264,9 +1271,9 @@ export default function Home() {
                     transition: 'all 0.15s',
                   }}
                   onMouseEnter={e => {
-                    ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.15)'
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#f1f1f1'
+                    ;(e.currentTarget as HTMLButtonElement).style.background = isLightMode ? 'rgba(15,15,18,0.06)' : 'rgba(255,255,255,0.15)'
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = isLightMode ? 'rgba(15,15,18,0.16)' : 'rgba(255,255,255,0.2)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--page-text)'
                   }}
                   onMouseLeave={e => {
                     ;(e.currentTarget as HTMLButtonElement).style.background = 'var(--search-bg)'
@@ -1294,14 +1301,14 @@ export default function Home() {
                   padding: '12px 16px',
                   marginBottom: '24px',
                   fontSize: '13px',
-                  color: result.fitment_status === 'demo_fallback' ? '#fcd34d' : '#fca5a5',
+                  color: isLightMode ? (result.fitment_status === 'demo_fallback' ? '#92400e' : '#991b1b') : (result.fitment_status === 'demo_fallback' ? '#fcd34d' : '#fca5a5'),
                   display: 'flex',
                   gap: '16px',
                   flexWrap: 'wrap',
                   alignItems: 'center',
                 }}
               >
-                <span style={{ color: '#fff', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 11 }}>
+                <span style={{ color: isLightMode ? '#111113' : '#fff', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 11 }}>
                   {result.fitment_status === 'exact' ? 'Fitment demo match' : result.fitment_status === 'demo_fallback' ? 'Demo-safe fallback' : 'Catalog search'}
                 </span>
                 {result.query_parsed.vehicle && (
@@ -1313,7 +1320,7 @@ export default function Home() {
                 {result.query_parsed.boltPattern && <span>Bolt: {result.query_parsed.boltPattern}</span>}
                 {result.query_parsed.brand && <span>Brand: {result.query_parsed.brand}</span>}
                 {result.matched_bolt_patterns && result.matched_bolt_patterns.length > 0 && <span>Bolt data: {result.matched_bolt_patterns.join(', ')}</span>}
-                <span style={{ marginLeft: 'auto', color: '#aaa' }}>{result.total} result{result.total !== 1 ? 's' : ''}</span>
+                <span style={{ marginLeft: 'auto', color: 'var(--soft-text)' }}>{result.total} result{result.total !== 1 ? 's' : ''}</span>
               </div>
             )}
 
@@ -1340,8 +1347,8 @@ export default function Home() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: isLightMode ? 'rgba(15,15,18,0.04)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.08)' : 'rgba(255,255,255,0.06)'}`,
                     borderRadius: '12px',
                     height: '380px',
                     animation: 'pulse 1.5s ease-in-out infinite',
@@ -1353,12 +1360,12 @@ export default function Home() {
             )}
 
             {!loading && result && result.wheels.length === 0 && !result.error && (
-              <div style={{ textAlign: 'center', padding: '60px 0', color: '#555' }}>
-                <p style={{ fontSize: '16px', marginBottom: '8px', color: '#777' }}>No wheels found for that search.</p>
+              <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--soft-text)' }}>
+                <p style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--muted-text)' }}>No wheels found for that search.</p>
                 <p style={{ fontSize: '13px' }}>Try a different year, model, or size.</p>
                 <div style={{ marginTop: 18, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
                   {(result.suggested_queries || SAFE_DEMO_SEARCHES).map(q => (
-                    <button key={q} className="demo-pill" onClick={() => handleSearch(q)} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--panel-border)', color: '#ddd', borderRadius: 999, padding: '8px 13px', cursor: 'pointer' }}>
+                    <button key={q} className="demo-pill" onClick={() => handleSearch(q)} style={{ background: 'var(--search-bg)', border: '1px solid var(--panel-border)', color: 'var(--page-text)', borderRadius: 999, padding: '8px 13px', cursor: 'pointer' }}>
                       {q}
                     </button>
                   ))}
