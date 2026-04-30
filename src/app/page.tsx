@@ -215,17 +215,25 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
   const initialSelected = gallery[0] ?? null
   const [imgError, setImgError] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<GalleryItem | null>(initialSelected)
+  const videoRef = useRef<HTMLVideoElement>(null)
   // Prefer the thumb URL (`url`) over `fullUrl` for images: the ToughAssets
   // `/api/file/<id>` binary endpoint (fullUrl) is currently unreliable, while
   // `cdn.toughassets.com/thumbs/...` (url) is served from CDN and stable.
   const imageUrl = !imgError ? (selectedMedia?.type === 'video' ? null : (selectedMedia?.url || selectedMedia?.fullUrl || wheel.ta_image_url || wheel.atd_image_url)) : null
   const videoUrl = selectedMedia?.type === 'video' ? selectedMedia.fullUrl : null
-  const hasVideo = gallery.some(item => item.type === 'video')
 
   useEffect(() => {
     setImgError(false)
     setSelectedMedia(gallery[0] ?? null)
   }, [wheel.id, wheel.ta_image_url, wheel.ta_images_json, wheel.atd_image_url])
+
+  useEffect(() => {
+    if (selectedMedia?.type !== 'video' || !videoUrl) return
+    const video = videoRef.current
+    if (!video) return
+    video.muted = true
+    video.play().catch(() => {})
+  }, [selectedMedia?.type, videoUrl])
 
   const formatPrice = (price: number | null) => {
     if (price == null) return null
@@ -257,7 +265,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
       }}
     >
       {wheel.in_stock != null && (
-        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: wheel.in_stock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: wheel.in_stock ? '#22c55e' : '#ef4444', border: `1px solid ${wheel.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
+        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 800, background: wheel.in_stock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: wheel.in_stock ? '#22c55e' : '#ef4444', border: `1px solid ${wheel.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
           {wheel.in_stock ? `${wheel.total_stock || ''} in stock` : 'Out of stock'}
         </div>
       )}
@@ -265,13 +273,17 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
       <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
         {selectedMedia?.type === 'video' && videoUrl ? (
           <video
+            key={videoUrl}
+            ref={videoRef}
             src={videoUrl}
             poster={selectedMedia.url}
             controls
+            autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
+            onLoadedMetadata={event => event.currentTarget.play().catch(() => {})}
             style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.12)', transformOrigin: 'center center' }}
           />
         ) : imageUrl ? (
@@ -359,7 +371,6 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
         </div>
         <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
           {wheel.model}
-          {hasVideo && <span style={{ marginLeft: '8px', fontSize: '10px', color: '#fca5a5', border: '1px solid rgba(220,38,38,0.35)', borderRadius: '999px', padding: '3px 7px', verticalAlign: 'middle', letterSpacing: '0.08em' }}>VIDEO</span>}
         </h3>
         <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>
           {wheel.color_finish}
@@ -476,7 +487,7 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
     >
       <div style={{ background: isLightMode ? '#f4f4f5' : '#000', height: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
         {tire.inStock != null && (
-          <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: tire.inStock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: tire.inStock ? '#22c55e' : '#ef4444', border: `1px solid ${tire.inStock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
+          <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 800, background: tire.inStock ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: tire.inStock ? '#22c55e' : '#ef4444', border: `1px solid ${tire.inStock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
             {tire.inStock ? `${tire.totalStock || ''} in stock` : 'Out of stock'}
           </div>
         )}
@@ -1502,38 +1513,21 @@ export default function Home() {
               <div
                 className="intent-banner"
                 style={{
-                  background: result.fitment_status === 'demo_fallback' ? 'rgba(245,158,11,0.10)' : 'rgba(220,38,38,0.08)',
-                  border: `1px solid ${result.fitment_status === 'demo_fallback' ? 'rgba(245,158,11,0.24)' : 'rgba(220,38,38,0.15)'}`,
-                  borderRadius: '14px',
-                  padding: '12px 16px',
-                  marginBottom: '24px',
-                  fontSize: '13px',
-                  color: isLightMode ? (result.fitment_status === 'demo_fallback' ? '#92400e' : '#991b1b') : (result.fitment_status === 'demo_fallback' ? '#fcd34d' : '#fca5a5'),
-                  display: 'flex',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
+                  margin: '-2px auto 26px',
+                  textAlign: 'center',
                 }}
               >
-                <span style={{ color: isLightMode ? '#111113' : '#fff', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 11 }}>
-                  {result.fitment_status === 'exact' ? 'Fitment demo match' : result.fitment_status === 'demo_fallback' ? 'Demo-safe fallback' : 'Catalog search'}
-                </span>
-                {result.query_parsed.vehicle && (
-                  <span>{result.query_parsed.vehicle.year} {result.query_parsed.vehicle.make} {result.query_parsed.vehicle.model}</span>
-                )}
-                {result.query_parsed.wheelModel && <span>Model: {result.query_parsed.wheelModel}</span>}
-                {result.query_parsed.size && <span>Size: {result.query_parsed.size}&quot;</span>}
-                {result.query_parsed.finish && <span>Finish: {result.query_parsed.finish}</span>}
-                {result.query_parsed.boltPattern && <span>Bolt: {result.query_parsed.boltPattern}</span>}
-                {result.query_parsed.brand && <span>Brand: {result.query_parsed.brand}</span>}
-                {result.matched_bolt_patterns && result.matched_bolt_patterns.length > 0 && <span>Bolt data: {result.matched_bolt_patterns.join(', ')}</span>}
-                <span style={{ marginLeft: 'auto', color: 'var(--soft-text)' }}>{result.total} result{result.total !== 1 ? 's' : ''}</span>
-              </div>
-            )}
-
-            {result?.notice && (
-              <div className="intent-banner" style={{ margin: '-10px 0 24px', padding: '12px 14px', borderRadius: 12, background: 'var(--panel-bg)', border: '1px solid var(--panel-border)', color: 'var(--muted-text)', fontSize: 13, lineHeight: 1.5 }}>
-                {result.notice}
+                <div style={{ color: '#fff', fontSize: 'clamp(20px, 2.5vw, 32px)', fontWeight: 950, lineHeight: 1.08, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  {result.query_parsed.vehicle
+                    ? `${result.query_parsed.vehicle.year} ${result.query_parsed.vehicle.make} ${result.query_parsed.vehicle.model}`
+                    : [result.query_parsed.brand, result.query_parsed.wheelModel, result.query_parsed.size ? `${result.query_parsed.size}\"` : null, result.query_parsed.finish].filter(Boolean).join(' ')}
+                  {(result.matched_bolt_patterns?.length || result.query_parsed.boltPattern) ? (
+                    <span> · {result.matched_bolt_patterns?.length ? result.matched_bolt_patterns.join(', ') : result.query_parsed.boltPattern}</span>
+                  ) : null}
+                </div>
+                <div style={{ color: 'var(--soft-text)', fontSize: '12px', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 8 }}>
+                  {result.total} result{result.total !== 1 ? 's' : ''}
+                </div>
               </div>
             )}
 
