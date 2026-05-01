@@ -274,10 +274,25 @@ export function getSmsDemoCardsByIds(ids: number[]): SmsDemoCard[] {
   `).all(...cleanIds) as SmsDemoCard[]
 }
 
-function resultUrlFor(cards: SmsDemoCard[], baseUrl?: string) {
-  const ids = cards.map(card => card.id).join(',')
-  const path = `/sms-demo?results=${encodeURIComponent(ids)}`
+export function getSmsDemoResultUrl(ids: number[], baseUrl?: string) {
+  const cleanIds = ids.filter(id => Number.isInteger(id) && id > 0)
+  if (!cleanIds.length) return undefined
+  const idsParam = cleanIds.join(',')
+  const path = `/sms-demo?results=${encodeURIComponent(idsParam)}`
   return baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
+}
+
+function resultUrlFor(cards: SmsDemoCard[], baseUrl?: string) {
+  const ids = cards.map(card => card.id)
+  const url = getSmsDemoResultUrl(ids, baseUrl)
+  if (!url) return baseUrl ? `${baseUrl.replace(/\/$/, '')}/sms-demo` : '/sms-demo'
+  return url
+}
+
+function resultUrlForIds(ids: number[] | undefined, baseUrl?: string) {
+  const url = getSmsDemoResultUrl(ids || [], baseUrl)
+  if (!url) return undefined
+  return url
 }
 
 function summarizeCards(cards: SmsDemoCard[]) {
@@ -304,7 +319,8 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     const count = state.lastResultIds?.length || 0
     return {
       state: { ...state, awaiting: null, email: parsed.email },
-      messages: [`Sent demo package to ${parsed.email}: wheel cards, specs, stock, pricing, and ATD buy links. In production this becomes the actual branded quote email.`],
+      messages: [`Got it — preparing the wheel-card package for ${parsed.email}.`],
+      resultUrl: resultUrlForIds(state.lastResultIds, options.baseUrl),
       emailPreview: {
         to: parsed.email,
         subject: `TIS wheel options${state.vehicle ? ` for ${describeVehicle(state.vehicle)}` : ''}`,

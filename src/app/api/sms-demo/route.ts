@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSmsDemoCardsByIds, handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
+import { sendWheelPackageEmail } from '@/lib/email-package'
+
+function appBaseUrl(request: NextRequest) {
+  const configured = process.env.TWILIO_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL
+  if (configured) return configured.replace(/\/$/, '')
+  const url = new URL(request.url)
+  return `${url.protocol}//${url.host}`
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +34,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    return NextResponse.json(handleSmsDemoMessage(message, state))
+    const reply = handleSmsDemoMessage(message, state, { baseUrl: appBaseUrl(request) })
+
+    if (reply.emailPreview) {
+      const cards = getSmsDemoCardsByIds(reply.state.lastResultIds || [])
+      const emailResult = await sendWheelPackageEmail({
+        to: reply.emailPreview.to,
+        cards,
+        state: reply.state,
+        resultUrl: reply.resultUrl,
+      })
+
+      reply.messages = emailResult.sent
+        ? [`Sent wheel-card package to ${reply.emailPreview.to}: specs, stock, pricing, and ATD buy links.`]
+        : [`I captured ${reply.emailPreview.to}, but email delivery is not configured yet. The wheel-card package is ready here: ${reply.resultUrl || 'open the generated cards below'}`]
+
+      return NextResponse.json({ ...reply, emailDelivery: emailResult })
+    }
+
+    return NextResponse.json(reply)
   } catch (error) {
     console.error('SMS demo error:', error)
     return NextResponse.json({ error: 'SMS demo failed' }, { status: 500 })

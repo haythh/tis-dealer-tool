@@ -8,7 +8,7 @@ Build a working demo that shows how a retailer can text TIS/ATD fitment question
 - Server conversation endpoint at `/api/sms-demo`.
 - Twilio-ready inbound SMS webhook at `/api/twilio/sms`.
 - Uses existing Dealer Tool SQLite catalog, stock, pricing, vehicle bolt-pattern table, image URLs, and ATD product links.
-- Captures an email address and returns a demo email confirmation instead of sending real email.
+- Captures an email address and sends a branded wheel-card package when `RESEND_API_KEY` and `EMAIL_FROM` are configured. Without those env vars, it keeps the package link ready and fails loud instead of pretending to send.
 
 ## Production seam
 The demo reads inventory/pricing from Dealer Tool data today. A real ATD EDI feed should replace only the inventory/pricing adapter layer, preserving:
@@ -41,6 +41,10 @@ The demo reads inventory/pricing from Dealer Tool data today. A real ATD EDI fee
 - `TWILIO_PUBLIC_BASE_URL` — optional override for SMS result links.
 - `TWILIO_VALIDATE_SIGNATURE` — set `true` after configuring the server-only token.
 - `TWILIO_AUTH_TOKEN` — server-only Twilio Auth Token for webhook signature checks.
+- `RESEND_API_KEY` — server-only email API key for sending wheel-card packages.
+- `EMAIL_FROM` — verified sender, for example `TIS Dealer Tool <dealer-tool@inventory.teamtis.com>`.
+- `EMAIL_REPLY_TO` — optional reply-to address.
+- `EMAIL_BCC` — optional comma-separated internal BCC list.
 
 ## Demo script
 1. Open `/sms-demo`.

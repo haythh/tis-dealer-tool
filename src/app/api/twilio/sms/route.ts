@@ -1,7 +1,8 @@
 import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-import { handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
+import { sendWheelPackageEmail } from '@/lib/email-package'
+import { getSmsDemoCardsByIds, handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
 
 type SmsSessionRow = {
   phone: string
@@ -145,6 +146,20 @@ export async function POST(request: NextRequest) {
 
     const reply = handleSmsDemoMessage(body, session.state, { baseUrl: appBaseUrl(request) })
     saveSession(from, reply.state, false)
+
+    if (reply.emailPreview) {
+      const cards = getSmsDemoCardsByIds(reply.state.lastResultIds || [])
+      const emailResult = await sendWheelPackageEmail({
+        to: reply.emailPreview.to,
+        cards,
+        state: reply.state,
+        resultUrl: reply.resultUrl,
+      })
+
+      reply.messages = emailResult.sent
+        ? [`Sent wheel-card package to ${reply.emailPreview.to}: specs, stock, pricing, and ATD buy links.`]
+        : [`I captured ${reply.emailPreview.to}, but email delivery is not configured yet. Full cards: ${reply.resultUrl || appBaseUrl(request)}`]
+    }
 
     const resultLink = reply.resultUrl && reply.cards?.length ? `\n\nFull cards: ${reply.resultUrl}` : ''
     return twiml(`${reply.messages.join('\n\n')}${resultLink}`)
