@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type SmsDemoState = {
@@ -119,6 +119,32 @@ function SmsDemoContent() {
         : 'Text the assistant like a dealer rep would. This demo uses Dealer Tool data now; the EDI feed plugs into the same inventory/pricing seam later.',
     },
   ])
+
+  useEffect(() => {
+    if (!linkedResultIds.length) return
+
+    let cancelled = false
+    async function loadLinkedResults() {
+      const response = await fetch(`/api/sms-demo?ids=${encodeURIComponent(linkedResultIds.join(','))}`)
+      const data = await response.json()
+      if (cancelled || !response.ok || !data.cards?.length) return
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: 'linked-results',
+          role: 'bot',
+          text: `Here are the shared TIS/ATD wheel cards from the SMS conversation.`,
+          cards: data.cards,
+        },
+      ])
+    }
+
+    loadLinkedResults().catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [linkedResultIds])
 
   async function sendMessage(message = input) {
     if (!message.trim() || loading) return

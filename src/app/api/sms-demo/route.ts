@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
+import { getSmsDemoCardsByIds, handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const ids = (searchParams.get('ids') || searchParams.get('results') || '')
+      .split(',')
+      .map(value => parseInt(value, 10))
+      .filter(Number.isFinite)
+
+    return NextResponse.json({ cards: getSmsDemoCardsByIds(ids) })
+  } catch (error) {
+    console.error('SMS demo results error:', error)
+    return NextResponse.json({ error: 'Failed to load SMS demo results' }, { status: 500 })
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {

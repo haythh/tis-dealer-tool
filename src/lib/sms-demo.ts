@@ -59,6 +59,10 @@ type ParsedSms = {
   email?: string | null
 }
 
+type SmsDemoOptions = {
+  baseUrl?: string
+}
+
 const WHEEL_FIELDS = 'id, supplier_pn, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, map_price, atd_url, in_stock, stock_today, stock_tomorrow, stock_national, total_stock, ta_image_url, atd_image_url'
 
 const FINISH_TERMS: Record<string, string> = {
@@ -71,10 +75,6 @@ const FINISH_TERMS: Record<string, string> = {
   bronze: 'Bronze',
   gunmetal: 'Gunmetal',
   silver: 'Silver',
-}
-
-function compact(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
 function extractVehicle(q: string): SmsDemoVehicle | null {
@@ -165,6 +165,10 @@ function mergeState(state: SmsDemoState, parsed: ParsedSms, rawText: string): Sm
   if (parsed.brand) next.brand = parsed.brand
   if (parsed.email) next.email = parsed.email
 
+  if (next.awaiting === 'size' && /\b(all|any|show all|no preference|no pref|whatever)\b/.test(lower)) {
+    next.size = 'all'
+  }
+
   if (next.awaiting === 'finish' && /\b(all|any|show all|no preference|no pref|whatever)\b/.test(lower)) {
     next.finish = null
     next.finishPreferenceAsked = true
@@ -214,7 +218,7 @@ function searchCards(state: SmsDemoState): SmsDemoCard[] {
     params.push(...boltPatterns.map(pattern => `%${pattern}%`))
   }
 
-  if (state.size) {
+  if (state.size && state.size !== 'all') {
     conditions.push('size LIKE ?')
     params.push(`${state.size}X%`)
   }
@@ -256,9 +260,24 @@ function searchCards(state: SmsDemoState): SmsDemoCard[] {
   return cards
 }
 
-function resultUrlFor(cards: SmsDemoCard[]) {
+export function getSmsDemoCardsByIds(ids: number[]): SmsDemoCard[] {
+  const cleanIds = [...new Set(ids.filter(id => Number.isInteger(id) && id > 0))].slice(0, 12)
+  if (!cleanIds.length) return []
+
+  const db = getDb()
+  const placeholders = cleanIds.map(() => '?').join(',')
+  return db.prepare(`
+    SELECT ${WHEEL_FIELDS}
+    FROM wheels
+    WHERE id IN (${placeholders})
+    ORDER BY CASE id ${cleanIds.map((id, index) => `WHEN ${id} THEN ${index}`).join(' ')} ELSE 999 END
+  `).all(...cleanIds) as SmsDemoCard[]
+}
+
+function resultUrlFor(cards: SmsDemoCard[], baseUrl?: string) {
   const ids = cards.map(card => card.id).join(',')
-  return `/sms-demo?results=${encodeURIComponent(ids)}`
+  const path = `/sms-demo?results=${encodeURIComponent(ids)}`
+  return baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
 }
 
 function summarizeCards(cards: SmsDemoCard[]) {
@@ -269,7 +288,7 @@ function summarizeCards(cards: SmsDemoCard[]) {
   }).join('\n')
 }
 
-export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState = {}): SmsDemoReply {
+export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState = {}, options: SmsDemoOptions = {}): SmsDemoReply {
   const parsed = parseSmsText(text)
   const state = mergeState(incomingState, parsed, text)
   const lower = text.toLowerCase()
@@ -316,7 +335,8 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   }
 
   const cards = searchCards(state)
-  const resultUrl = resultUrlFor(cards)
+  const resultUrl = resultUrlFor(cards, options.baseUrl)
+  const sizeLabel = state.size === 'all' ? 'all-size' : `${state.size}"`
   const nextState: SmsDemoState = {
     ...state,
     awaiting: null,
@@ -326,7 +346,7 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   return {
     state: nextState,
     messages: [
-      `I found ${cards.length} stocked ${state.size}" option${cards.length === 1 ? '' : 's'} for ${describeVehicle(state.vehicle)}${state.finish ? ` in ${state.finish}` : ''}.`,
+      `I found ${cards.length} stocked ${sizeLabel} option${cards.length === 1 ? '' : 's'} for ${describeVehicle(state.vehicle)}${state.finish ? ` in ${state.finish}` : ''}.`,
       summarizeCards(cards),
       'Want me to email these cards and ATD buy links? Reply with an email address.',
     ],
