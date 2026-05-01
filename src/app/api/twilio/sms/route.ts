@@ -69,6 +69,18 @@ function twiml(message: string, status = 200) {
 function appBaseUrl(request: NextRequest) {
   const configured = process.env.TWILIO_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL
   if (configured) return configured.replace(/\/$/, '')
+
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https'
+  if (forwardedHost && !forwardedHost.includes('localhost')) {
+    return `${forwardedProto}://${forwardedHost}`
+  }
+
+  const host = request.headers.get('host')
+  if (host && !host.includes('localhost')) {
+    return `https://${host}`
+  }
+
   const url = new URL(request.url)
   return `${url.protocol}//${url.host}`
 }
