@@ -141,6 +141,16 @@ type OfficialWheelVideo = {
 const officialVideosByCode = officialWheelVideos.videosByCode as Record<string, OfficialWheelVideo>
 const tireData = tisTiresData as TireData
 
+function wheelDiameter(size: string) {
+  const match = size.match(/^(\d{2})\s*x/i)
+  return match ? parseInt(match[1], 10) : null
+}
+
+function tireStockLabel(tire: Tire) {
+  if (tire.inStock == null) return 'Stock pending'
+  return tire.inStock ? `${tire.totalStock || 0} in stock` : 'Out of stock'
+}
+
 function wheelModelVideoCodes(model: string) {
   const compact = model.toUpperCase().replace(/[^A-Z0-9.]/g, '')
   const candidates = new Set<string>([
@@ -215,12 +225,22 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
   const initialSelected = gallery[0] ?? null
   const [imgError, setImgError] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<GalleryItem | null>(initialSelected)
+  const [selectedTire, setSelectedTire] = useState<Tire | null>(null)
+  const [isTireModalOpen, setIsTireModalOpen] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   // Prefer the thumb URL (`url`) over `fullUrl` for images: the ToughAssets
   // `/api/file/<id>` binary endpoint (fullUrl) is currently unreliable, while
   // `cdn.toughassets.com/thumbs/...` (url) is served from CDN and stable.
   const imageUrl = !imgError ? (selectedMedia?.type === 'video' ? null : (selectedMedia?.url || selectedMedia?.fullUrl || wheel.ta_image_url || wheel.atd_image_url)) : null
   const videoUrl = selectedMedia?.type === 'video' ? selectedMedia.fullUrl : null
+  const rimDiameter = wheelDiameter(wheel.size)
+  const matchingTires = tireData.tires
+    .filter(tire => tire.rimDiameter === rimDiameter && (tire.line === 'RT1' || tire.line === 'TT1'))
+    .sort((a, b) => {
+      const stockDiff = (b.totalStock || 0) - (a.totalStock || 0)
+      if (stockDiff !== 0) return stockDiff
+      return a.line.localeCompare(b.line) || a.size.localeCompare(b.size)
+    })
 
   useEffect(() => {
     setImgError(false)
@@ -245,6 +265,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
   const brandLogoHeight = brandLogo?.height ?? 30
 
   return (
+    <>
     <div
       className="wheel-card"
       style={{
@@ -412,37 +433,109 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
           {wheel.oracle_id && <span style={{ marginLeft: '8px', color: '#444' }}>ORACLE: {wheel.oracle_id}</span>}
         </div>
 
-        {wheel.atd_url ? (
-          <a
-            href={wheel.atd_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-slide btn-slide-link"
+        <div style={{ display: 'grid', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={() => setIsTireModalOpen(true)}
+            disabled={!matchingTires.length}
+            className="btn-slide"
             style={{
-              display: 'block',
-              textAlign: 'center',
-              textDecoration: 'none',
+              borderRadius: '8px',
+              boxShadow: 'none',
               fontFamily: 'inherit',
+              opacity: matchingTires.length ? 1 : 0.55,
+              cursor: matchingTires.length ? 'pointer' : 'not-allowed',
             }}
           >
-            <span style={{ position: 'relative', zIndex: 2 }}>Check Your Price on ATDOnline</span>
-          </a>
-        ) : (
-          <div style={{
-            display: 'block',
-            background: isLightMode ? 'rgba(15,15,18,0.05)' : 'rgba(255,255,255,0.06)',
-            color: isLightMode ? '#52525b' : '#666',
-            textAlign: 'center',
-            padding: '10px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: 500,
-          }}>
-            Not on ATD
+            <span style={{ position: 'relative', zIndex: 2 }}>{selectedTire ? 'Change Tire' : 'Add Tires'}</span>
+          </button>
+
+          {selectedTire && (
+            <div style={{ border: `1px solid ${isLightMode ? 'rgba(220,38,38,0.22)' : 'rgba(220,38,38,0.34)'}`, background: isLightMode ? 'rgba(220,38,38,0.04)' : 'rgba(220,38,38,0.10)', borderRadius: 10, padding: '10px 12px' }}>
+              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', color: isLightMode ? '#991b1b' : '#fecaca', marginBottom: 4 }}>Selected tire</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: isLightMode ? '#18181b' : '#fff' }}>{selectedTire.line} {selectedTire.size}</div>
+              <div style={{ fontSize: 11, color: isLightMode ? '#71717a' : '#a1a1aa', marginTop: 2 }}>{selectedTire.terrain} · {tireStockLabel(selectedTire)}</div>
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: selectedTire?.atdUrl ? '1fr 1fr' : '1fr', gap: '8px' }}>
+            {wheel.atd_url ? (
+              <a href={wheel.atd_url} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit', paddingLeft: 10, paddingRight: 10 }}>
+                <span style={{ position: 'relative', zIndex: 2 }}>Wheel ATD</span>
+              </a>
+            ) : (
+              <div style={{ display: 'block', background: isLightMode ? 'rgba(15,15,18,0.05)' : 'rgba(255,255,255,0.06)', color: isLightMode ? '#52525b' : '#666', textAlign: 'center', padding: '10px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 500 }}>
+                Wheel not on ATD
+              </div>
+            )}
+
+            {selectedTire?.atdUrl && (
+              <a href={selectedTire.atdUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit', paddingLeft: 10, paddingRight: 10 }}>
+                <span style={{ position: 'relative', zIndex: 2 }}>Tire ATD</span>
+              </a>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
+
+    {isTireModalOpen && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Add tires for ${wheel.size} wheel`}
+        onClick={() => setIsTireModalOpen(false)}
+        style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 18 }}
+      >
+        <div
+          onClick={event => event.stopPropagation()}
+          style={{ width: 'min(940px, 100%)', maxHeight: '88vh', overflow: 'auto', borderRadius: 18, border: `1px solid ${isLightMode ? 'rgba(15,15,18,0.12)' : 'rgba(255,255,255,0.12)'}`, background: isLightMode ? '#fff' : '#111113', boxShadow: '0 30px 100px rgba(0,0,0,0.45)' }}
+        >
+          <div style={{ position: 'sticky', top: 0, zIndex: 2, padding: '18px 20px', borderBottom: `1px solid ${isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.10)'}`, background: isLightMode ? 'rgba(255,255,255,0.96)' : 'rgba(17,17,19,0.96)', backdropFilter: 'blur(14px)', display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.14em', textTransform: 'uppercase', color: isLightMode ? '#991b1b' : '#fecaca' }}>Build package</div>
+              <h3 style={{ margin: '4px 0 2px', fontSize: 24, lineHeight: 1.1, color: isLightMode ? '#111113' : '#fff' }}>Add RT1 / TT1 tires</h3>
+              <p style={{ margin: 0, fontSize: 13, color: isLightMode ? '#71717a' : '#a1a1aa' }}>{wheel.brand} {wheel.model} {wheel.size} · showing tires for {rimDiameter || 'this'}&quot; wheels</p>
+            </div>
+            <button type="button" onClick={() => setIsTireModalOpen(false)} style={{ border: 0, background: isLightMode ? '#f4f4f5' : 'rgba(255,255,255,0.08)', color: isLightMode ? '#18181b' : '#fff', width: 38, height: 38, borderRadius: 999, cursor: 'pointer', fontSize: 22, lineHeight: '38px' }} aria-label="Close tire selector">×</button>
+          </div>
+
+          <div style={{ padding: 18, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(245px, 1fr))', gap: 12 }}>
+            {matchingTires.map(tire => {
+              const tireImage = tire.imageUrls?.[0] || tire.heroImageUrl
+              const active = selectedTire?.id === tire.id
+              return (
+                <button
+                  key={tire.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTire(tire)
+                    setIsTireModalOpen(false)
+                  }}
+                  style={{ textAlign: 'left', border: `1px solid ${active ? 'rgba(220,38,38,0.72)' : isLightMode ? 'rgba(15,15,18,0.10)' : 'rgba(255,255,255,0.10)'}`, borderRadius: 14, background: active ? (isLightMode ? 'rgba(220,38,38,0.06)' : 'rgba(220,38,38,0.13)') : (isLightMode ? '#fafafa' : 'rgba(255,255,255,0.04)'), color: isLightMode ? '#111113' : '#fff', padding: 10, cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  <div style={{ height: 132, background: isLightMode ? '#f4f4f5' : '#050505', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10, overflow: 'hidden' }}>
+                    {tireImage ? <img src={tireImage} alt={`${tire.line} ${tire.size}`} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8 }} /> : <span style={{ opacity: 0.45, fontSize: 12 }}>No image</span>}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                    <strong style={{ fontSize: 16 }}>{tire.line} {tire.size}</strong>
+                    <span style={{ fontSize: 10, fontWeight: 900, color: tire.inStock ? '#22c55e' : '#ef4444', whiteSpace: 'nowrap' }}>{tireStockLabel(tire)}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: isLightMode ? '#71717a' : '#a1a1aa', marginBottom: 8 }}>{tire.terrain}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, fontSize: 11 }}>
+                    <span>Load: {tire.loadRange || '—'}</span>
+                    <span>Ply: {tire.tirePly || '—'}</span>
+                    <span>OD: {tire.tireDiameter ? `${tire.tireDiameter}&quot;` : '—'}</span>
+                    <span>ATD: {tire.atdProductNumber || 'pending'}</span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 
