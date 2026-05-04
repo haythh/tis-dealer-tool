@@ -190,27 +190,7 @@ function SmsDemoContent() {
         <div className="absolute left-[-10%] top-[-20%] h-96 w-96 rounded-full bg-red-600/20 blur-3xl" />
         <div className="absolute bottom-[-20%] right-[-10%] h-96 w-96 rounded-full bg-zinc-500/10 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="flex flex-col justify-between rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/30 backdrop-blur md:p-8">
-            <div>
-              <div className="inline-flex rounded-full border border-red-400/30 bg-red-500/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-red-200">
-                TIS SMS Assistant Demo
-              </div>
-              <h1 className="mt-6 max-w-xl text-4xl font-black tracking-tight md:text-6xl">
-                Dealer Tool, rebuilt for the text thread.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-300">
-                Retail reps ask messy fitment questions. The assistant drills down, returns stocked wheel cards, then captures an email for a buy-ready ATD package.
-              </p>
-            </div>
-
-            <div className="mt-10 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
-              <DemoPill label="Now" value="SQLite demo inventory" />
-              <DemoPill label="Next" value="ATD EDI adapter" />
-              <DemoPill label="Channel" value="Twilio SMS/MMS" />
-            </div>
-          </div>
-
+        <div className="relative mx-auto max-w-3xl">
           <div className="rounded-[2rem] border border-white/10 bg-zinc-950/90 shadow-2xl shadow-black/40">
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
               <div>
@@ -279,15 +259,6 @@ function SmsDemoContent() {
         ) : null}
       </section>
     </main>
-  )
-}
-
-function DemoPill({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-      <div className="text-[10px] font-black uppercase tracking-[0.24em] text-zinc-500">{label}</div>
-      <div className="mt-2 font-bold text-white">{value}</div>
-    </div>
   )
 }
 
