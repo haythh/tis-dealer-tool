@@ -461,7 +461,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
           <div style={{ display: 'grid', gridTemplateColumns: selectedTire?.atdUrl ? '1fr 1fr' : '1fr', gap: '8px' }}>
             {wheel.atd_url ? (
               <a href={wheel.atd_url} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit', paddingLeft: 10, paddingRight: 10 }}>
-                <span style={{ position: 'relative', zIndex: 2 }}>Wheel ATD</span>
+                <span style={{ position: 'relative', zIndex: 2 }}>Wheel Link</span>
               </a>
             ) : (
               <div style={{ display: 'block', background: isLightMode ? 'rgba(15,15,18,0.05)' : 'rgba(255,255,255,0.06)', color: isLightMode ? '#52525b' : '#666', textAlign: 'center', padding: '10px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 500 }}>
@@ -471,7 +471,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
 
             {selectedTire?.atdUrl && (
               <a href={selectedTire.atdUrl} target="_blank" rel="noopener noreferrer" className="btn-slide btn-slide-link" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', fontFamily: 'inherit', paddingLeft: 10, paddingRight: 10 }}>
-                <span style={{ position: 'relative', zIndex: 2 }}>Tire ATD</span>
+                <span style={{ position: 'relative', zIndex: 2 }}>Tire Link</span>
               </a>
             )}
           </div>
