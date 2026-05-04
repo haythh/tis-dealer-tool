@@ -1,12 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { type FormEvent, useMemo, useState } from 'react'
 import { preorderWheels, type PreorderWheel } from '@/data/preorder-wheels'
 
 const SIZES = ['20"', '22"', '24"', '26"'] as const
 const WIDTHS = ['9"', '10"', '12"', '14"'] as const
 const LUG_PATTERNS = ['5x112', '5x114.3', '5x120', '5x127', '5x150', '6x135', '6x139.7', '8x170', '8x180'] as const
 const QUANTITIES = [4, 8, 12, 16, 20, 24, 28, 32] as const
+const BRAND_LINE = 'TIS MOTORSPORTS FORGED'
+const SUCCESS_MESSAGE = 'Thank You! Your order has been submitted and an ATD representative will contact you soon.'
 
 const PRICE_BY_SIZE: Record<(typeof SIZES)[number], number> = {
   '20"': 300,
@@ -35,11 +37,27 @@ type OrderItem = {
   total: number
 }
 
+type CheckoutForm = {
+  name: string
+  companyName: string
+  address: string
+  phone: string
+  email: string
+}
+
 const emptySelection: WheelSelection = {
   size: '',
   width: '',
   lugPattern: '',
   quantity: '',
+}
+
+const emptyCheckoutForm: CheckoutForm = {
+  name: '',
+  companyName: '',
+  address: '',
+  phone: '',
+  email: '',
 }
 
 function dollars(value: number) {
@@ -103,7 +121,7 @@ function PreorderCard({
         <div>
           <p className="eyebrow">New style</p>
           <h2>{wheel.code}</h2>
-          <p className="style-name">{wheel.name}</p>
+          <p className="style-name">{BRAND_LINE}</p>
         </div>
         <div className="selectors">
           <SelectField label="Wheel size" value={selection.size} options={SIZES} placeholder="Select size" onChange={size => onSelectionChange(wheel.id, { size })} />
@@ -129,6 +147,10 @@ function PreorderCard({
 export default function PreorderPage() {
   const [selections, setSelections] = useState<Record<string, WheelSelection>>({})
   const [order, setOrder] = useState<OrderItem[]>([])
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(emptyCheckoutForm)
+  const [checkoutStatus, setCheckoutStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [checkoutMessage, setCheckoutMessage] = useState('')
 
   const grandTotal = useMemo(() => order.reduce((sum, item) => sum + item.total, 0), [order])
 
@@ -139,12 +161,18 @@ export default function PreorderPage() {
     }))
   }
 
+  const updateCheckoutForm = (field: keyof CheckoutForm, value: string) => {
+    setCheckoutForm(current => ({ ...current, [field]: value }))
+  }
+
   const addToOrder = (wheel: PreorderWheel, selection: WheelSelection) => {
     if (!selection.size || !selection.width || !selection.lugPattern || !selection.quantity) return
 
     const quantity = Number(selection.quantity)
     const unitPrice = unitPriceFor(selection.size)
 
+    setCheckoutStatus('idle')
+    setCheckoutMessage('')
     setOrder(current => [
       ...current,
       {
@@ -160,6 +188,44 @@ export default function PreorderPage() {
         total: unitPrice * quantity,
       },
     ])
+  }
+
+  const submitCheckout = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!order.length || checkoutStatus === 'submitting') return
+
+    const requiredFields: (keyof CheckoutForm)[] = ['name', 'companyName', 'address', 'phone', 'email']
+    const missingField = requiredFields.find(field => !checkoutForm[field].trim())
+    if (missingField) {
+      setCheckoutStatus('error')
+      setCheckoutMessage('Please fill out every checkout field before submitting.')
+      return
+    }
+
+    setCheckoutStatus('submitting')
+    setCheckoutMessage('')
+
+    try {
+      const response = await fetch('/api/preorder/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ retailer: checkoutForm, items: order }),
+      })
+      const data = (await response.json().catch(() => ({}))) as { message?: string; error?: string }
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Checkout submission failed. Please try again.')
+      }
+
+      setCheckoutStatus('success')
+      setCheckoutMessage(SUCCESS_MESSAGE)
+      setOrder([])
+      setCheckoutOpen(false)
+      setCheckoutForm(emptyCheckoutForm)
+    } catch (error) {
+      setCheckoutStatus('error')
+      setCheckoutMessage(error instanceof Error ? error.message : 'Checkout submission failed. Please try again.')
+    }
   }
 
   return (
@@ -392,6 +458,129 @@ export default function PreorderPage() {
           margin: 0;
         }
 
+        .checkout-button {
+          background: #dc2626;
+          border: 0;
+          border-radius: 12px;
+          color: #fff;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          margin-top: 16px;
+          padding: 13px 16px;
+          text-transform: uppercase;
+          width: 100%;
+        }
+
+        .checkout-button:disabled {
+          cursor: not-allowed;
+          opacity: 0.45;
+        }
+
+        .checkout-form {
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 18px;
+          display: grid;
+          gap: 12px;
+          margin-top: 16px;
+          padding: 14px;
+        }
+
+        .checkout-form h3 {
+          font-size: 15px;
+          letter-spacing: 0.08em;
+          margin: 0;
+          text-transform: uppercase;
+        }
+
+        .checkout-field {
+          display: grid;
+          gap: 6px;
+        }
+
+        .checkout-field span {
+          color: #d4d4d8;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .checkout-field input,
+        .checkout-field textarea {
+          background: #ffffff;
+          border: 1px solid rgba(15, 15, 18, 0.12);
+          border-radius: 10px;
+          color: #18181b;
+          font: inherit;
+          font-size: 14px;
+          font-weight: 650;
+          padding: 11px 12px;
+          width: 100%;
+        }
+
+        .checkout-field textarea {
+          min-height: 76px;
+          resize: vertical;
+        }
+
+        .checkout-actions {
+          display: grid;
+          gap: 8px;
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .checkout-submit,
+        .checkout-cancel {
+          border-radius: 10px;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          padding: 11px 12px;
+          text-transform: uppercase;
+        }
+
+        .checkout-submit {
+          background: #dc2626;
+          border: 0;
+          color: #fff;
+        }
+
+        .checkout-cancel {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          color: #fff;
+        }
+
+        .checkout-submit:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+
+        .checkout-message {
+          border-radius: 14px;
+          font-size: 13px;
+          font-weight: 800;
+          line-height: 1.45;
+          margin-top: 14px;
+          padding: 12px;
+        }
+
+        .checkout-message.success {
+          background: rgba(34, 197, 94, 0.14);
+          border: 1px solid rgba(74, 222, 128, 0.3);
+          color: #bbf7d0;
+        }
+
+        .checkout-message.error {
+          background: rgba(220, 38, 38, 0.16);
+          border: 1px solid rgba(248, 113, 113, 0.32);
+          color: #fecaca;
+        }
+
         .remove-button {
           background: transparent;
           border: 1px solid rgba(255, 255, 255, 0.12);
@@ -455,7 +644,7 @@ export default function PreorderPage() {
           align-items: center;
           background: #f4f4f5;
           display: flex;
-          height: 320px;
+          height: 380px;
           justify-content: center;
           padding: 12px;
           position: relative;
@@ -492,10 +681,10 @@ export default function PreorderPage() {
         }
 
         .style-name {
-          color: #62626a;
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0;
+          color: #991b1b;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
           margin: 0 0 2px;
         }
 
@@ -675,7 +864,7 @@ export default function PreorderPage() {
 
           <aside className="summary" aria-label="Order summary">
             <h2>Order Summary</h2>
-            <p className="summary-note">Add configured styles here. This is client-side only for now; no backend order is submitted.</p>
+            <p className="summary-note">Add configured styles here, then submit checkout to send the preorder request to TIS.</p>
             {order.length === 0 ? (
               <div className="empty-cart">No styles added yet. Select all options on any wheel card to unlock Add to Order.</div>
             ) : (
@@ -687,7 +876,7 @@ export default function PreorderPage() {
                       <div>
                         <h3>{item.wheelName}</h3>
                         <p>
-                          {preorderWheels.find(wheel => wheel.id === item.wheelId)?.name}<br />
+                          {BRAND_LINE}<br />
                           {item.size} × {item.width} · {item.lugPattern}<br />
                           Qty {item.quantity} · {dollars(item.unitPrice)} ea · {dollars(item.total)}
                         </p>
@@ -702,7 +891,48 @@ export default function PreorderPage() {
                   <span>Grand total</span>
                   <strong>{dollars(grandTotal)}</strong>
                 </div>
+                <button className="checkout-button" type="button" disabled={!order.length} onClick={() => setCheckoutOpen(open => !open)}>
+                  Checkout
+                </button>
+                {checkoutOpen && (
+                  <form className="checkout-form" onSubmit={submitCheckout}>
+                    <h3>Retailer details</h3>
+                    <label className="checkout-field">
+                      <span>Name</span>
+                      <input required value={checkoutForm.name} onChange={event => updateCheckoutForm('name', event.target.value)} />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Company Name</span>
+                      <input required value={checkoutForm.companyName} onChange={event => updateCheckoutForm('companyName', event.target.value)} />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Address</span>
+                      <textarea required value={checkoutForm.address} onChange={event => updateCheckoutForm('address', event.target.value)} />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Phone</span>
+                      <input required type="tel" value={checkoutForm.phone} onChange={event => updateCheckoutForm('phone', event.target.value)} />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Email</span>
+                      <input required type="email" value={checkoutForm.email} onChange={event => updateCheckoutForm('email', event.target.value)} />
+                    </label>
+                    <div className="checkout-actions">
+                      <button className="checkout-cancel" type="button" onClick={() => setCheckoutOpen(false)}>
+                        Cancel
+                      </button>
+                      <button className="checkout-submit" type="submit" disabled={checkoutStatus === 'submitting'}>
+                        {checkoutStatus === 'submitting' ? 'Submitting...' : 'Submit Order'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </>
+            )}
+            {checkoutMessage && (
+              <div className={`checkout-message ${checkoutStatus === 'success' ? 'success' : 'error'}`}>
+                {checkoutMessage}
+              </div>
             )}
           </aside>
         </section>
