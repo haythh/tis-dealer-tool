@@ -71,6 +71,7 @@ function currency(value: number | null) {
 }
 
 const WHEEL_FIELDS = 'id, supplier_pn, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, map_price, atd_url, in_stock, stock_today, stock_tomorrow, stock_national, total_stock, ta_image_url, atd_image_url'
+const SMS_DEMO_RESULT_LIMIT = 10
 
 const SEARCH_FIELDS = ['supplier_pn', 'model', 'color_finish', 'size', 'bolt_pattern', 'upc', 'brand']
 const SEARCH_STOPWORDS = new Set([
@@ -295,7 +296,7 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     FROM wheels
     WHERE ${where}
     ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
-    LIMIT 6
+    LIMIT ${SMS_DEMO_RESULT_LIMIT}
   `).all(...params) as SmsDemoCard[]
 
   if (!cards.length && state.finish) {
@@ -313,7 +314,7 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
       SELECT ${WHEEL_FIELDS}
       FROM wheels
       ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
-      LIMIT 6
+      LIMIT ${SMS_DEMO_RESULT_LIMIT}
     `).all() as SmsDemoCard[]
   }
 
@@ -370,11 +371,22 @@ function hasCatalogCriteria(parsed: ParsedSms, state: SmsDemoState) {
 
 function ordinalIndex(text: string) {
   const lower = text.toLowerCase()
-  const ordinalMap: Record<string, number> = { first: 0, second: 1, third: 2, fourth: 3, fifth: 4, sixth: 5 }
+  const ordinalMap: Record<string, number> = {
+    first: 0,
+    second: 1,
+    third: 2,
+    fourth: 3,
+    fifth: 4,
+    sixth: 5,
+    seventh: 6,
+    eighth: 7,
+    ninth: 8,
+    tenth: 9,
+  }
   for (const [word, index] of Object.entries(ordinalMap)) {
     if (new RegExp(`\\b${word}\\b`).test(lower)) return index
   }
-  const numberMatch = lower.match(/#\s*([1-6])\b|\bnumber\s*([1-6])\b|\b([1-6])\b/)
+  const numberMatch = lower.match(/#\s*(10|[1-9])\b|\bnumber\s*(10|[1-9])\b|\b(10|[1-9])\b/)
   const value = numberMatch?.[1] || numberMatch?.[2] || numberMatch?.[3]
   return value ? parseInt(value, 10) - 1 : null
 }
@@ -387,7 +399,7 @@ function formatCardDetail(card: SmsDemoCard) {
 }
 
 function summarizeCardList(cards: SmsDemoCard[]) {
-  return cards.slice(0, 3).map((card, index) => {
+  return cards.slice(0, SMS_DEMO_RESULT_LIMIT).map((card, index) => {
     const price = card.map_price ? `$${Math.round(card.map_price)}` : 'price TBD'
     const stock = typeof card.total_stock === 'number' ? `${card.total_stock} available` : 'stock shown in ATD'
     return `${index + 1}) ${card.brand} ${card.model} ${card.size} — ${card.color_finish}, ${price}, ${stock}`
@@ -457,7 +469,7 @@ function handleLastResultConversation(text: string, incomingState: SmsDemoState,
   if (/\b(compare|recap|show those|show them|list again)\b/.test(lower)) {
     return {
       state: { ...incomingState, awaiting: null },
-      messages: ['Here’s the current set again:', summarizeCardList(lastCards), 'Ask “cheapest,” “most stock,” “details on #2,” or “send the third one.”'],
+      messages: ['Here’s the current set again:', summarizeCardList(lastCards), 'Ask “cheapest,” “most stock,” “details on #2,” or “send the tenth one.”'],
       cards: lastCards,
       resultUrl: resultUrlFor(lastCards, options.baseUrl),
     }

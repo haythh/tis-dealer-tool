@@ -253,7 +253,7 @@ function SmsDemoContent() {
               <div className="hidden text-right text-sm text-zinc-400 sm:block">Same card payload can power MMS previews, mobile quote pages, and ATD links.</div>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {latestCards.slice(0, 6).map(card => <WheelCard key={card.id} card={card} />)}
+              {latestCards.slice(0, 10).map(card => <WheelCard key={card.id} card={card} />)}
             </div>
           </div>
         ) : null}
