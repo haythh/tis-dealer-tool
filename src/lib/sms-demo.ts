@@ -75,7 +75,7 @@ const SMS_DEMO_RESULT_LIMIT = 10
 
 const SEARCH_FIELDS = ['supplier_pn', 'model', 'color_finish', 'size', 'bolt_pattern', 'upc', 'brand']
 const SEARCH_STOPWORDS = new Set([
-  'what', 'which', 'show', 'find', 'have', 'with', 'wheel', 'wheels', 'rim', 'rims', 'about',
+  'what', 'which', 'show', 'find', 'fit', 'fits', 'have', 'with', 'wheel', 'wheels', 'rim', 'rims', 'about',
   'stock', 'stocked', 'available', 'availability', 'price', 'pricing', 'map', 'for', 'the',
   'and', 'that', 'are', 'all', 'any', 'options', 'option', 'catalog', 'data', 'demo',
   'inch', 'inches', 'send', 'email', 'quote', 'share', 'please', 'lookup', 'search',
@@ -112,6 +112,8 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     [/\b4runner\b/, 'Toyota', '4Runner'],
     [/\bwrangler\b/, 'Jeep', 'Wrangler'],
     [/\bgladiator\b/, 'Jeep', 'Gladiator'],
+    [/\bbmw\s+i[-\s]?x\b|\bix\b/, 'BMW', 'iX'],
+    [/\bbmw\s+i8\b|\bi8\b/, 'BMW', 'i8'],
     [/\bram\s?(1500|2500|3500)?\b/, 'RAM', '1500'],
   ]
 
@@ -126,9 +128,13 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     }
   }
 
-  const makeOnly = lower.match(/\b(ford|chevy|chevrolet|gmc|ram|toyota|jeep)\b/)
+  const makeOnly = lower.match(/\b(ford|chevy|chevrolet|gmc|ram|toyota|jeep|bmw)\b/)
   if (makeOnly) {
-    const make = makeOnly[1] === 'chevy' ? 'Chevrolet' : makeOnly[1].charAt(0).toUpperCase() + makeOnly[1].slice(1)
+    const make = makeOnly[1] === 'chevy'
+      ? 'Chevrolet'
+      : makeOnly[1] === 'bmw'
+        ? 'BMW'
+        : makeOnly[1].charAt(0).toUpperCase() + makeOnly[1].slice(1)
     return { year, make, model: null }
   }
 
@@ -173,7 +179,7 @@ export function parseSmsText(text: string): ParsedSms {
         if (SEARCH_STOPWORDS.has(lowerTerm)) return false
         if (/^(19|20)\d{2}$/.test(term)) return false
         if (/^(17|18|20|22|24|26|28|30)S?$/.test(term)) return false
-        if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP'].includes(term)) return false
+        if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP', 'BMW'].includes(term)) return false
         if (['F150', 'F-150', 'F250', 'F-250', 'F350', 'F-350', 'SILVERADO', 'SIERRA', 'TACOMA', 'TUNDRA', '4RUNNER', 'WRANGLER', 'GLADIATOR', 'BRONCO', 'RANGER'].includes(term)) return false
         if (Object.keys(FINISH_TERMS).some(finishTerm => finishTerm.toUpperCase() === term)) return false
         return term.length >= 3 || /^[A-Z]\d+$/.test(term)
@@ -198,10 +204,11 @@ function mergeState(state: SmsDemoState, parsed: ParsedSms, rawText: string): Sm
   const next: SmsDemoState = { ...state }
 
   if (parsed.vehicle) {
+    const makeOnly = Boolean(parsed.vehicle.make && !parsed.vehicle.model)
     next.vehicle = {
-      year: parsed.vehicle.year ?? next.vehicle?.year ?? null,
+      year: makeOnly ? parsed.vehicle.year ?? null : parsed.vehicle.year ?? next.vehicle?.year ?? null,
       make: parsed.vehicle.make ?? next.vehicle?.make ?? null,
-      model: parsed.vehicle.model ?? next.vehicle?.model ?? null,
+      model: makeOnly ? null : parsed.vehicle.model ?? next.vehicle?.model ?? null,
     }
   }
   if (parsed.size) next.size = parsed.size
@@ -265,6 +272,9 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
   const boltPatterns = state.vehicle ? findBoltPatterns(state.vehicle) : []
   const requestedBoltPatterns = parsed?.boltPattern ? normalizeBoltPattern(parsed.boltPattern) : []
   const allBoltPatterns = [...new Set([...boltPatterns, ...requestedBoltPatterns])]
+  if (state.vehicle?.make && state.vehicle?.model && !allBoltPatterns.length) {
+    return []
+  }
   if (allBoltPatterns.length) {
     conditions.push(`(${allBoltPatterns.map(() => `UPPER(bolt_pattern) LIKE UPPER(?)`).join(' OR ')})`)
     params.push(...allBoltPatterns.map(pattern => `%${pattern}%`))
@@ -309,7 +319,18 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     cards = searchCards({ ...state, finish: null }, relaxedParsed)
   }
 
-  if (!cards.length) {
+  const hasSpecificCriteria = Boolean(
+    state.vehicle?.make ||
+    state.vehicle?.model ||
+    state.size ||
+    state.finish ||
+    state.brand ||
+    parsed?.boltPattern ||
+    parsed?.catalogTerms?.length ||
+    parsed?.stockFilter
+  )
+
+  if (!cards.length && !hasSpecificCriteria) {
     cards = db.prepare(`
       SELECT ${WHEEL_FIELDS}
       FROM wheels
@@ -529,6 +550,13 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     : state
   const broadCatalogSearch = hasCatalogCriteria(parsed, searchState)
 
+  if (searchState.vehicle?.make && !searchState.vehicle?.model) {
+    return {
+      state: { ...searchState, awaiting: 'vehicle' },
+      messages: [`Got the make${searchState.vehicle.year ? ` and year` : ''}. Which ${searchState.vehicle.make} model? Example: BMW iX or Ford F-150.`],
+    }
+  }
+
   if (!broadCatalogSearch && (!searchState.vehicle?.year || !searchState.vehicle?.make || !searchState.vehicle?.model)) {
     return {
       state: { ...state, awaiting: 'vehicle' },
@@ -553,6 +581,15 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   const cards = searchCards(searchState, parsed)
   const resultUrl = resultUrlFor(cards, options.baseUrl)
   const sizeLabel = searchState.size && searchState.size !== 'all' ? `${searchState.size}"` : 'catalog'
+  if (!cards.length) {
+    return {
+      state: { ...searchState, awaiting: null, lastResultIds: [] },
+      messages: [
+        `I don’t have a confirmed TIS/DTS catalog match${describeVehicle(searchState.vehicle) ? ` for ${describeVehicle(searchState.vehicle)}` : ''}${searchState.size && searchState.size !== 'all' ? ` in ${searchState.size}"` : ''}${searchState.finish ? ` in ${searchState.finish}` : ''}.`,
+        'I’m not going to guess-fit a wheel. Try a different size/finish, or ask by bolt pattern/SKU.',
+      ],
+    }
+  }
   const nextState: SmsDemoState = {
     ...searchState,
     awaiting: null,

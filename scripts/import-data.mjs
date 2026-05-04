@@ -113,6 +113,7 @@ const VEHICLES = [
   // BMW
   { year_start: 2018, year_end: 2026, make: 'BMW', model: 'X5', bolt_pattern: '5x112', lug_count: 5 },
   { year_start: 2020, year_end: 2026, make: 'BMW', model: 'X6', bolt_pattern: '5x112', lug_count: 5 },
+  { year_start: 2022, year_end: 2026, make: 'BMW', model: 'iX', bolt_pattern: '5x112', lug_count: 5 },
   // Audi
   { year_start: 2019, year_end: 2026, make: 'Audi', model: 'Q7', bolt_pattern: '5x112', lug_count: 5 },
   { year_start: 2019, year_end: 2026, make: 'Audi', model: 'Q8', bolt_pattern: '5x112', lug_count: 5 },

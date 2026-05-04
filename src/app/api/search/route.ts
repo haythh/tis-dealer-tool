@@ -129,7 +129,7 @@ function parseQueryFallback(query: string): ParsedQuery {
     'nissan': 'Nissan', 'titan': 'Nissan', 'frontier': 'Nissan',
     'honda': 'Honda', 'ridgeline': 'Honda', 'pilot': 'Honda',
     'tesla': 'Tesla', 'cybertruck': 'Tesla',
-    'bmw': 'BMW', 'x3': 'BMW', 'x5': 'BMW', 'x7': 'BMW',
+    'bmw': 'BMW', 'x3': 'BMW', 'x5': 'BMW', 'x6': 'BMW', 'x7': 'BMW', 'ix': 'BMW', 'i8': 'BMW',
     'mercedes': 'Mercedes-Benz', 'mercedes-benz': 'Mercedes-Benz', 'g wagon': 'Mercedes-Benz', 'g-wagon': 'Mercedes-Benz', 'sprinter': 'Mercedes-Benz',
     'audi': 'Audi', 'q5': 'Audi', 'q7': 'Audi', 'q8': 'Audi',
     'lexus': 'Lexus', 'gx': 'Lexus', 'lx': 'Lexus',
@@ -163,7 +163,7 @@ function parseQueryFallback(query: string): ParsedQuery {
       'titan': 'Titan', 'frontier': 'Frontier',
       'ridgeline': 'Ridgeline', 'pilot': 'Pilot',
       'cybertruck': 'Cybertruck',
-      'x3': 'X3', 'x5': 'X5', 'x7': 'X7',
+      'x3': 'X3', 'x5': 'X5', 'x6': 'X6', 'x7': 'X7', 'ix': 'iX', 'i8': 'i8',
       'g wagon': 'G Wagon', 'g-wagon': 'G Wagon', 'sprinter': 'Sprinter',
       'q5': 'Q5', 'q7': 'Q7', 'q8': 'Q8',
       'gx': 'GX', 'lx': 'LX', 'escalade': 'Escalade', 'navigator': 'Navigator',
@@ -255,7 +255,9 @@ export async function POST(request: NextRequest) {
     let matchedBoltPatterns: string[] = []
 
     // Strategy: if vehicle detected, look up bolt pattern first
-    if (parsed.vehicle && (parsed.vehicle.make || parsed.vehicle.model)) {
+    if (parsed.vehicle && parsed.vehicle.make && !parsed.vehicle.model) {
+      notice = `I found ${parsed.vehicle.make}, but need the model before checking fitment. I’m not showing guess-fit wheels.`
+    } else if (parsed.vehicle && (parsed.vehicle.make || parsed.vehicle.model)) {
       const { year, make, model } = parsed.vehicle
 
       // Find matching vehicles
@@ -315,14 +317,14 @@ export async function POST(request: NextRequest) {
           notice = `Demo fitment matched ${parsed.vehicle.year || ''} ${parsed.vehicle.make} ${parsed.vehicle.model} by bolt pattern${matchedBoltPatterns.length ? ` (${matchedBoltPatterns.join(', ')})` : ''}. Confirm final fitment with ATDOnline.`
         }
       } else {
-        fitmentStatus = 'demo_fallback'
-        notice = `That vehicle is not in the demo fitment table yet. Showing high-impact TIS/DTS wheels instead — for the demo, search by bolt pattern or try F-150, Silverado, RAM 1500, Tacoma, Tundra, Wrangler, or Bronco.`
-        wheels = demoFallbackWheels(db, parsed, inStockOnly)
+        fitmentStatus = 'catalog_search'
+        notice = `That vehicle is not in the demo fitment table yet, so I’m not showing guess-fit wheels. Search by bolt pattern/SKU or try a supported vehicle.`
       }
     }
 
-    // Fallback: search by other criteria if no vehicle or no results
-    if (wheels.length === 0) {
+    // Fallback: search by other criteria if no vehicle was detected.
+    // If a vehicle was detected, do not fall back to unrelated catalog wheels; bad fitment is worse than no result.
+    if (wheels.length === 0 && !parsed.vehicle) {
       const conditions: string[] = []
       const params: (string | number)[] = []
 
@@ -366,9 +368,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (wheels.length === 0 && parsed.vehicle) {
-      fitmentStatus = 'demo_fallback'
-      notice = notice || 'No exact demo match found. Showing popular media-rich wheels so the demo stays useful instead of dead-ending.'
-      wheels = demoFallbackWheels(db, parsed, inStockOnly)
+      notice = notice || `No confirmed TIS/DTS catalog match found for ${[parsed.vehicle.year, parsed.vehicle.make, parsed.vehicle.model].filter(Boolean).join(' ')}. I’m not showing guess-fit wheels.`
     }
 
     return NextResponse.json({
