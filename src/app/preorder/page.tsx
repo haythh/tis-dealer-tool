@@ -97,12 +97,13 @@ function PreorderCard({
   return (
     <article className="preorder-card">
       <div className="image-shell">
-        <img src={wheel.image} alt={`${wheel.name} wheel preorder style`} loading="lazy" />
+        <img src={wheel.image} alt={`${wheel.code} ${wheel.name} wheel preorder style`} loading="lazy" />
       </div>
       <div className="card-copy">
         <div>
           <p className="eyebrow">New style</p>
-          <h2>{wheel.name}</h2>
+          <h2>{wheel.code}</h2>
+          <p className="style-name">{wheel.name}</p>
         </div>
         <div className="selectors">
           <SelectField label="Wheel size" value={selection.size} options={SIZES} placeholder="Select size" onChange={size => onSelectionChange(wheel.id, { size })} />
@@ -149,7 +150,7 @@ export default function PreorderPage() {
       {
         id: `${wheel.id}-${Date.now()}-${current.length}`,
         wheelId: wheel.id,
-        wheelName: wheel.name,
+        wheelName: wheel.code,
         image: wheel.image,
         size: selection.size,
         width: selection.width,
@@ -163,7 +164,7 @@ export default function PreorderPage() {
 
   return (
     <div className="preorder-page">
-      <style jsx>{`
+      <style>{`
         .preorder-page {
           min-height: 100vh;
           color: #f7f7f8;
@@ -257,8 +258,7 @@ export default function PreorderPage() {
         }
 
         .hero-card,
-        .summary,
-        .preorder-card {
+        .summary {
           background: rgba(255, 255, 255, 0.045);
           border: 1px solid rgba(255, 255, 255, 0.09);
           box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -432,25 +432,38 @@ export default function PreorderPage() {
         }
 
         .preorder-card {
-          border-radius: 24px;
+          background: #ffffff;
+          border: 1px solid rgba(15, 15, 18, 0.1);
+          border-radius: 12px;
+          box-shadow: 0 20px 50px rgba(15, 15, 18, 0.08);
+          color: #111113;
           display: flex;
           flex-direction: column;
           min-width: 0;
           overflow: hidden;
+          position: relative;
+          transition: border-color 180ms ease, box-shadow 220ms ease, transform 220ms ease;
+        }
+
+        .preorder-card:hover {
+          border-color: rgba(220, 38, 38, 0.4);
+          box-shadow: 0 28px 80px rgba(220, 38, 38, 0.12);
+          transform: translateY(-2px);
         }
 
         .image-shell {
           align-items: center;
-          background: radial-gradient(circle, #ffffff 0%, #f5f5f5 56%, #d7d7db 100%);
+          background: #f4f4f5;
           display: flex;
+          height: 320px;
           justify-content: center;
-          min-height: 265px;
-          padding: 22px;
+          padding: 12px;
+          position: relative;
         }
 
         .image-shell img {
           filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.24));
-          height: 235px;
+          height: 100%;
           max-width: 100%;
           object-fit: contain;
           width: 100%;
@@ -460,14 +473,30 @@ export default function PreorderPage() {
           display: flex;
           flex: 1;
           flex-direction: column;
-          gap: 18px;
-          padding: 20px;
+          gap: 14px;
+          padding: 16px;
+        }
+
+        .card-copy .eyebrow {
+          color: #991b1b;
         }
 
         .card-copy h2 {
+          color: #111113;
           font-size: 21px;
+          font-weight: 800;
+          letter-spacing: 0;
+          line-height: 1.3;
           margin: 4px 0 0;
           text-transform: uppercase;
+        }
+
+        .style-name {
+          color: #62626a;
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0;
+          margin: 0 0 2px;
         }
 
         .selectors {
@@ -477,28 +506,34 @@ export default function PreorderPage() {
         }
 
         .preorder-field {
+          background: #f5f5f6;
+          border-radius: 6px;
           display: grid;
-          gap: 6px;
+          gap: 4px;
+          padding: 6px 8px 8px;
         }
 
         .preorder-field span {
-          color: #a1a1aa;
-          font-size: 11px;
-          font-weight: 900;
-          letter-spacing: 0.08em;
+          color: #74747b;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
         }
 
         select {
           appearance: none;
-          background: #151518;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 12px;
-          color: #fff;
+          background: #ffffff;
+          border: 1px solid rgba(15, 15, 18, 0.1);
+          border-radius: 8px;
+          color: #242428;
           cursor: pointer;
+          font-size: 13px;
+          font-weight: 700;
           min-width: 0;
           outline: none;
-          padding: 11px 12px;
+          padding: 8px 10px;
+          width: 100%;
         }
 
         select:focus {
@@ -507,7 +542,7 @@ export default function PreorderPage() {
         }
 
         .card-footer {
-          align-items: center;
+          align-items: end;
           display: flex;
           gap: 12px;
           justify-content: space-between;
@@ -516,28 +551,32 @@ export default function PreorderPage() {
 
         .price-label,
         .card-footer small {
-          color: #a1a1aa;
+          color: #52525b;
           display: block;
-          font-size: 11px;
-          font-weight: 900;
-          letter-spacing: 0.08em;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
         }
 
         .card-footer strong {
+          color: #111113;
           display: block;
-          font-size: 24px;
+          font-size: 18px;
+          font-weight: 800;
           margin: 2px 0;
         }
 
         .card-footer button {
           background: #dc2626;
           border: 0;
-          border-radius: 14px;
+          border-radius: 8px;
+          box-shadow: none;
           color: #fff;
           cursor: pointer;
-          font-weight: 950;
-          padding: 13px 16px;
+          font-size: 14px;
+          font-weight: 800;
+          padding: 10px 16px;
           text-transform: uppercase;
           transition: background 160ms ease, opacity 160ms ease, transform 160ms ease;
           white-space: nowrap;
@@ -648,6 +687,7 @@ export default function PreorderPage() {
                       <div>
                         <h3>{item.wheelName}</h3>
                         <p>
+                          {preorderWheels.find(wheel => wheel.id === item.wheelId)?.name}<br />
                           {item.size} × {item.width} · {item.lugPattern}<br />
                           Qty {item.quantity} · {dollars(item.unitPrice)} ea · {dollars(item.total)}
                         </p>
