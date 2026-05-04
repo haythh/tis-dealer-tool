@@ -1,13 +1,18 @@
 'use client'
 
 import { type FormEvent, useMemo, useState } from 'react'
+import { preorderOffroadWheels } from '@/data/preorder-offroad-wheels'
 import { preorderWheels, type PreorderWheel } from '@/data/preorder-wheels'
 
 const SIZES = ['20"', '22"', '24"', '26"'] as const
 const WIDTHS = ['9"', '10"', '12"', '14"'] as const
 const LUG_PATTERNS = ['5x112', '5x114.3', '5x120', '5x127', '5x150', '6x135', '6x139.7', '8x170', '8x180'] as const
 const QUANTITIES = [4, 8, 12, 16, 20, 24, 28, 32] as const
-const BRAND_LINE = 'TIS MOTORSPORTS FORGED'
+const PREORDER_CATEGORIES = [
+  { id: 'motorsports', label: 'TIS MOTORSPORTS FORGED', wheels: preorderWheels },
+  { id: 'offroad', label: 'TIS OFFROAD FORGED', wheels: preorderOffroadWheels },
+] as const
+const allPreorderWheels = [...preorderWheels, ...preorderOffroadWheels]
 const SUCCESS_MESSAGE = 'Thank You! Your order has been submitted and an ATD representative will contact you soon.'
 
 const PRICE_BY_SIZE: Record<(typeof SIZES)[number], number> = {
@@ -28,6 +33,7 @@ type OrderItem = {
   id: string
   wheelId: string
   wheelName: string
+  category: PreorderWheel['category']
   image: string
   size: string
   width: string
@@ -121,7 +127,7 @@ function PreorderCard({
         <div>
           <p className="eyebrow">New style</p>
           <h2>{wheel.code}</h2>
-          <p className="style-name">{BRAND_LINE}</p>
+          <p className="style-name">{wheel.category}</p>
         </div>
         <div className="selectors">
           <SelectField label="Wheel size" value={selection.size} options={SIZES} placeholder="Select size" onChange={size => onSelectionChange(wheel.id, { size })} />
@@ -145,6 +151,7 @@ function PreorderCard({
 }
 
 export default function PreorderPage() {
+  const [activeCategoryId, setActiveCategoryId] = useState<(typeof PREORDER_CATEGORIES)[number]['id']>('motorsports')
   const [selections, setSelections] = useState<Record<string, WheelSelection>>({})
   const [order, setOrder] = useState<OrderItem[]>([])
   const [checkoutOpen, setCheckoutOpen] = useState(false)
@@ -152,6 +159,8 @@ export default function PreorderPage() {
   const [checkoutStatus, setCheckoutStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [checkoutMessage, setCheckoutMessage] = useState('')
 
+  const activeCategory = PREORDER_CATEGORIES.find(category => category.id === activeCategoryId) ?? PREORDER_CATEGORIES[0]
+  const visibleWheels = activeCategory.wheels
   const grandTotal = useMemo(() => order.reduce((sum, item) => sum + item.total, 0), [order])
 
   const updateSelection = (wheelId: string, patch: Partial<WheelSelection>) => {
@@ -179,6 +188,7 @@ export default function PreorderPage() {
         id: `${wheel.id}-${Date.now()}-${current.length}`,
         wheelId: wheel.id,
         wheelName: wheel.code,
+        category: wheel.category,
         image: wheel.image,
         size: selection.size,
         width: selection.width,
@@ -614,6 +624,47 @@ export default function PreorderPage() {
           font-size: 28px;
         }
 
+        .category-tabs {
+          display: grid;
+          gap: 12px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          margin: 0 0 20px;
+        }
+
+        .category-tabs button {
+          align-items: center;
+          background: rgba(255, 255, 255, 0.055);
+          border: 1px solid rgba(255, 255, 255, 0.11);
+          border-radius: 18px;
+          color: #d4d4d8;
+          cursor: pointer;
+          display: flex;
+          font-size: 13px;
+          font-weight: 950;
+          justify-content: space-between;
+          letter-spacing: 0.08em;
+          padding: 16px 18px;
+          text-align: left;
+          text-transform: uppercase;
+          transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+        }
+
+        .category-tabs button:hover,
+        .category-tabs button.active {
+          background: #ffffff;
+          border-color: rgba(220, 38, 38, 0.6);
+          color: #111113;
+          transform: translateY(-1px);
+        }
+
+        .category-tabs strong {
+          background: #dc2626;
+          border-radius: 999px;
+          color: #ffffff;
+          font-size: 12px;
+          padding: 5px 9px;
+        }
+
         .grid {
           display: grid;
           gap: 18px;
@@ -810,6 +861,7 @@ export default function PreorderPage() {
             padding: 34px 16px 56px;
           }
 
+          .category-tabs,
           .hero-stats,
           .grid,
           .selectors {
@@ -848,7 +900,7 @@ export default function PreorderPage() {
             </p>
             <div className="hero-stats">
               <div>
-                <strong>{preorderWheels.length}</strong>
+                <strong>{allPreorderWheels.length}</strong>
                 <span>New styles</span>
               </div>
               <div>
@@ -876,7 +928,7 @@ export default function PreorderPage() {
                       <div>
                         <h3>{item.wheelName}</h3>
                         <p>
-                          {BRAND_LINE}<br />
+                          {item.category}<br />
                           {item.size} × {item.width} · {item.lugPattern}<br />
                           Qty {item.quantity} · {dollars(item.unitPrice)} ea · {dollars(item.total)}
                         </p>
@@ -937,8 +989,23 @@ export default function PreorderPage() {
           </aside>
         </section>
 
-        <section className="grid" aria-label="Preorder wheel styles">
-          {preorderWheels.map(wheel => (
+        <section className="category-tabs" aria-label="Preorder categories">
+          {PREORDER_CATEGORIES.map(category => (
+            <button
+              key={category.id}
+              type="button"
+              className={category.id === activeCategoryId ? 'active' : ''}
+              aria-pressed={category.id === activeCategoryId}
+              onClick={() => setActiveCategoryId(category.id)}
+            >
+              <span>{category.label}</span>
+              <strong>{category.wheels.length}</strong>
+            </button>
+          ))}
+        </section>
+
+        <section className="grid" aria-label={`${activeCategory.label} preorder wheel styles`}>
+          {visibleWheels.map(wheel => (
             <PreorderCard
               key={wheel.id}
               wheel={wheel}

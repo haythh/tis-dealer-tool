@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 const RECIPIENT_EMAIL = 'hh@tiswheels.com'
-const BRAND_LINE = 'TIS MOTORSPORTS FORGED'
+const VALID_CATEGORIES = ['TIS MOTORSPORTS FORGED', 'TIS OFFROAD FORGED'] as const
+const DEFAULT_CATEGORY = 'TIS MOTORSPORTS FORGED'
 const SUCCESS_MESSAGE = 'Thank You! Your order has been submitted and an ATD representative will contact you soon.'
 
 const VALID_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -16,6 +17,7 @@ type RetailerDetails = {
 
 type PreorderItem = {
   wheelName: string
+  category: (typeof VALID_CATEGORIES)[number]
   image: string
   size: string
   width: string
@@ -43,7 +45,12 @@ function cleanString(value: unknown) {
 }
 
 function isValidImagePath(value: string) {
-  return value.startsWith('/preorder-wheels/') && !value.includes('..')
+  return (value.startsWith('/preorder-wheels/') || value.startsWith('/preorder-offroad-wheels/')) && !value.includes('..')
+}
+
+function cleanCategory(value: unknown) {
+  const category = cleanString(value)
+  return VALID_CATEGORIES.includes(category as (typeof VALID_CATEGORIES)[number]) ? category as (typeof VALID_CATEGORIES)[number] : DEFAULT_CATEGORY
 }
 
 function absoluteImageUrl(image: string, origin: string) {
@@ -88,6 +95,7 @@ function validatePayload(body: unknown): { retailer: RetailerDetails; items: Pre
     const total = Number(item.total)
     const cleaned = {
       wheelName: cleanString(item.wheelName),
+      category: cleanCategory(item.category),
       image: cleanString(item.image),
       size: cleanString(item.size),
       width: cleanString(item.width),
@@ -123,7 +131,7 @@ function textBody(retailer: RetailerDetails, items: PreorderItem[], grandTotal: 
     `Email: ${retailer.email}`,
     '',
     'Items:',
-    ...items.map(item => `${item.wheelName} — ${item.size} x ${item.width} — ${item.lugPattern} — Qty ${item.quantity} — ${dollars(item.unitPrice)} ea — ${dollars(item.total)}`),
+    ...items.map(item => `${item.wheelName} — ${item.category} — ${item.size} x ${item.width} — ${item.lugPattern} — Qty ${item.quantity} — ${dollars(item.unitPrice)} ea — ${dollars(item.total)}`),
     '',
     `Grand total: ${dollars(grandTotal)}`,
   ].join('\n')
@@ -139,7 +147,7 @@ function htmlBody(retailer: RetailerDetails, items: PreorderItem[], grandTotal: 
         </td>
         <td style="padding:14px;border-bottom:1px solid #e5e7eb;vertical-align:middle;">
           <div style="font-size:18px;font-weight:900;color:#111827;">${escapeHtml(item.wheelName)}</div>
-          <div style="margin-top:3px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#991b1b;font-weight:900;">${BRAND_LINE}</div>
+          <div style="margin-top:3px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#991b1b;font-weight:900;">${escapeHtml(item.category)}</div>
         </td>
         <td style="padding:14px;border-bottom:1px solid #e5e7eb;vertical-align:middle;color:#374151;">${escapeHtml(item.size)}</td>
         <td style="padding:14px;border-bottom:1px solid #e5e7eb;vertical-align:middle;color:#374151;">${escapeHtml(item.width)}</td>
