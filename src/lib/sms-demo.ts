@@ -66,11 +66,15 @@ type SmsDemoOptions = {
   baseUrl?: string
 }
 
+function currency(value: number | null) {
+  return value ? `$${Math.round(value).toLocaleString()}` : 'TBD'
+}
+
 const WHEEL_FIELDS = 'id, supplier_pn, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, map_price, atd_url, in_stock, stock_today, stock_tomorrow, stock_national, total_stock, ta_image_url, atd_image_url'
 
 const SEARCH_FIELDS = ['supplier_pn', 'model', 'color_finish', 'size', 'bolt_pattern', 'upc', 'brand']
 const SEARCH_STOPWORDS = new Set([
-  'what', 'which', 'show', 'find', 'have', 'with', 'wheel', 'wheels', 'rim', 'rims',
+  'what', 'which', 'show', 'find', 'have', 'with', 'wheel', 'wheels', 'rim', 'rims', 'about',
   'stock', 'stocked', 'available', 'availability', 'price', 'pricing', 'map', 'for', 'the',
   'and', 'that', 'are', 'all', 'any', 'options', 'option', 'catalog', 'data', 'demo',
   'inch', 'inches', 'send', 'email', 'quote', 'share', 'please', 'lookup', 'search',
@@ -135,7 +139,7 @@ export function parseSmsText(text: string): ParsedSms {
   const lower = q.toLowerCase()
   const email = q.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || null
 
-  const size = lower.match(/\b(17|18|20|22|24|26|28|30)\s*(?:in|inch|inches|\")?\b/)?.[1] || null
+  const size = lower.match(/\b(17|18|20|22|24|26|28|30)\s*(?:s|in|inch|inches|\")?\b/)?.[1] || null
   const boltPattern = lower.match(/\b([568]\s*x\s*(?:\d{3}(?:\.\d)?|\d(?:\.\d{1,2})?))\b/i)?.[1]?.replace(/\s+/g, '').toUpperCase() || null
 
   let finish: string | null = null
@@ -167,7 +171,7 @@ export function parseSmsText(text: string): ParsedSms {
         const lowerTerm = term.toLowerCase()
         if (SEARCH_STOPWORDS.has(lowerTerm)) return false
         if (/^(19|20)\d{2}$/.test(term)) return false
-        if (/^(17|18|20|22|24|26|28|30)$/.test(term)) return false
+        if (/^(17|18|20|22|24|26|28|30)S?$/.test(term)) return false
         if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP'].includes(term)) return false
         if (['F150', 'F-150', 'F250', 'F-250', 'F350', 'F-350', 'SILVERADO', 'SIERRA', 'TACOMA', 'TUNDRA', '4RUNNER', 'WRANGLER', 'GLADIATOR', 'BRONCO', 'RANGER'].includes(term)) return false
         if (Object.keys(FINISH_TERMS).some(finishTerm => finishTerm.toUpperCase() === term)) return false
@@ -364,7 +368,25 @@ function hasCatalogCriteria(parsed: ParsedSms, state: SmsDemoState) {
   )
 }
 
-function summarizeCards(cards: SmsDemoCard[]) {
+function ordinalIndex(text: string) {
+  const lower = text.toLowerCase()
+  const ordinalMap: Record<string, number> = { first: 0, second: 1, third: 2, fourth: 3, fifth: 4, sixth: 5 }
+  for (const [word, index] of Object.entries(ordinalMap)) {
+    if (new RegExp(`\\b${word}\\b`).test(lower)) return index
+  }
+  const numberMatch = lower.match(/#\s*([1-6])\b|\bnumber\s*([1-6])\b|\b([1-6])\b/)
+  const value = numberMatch?.[1] || numberMatch?.[2] || numberMatch?.[3]
+  return value ? parseInt(value, 10) - 1 : null
+}
+
+function formatCardDetail(card: SmsDemoCard) {
+  const stock = typeof card.total_stock === 'number'
+    ? `${card.total_stock} total (${card.stock_today ?? 0} today / ${card.stock_national ?? 0} national)`
+    : 'stock shown in ATD'
+  return `${card.brand} ${card.model} ${card.size} — ${card.color_finish}\nSKU: ${card.supplier_pn}\nMAP: ${currency(card.map_price)}\nStock: ${stock}\nBolt: ${card.bolt_pattern} · Offset: ${card.offset_mm || '—'} · Hub: ${card.hub_bore || '—'}${card.atd_url ? `\nATD: ${card.atd_url}` : ''}`
+}
+
+function summarizeCardList(cards: SmsDemoCard[]) {
   return cards.slice(0, 3).map((card, index) => {
     const price = card.map_price ? `$${Math.round(card.map_price)}` : 'price TBD'
     const stock = typeof card.total_stock === 'number' ? `${card.total_stock} available` : 'stock shown in ATD'
@@ -372,10 +394,85 @@ function summarizeCards(cards: SmsDemoCard[]) {
   }).join('\n')
 }
 
+function summarizeCards(cards: SmsDemoCard[]) {
+  return summarizeCardList(cards)
+}
+
+function isConversationalFollowUp(text: string, incomingState: SmsDemoState, parsed: ParsedSms) {
+  const lower = text.toLowerCase()
+  if (!incomingState.lastResultIds?.length && !incomingState.vehicle) return false
+  if (/\b(what about|how about|instead|same|those|that|these|them|more like|can you|do you have|got anything|anything in|any in)\b/.test(lower)) return true
+  if (incomingState.vehicle && (parsed.size || parsed.finish) && !parsed.vehicle && !parsed.catalogTerms?.length && !parsed.boltPattern && !parsed.brand) return true
+  return false
+}
+
+function handleLastResultConversation(text: string, incomingState: SmsDemoState, options: SmsDemoOptions): SmsDemoReply | null {
+  const lastCards = getSmsDemoCardsByIds(incomingState.lastResultIds || [])
+  if (!lastCards.length) return null
+
+  const lower = text.toLowerCase()
+  const selectedIndex = ordinalIndex(text)
+  const selectedCard = selectedIndex === null
+    ? (/\b(that one|this one|it|that|this)\b/.test(lower) && lastCards.length === 1 ? lastCards[0] : null)
+    : lastCards[selectedIndex]
+
+  if (/\b(cheapest|lowest price|least expensive)\b/.test(lower)) {
+    const cards = [...lastCards].sort((a, b) => (a.map_price ?? Number.MAX_SAFE_INTEGER) - (b.map_price ?? Number.MAX_SAFE_INTEGER))
+    return {
+      state: { ...incomingState, lastResultIds: cards.map(card => card.id), awaiting: null },
+      messages: ['Cheapest from the current set:', summarizeCardList(cards), 'Want one packaged up? Say “send the first one” or drop an email.'],
+      cards,
+      resultUrl: resultUrlFor(cards, options.baseUrl),
+    }
+  }
+
+  if (/\b(most stock|highest stock|best stock|most available|availability)\b/.test(lower)) {
+    const cards = [...lastCards].sort((a, b) => (b.total_stock ?? 0) - (a.total_stock ?? 0))
+    return {
+      state: { ...incomingState, lastResultIds: cards.map(card => card.id), awaiting: null },
+      messages: ['Best availability from the current set:', summarizeCardList(cards), 'Want one packaged up? Say “send the first one” or drop an email.'],
+      cards,
+      resultUrl: resultUrlFor(cards, options.baseUrl),
+    }
+  }
+
+  if (selectedCard && /\b(detail|details|spec|specs|price|map|stock|availability|offset|bolt|hub|link|atd|tell me about|what is)\b/.test(lower)) {
+    return {
+      state: { ...incomingState, lastResultIds: [selectedCard.id], awaiting: null },
+      messages: [formatCardDetail(selectedCard), 'Want me to email this card and ATD link? Reply with an email address.'],
+      cards: [selectedCard],
+      resultUrl: resultUrlFor([selectedCard], options.baseUrl),
+    }
+  }
+
+  if (selectedCard && /\b(send|share|quote|package|email|use|pick|choose)\b/.test(lower)) {
+    return {
+      state: { ...incomingState, lastResultIds: [selectedCard.id], awaiting: 'email' },
+      messages: [`Got it — I’ll package ${selectedCard.brand} ${selectedCard.model} ${selectedCard.size} (${selectedCard.color_finish}). What email should I send it to?`],
+      cards: [selectedCard],
+      resultUrl: resultUrlFor([selectedCard], options.baseUrl),
+    }
+  }
+
+  if (/\b(compare|recap|show those|show them|list again)\b/.test(lower)) {
+    return {
+      state: { ...incomingState, awaiting: null },
+      messages: ['Here’s the current set again:', summarizeCardList(lastCards), 'Ask “cheapest,” “most stock,” “details on #2,” or “send the third one.”'],
+      cards: lastCards,
+      resultUrl: resultUrlFor(lastCards, options.baseUrl),
+    }
+  }
+
+  return null
+}
+
 export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState = {}, options: SmsDemoOptions = {}): SmsDemoReply {
   const parsed = parseSmsText(text)
   const state = mergeState(incomingState, parsed, text)
   const lower = text.toLowerCase()
+
+  const lastResultReply = handleLastResultConversation(text, incomingState, options)
+  if (lastResultReply) return lastResultReply
 
   if ((parsed.wantsEmail || state.awaiting === 'email') && !parsed.email) {
     return {
@@ -398,7 +495,9 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     }
   }
 
+  const conversationalFollowUp = isConversationalFollowUp(text, incomingState, parsed)
   const standaloneCatalogSearch = Boolean(
+    !conversationalFollowUp &&
     !parsed.vehicle &&
     incomingState.awaiting !== 'size' &&
     incomingState.awaiting !== 'finish' &&
