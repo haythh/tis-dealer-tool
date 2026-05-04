@@ -1,6 +1,6 @@
 'use client'
 
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { preorderOffroadWheels } from '@/data/preorder-offroad-wheels'
 import { preorderWheels, type PreorderWheel } from '@/data/preorder-wheels'
 
@@ -107,11 +107,13 @@ function PreorderCard({
   selection,
   onSelectionChange,
   onAdd,
+  onImageOpen,
 }: {
   wheel: PreorderWheel
   selection: WheelSelection
   onSelectionChange: (wheelId: string, patch: Partial<WheelSelection>) => void
   onAdd: (wheel: PreorderWheel, selection: WheelSelection) => void
+  onImageOpen: (wheel: PreorderWheel) => void
 }) {
   const quantity = Number(selection.quantity)
   const unitPrice = unitPriceFor(selection.size)
@@ -120,9 +122,9 @@ function PreorderCard({
 
   return (
     <article className="preorder-card">
-      <div className="image-shell">
+      <button className="image-shell image-button" type="button" onClick={() => onImageOpen(wheel)} aria-label={`View larger image of ${wheel.code}`}>
         <img src={wheel.image} alt={`${wheel.code} ${wheel.name} wheel preorder style`} loading="lazy" />
-      </div>
+      </button>
       <div className="card-copy">
         <div>
           <p className="eyebrow">New style</p>
@@ -158,10 +160,22 @@ export default function PreorderPage() {
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(emptyCheckoutForm)
   const [checkoutStatus, setCheckoutStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [checkoutMessage, setCheckoutMessage] = useState('')
+  const [lightboxWheel, setLightboxWheel] = useState<PreorderWheel | null>(null)
 
   const activeCategory = PREORDER_CATEGORIES.find(category => category.id === activeCategoryId) ?? PREORDER_CATEGORIES[0]
   const visibleWheels = activeCategory.wheels
   const grandTotal = useMemo(() => order.reduce((sum, item) => sum + item.total, 0), [order])
+
+  useEffect(() => {
+    if (!lightboxWheel) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLightboxWheel(null)
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [lightboxWheel])
 
   const updateSelection = (wheelId: string, patch: Partial<WheelSelection>) => {
     setSelections(current => ({
@@ -245,9 +259,9 @@ export default function PreorderPage() {
           min-height: 100vh;
           color: #f7f7f8;
           background:
-            radial-gradient(circle at 12% 8%, rgba(220, 38, 38, 0.22), transparent 32%),
-            radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.09), transparent 28%),
-            linear-gradient(180deg, #070707 0%, #101012 52%, #050505 100%);
+            radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.14), transparent 32%),
+            radial-gradient(circle at 88% 18%, rgba(24, 24, 27, 0.18), transparent 30%),
+            linear-gradient(180deg, #71717a 0%, #52525b 48%, #3f3f46 100%);
         }
 
         .preorder-page::before {
@@ -701,6 +715,17 @@ export default function PreorderPage() {
           position: relative;
         }
 
+        .image-button {
+          border: 0;
+          cursor: zoom-in;
+          width: 100%;
+        }
+
+        .image-button:focus-visible {
+          outline: 3px solid rgba(220, 38, 38, 0.55);
+          outline-offset: -3px;
+        }
+
         .image-shell img {
           filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.24));
           height: 100%;
@@ -832,6 +857,76 @@ export default function PreorderPage() {
           opacity: 0.42;
         }
 
+        .lightbox-backdrop {
+          align-items: center;
+          background: rgba(9, 9, 11, 0.78);
+          backdrop-filter: blur(18px);
+          display: flex;
+          inset: 0;
+          justify-content: center;
+          padding: 24px;
+          position: fixed;
+          z-index: 20;
+        }
+
+        .lightbox-panel {
+          background: #f4f4f5;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 24px;
+          box-shadow: 0 30px 120px rgba(0, 0, 0, 0.48);
+          color: #111113;
+          max-width: min(920px, 94vw);
+          overflow: hidden;
+          position: relative;
+          width: 100%;
+        }
+
+        .lightbox-close {
+          background: rgba(17, 17, 19, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 999px;
+          color: #fff;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          padding: 10px 13px;
+          position: absolute;
+          right: 16px;
+          text-transform: uppercase;
+          top: 16px;
+          z-index: 1;
+        }
+
+        .lightbox-panel img {
+          aspect-ratio: 1.25;
+          display: block;
+          object-fit: contain;
+          padding: clamp(28px, 5vw, 56px);
+          width: 100%;
+        }
+
+        .lightbox-caption {
+          background: #fff;
+          border-top: 1px solid rgba(15, 15, 18, 0.08);
+          padding: 16px 20px;
+        }
+
+        .lightbox-caption h2 {
+          font-size: 22px;
+          margin: 0;
+          text-transform: uppercase;
+        }
+
+        .lightbox-caption p {
+          color: #71717a;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          margin: 4px 0 0;
+          text-transform: uppercase;
+        }
+
         @media (max-width: 1100px) {
           .hero {
             grid-template-columns: 1fr;
@@ -894,7 +989,7 @@ export default function PreorderPage() {
         <section className="hero" aria-label="New TIS Wheel Preorder">
           <div className="hero-card">
             <p className="badge">Retailer commitment preview</p>
-            <h1>New TIS Wheel Preorder</h1>
+            <h1>TIS Forged Preorder</h1>
             <p>
               Review upcoming wheel styles, choose a size package, and build a no-pressure preorder summary for retailer commitments. Pricing starts at $300 per wheel for 20&quot; and steps up $40 per diameter.
             </p>
@@ -1012,10 +1107,26 @@ export default function PreorderPage() {
               selection={selections[wheel.id] ?? emptySelection}
               onSelectionChange={updateSelection}
               onAdd={addToOrder}
+              onImageOpen={setLightboxWheel}
             />
           ))}
         </section>
       </main>
+
+      {lightboxWheel && (
+        <div className="lightbox-backdrop" role="presentation" onClick={() => setLightboxWheel(null)}>
+          <div className="lightbox-panel" role="dialog" aria-modal="true" aria-label={`${lightboxWheel.code} enlarged wheel image`} onClick={event => event.stopPropagation()}>
+            <button className="lightbox-close" type="button" onClick={() => setLightboxWheel(null)}>
+              Close
+            </button>
+            <img src={lightboxWheel.image} alt={`${lightboxWheel.code} ${lightboxWheel.name} wheel enlarged`} />
+            <div className="lightbox-caption">
+              <h2>{lightboxWheel.code}</h2>
+              <p>{lightboxWheel.category}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1257,6 +1257,25 @@ export default function Home() {
                 {label}
               </button>
             ))}
+            <a
+              href="/preorder"
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--header-border)',
+                borderRadius: 999,
+                color: 'var(--page-text)',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontSize: 12,
+                fontWeight: 900,
+                letterSpacing: '0.05em',
+                padding: '8px 12px',
+                textDecoration: 'none',
+                textTransform: 'uppercase',
+              }}
+            >
+              Preorder
+            </a>
           </nav>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
