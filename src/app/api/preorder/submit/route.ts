@@ -227,7 +227,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'EMAIL_FROM is not configured. Preorder checkout email cannot be sent.' }, { status: 500 })
   }
 
-  const bcc = process.env.EMAIL_BCC?.split(',').map(value => value.trim()).filter(Boolean)
+  const bcc = process.env.EMAIL_BCC
+    ?.split(',')
+    .map(value => value.trim())
+    .filter(value => value && value.toLowerCase() !== RECIPIENT_EMAIL.toLowerCase())
   const replyTo = process.env.EMAIL_REPLY_TO || validated.retailer.email
   const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin
 
