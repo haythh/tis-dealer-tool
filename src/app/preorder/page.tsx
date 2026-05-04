@@ -1,0 +1,684 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+import { preorderWheels, type PreorderWheel } from '@/data/preorder-wheels'
+
+const SIZES = ['20"', '22"', '24"', '26"'] as const
+const WIDTHS = ['9"', '10"', '12"', '14"'] as const
+const LUG_PATTERNS = ['5x112', '5x114.3', '5x120', '5x127', '5x150', '6x135', '6x139.7', '8x170', '8x180'] as const
+const QUANTITIES = [4, 8, 12, 16, 20, 24, 28, 32] as const
+
+const PRICE_BY_SIZE: Record<(typeof SIZES)[number], number> = {
+  '20"': 300,
+  '22"': 340,
+  '24"': 380,
+  '26"': 420,
+}
+
+type WheelSelection = {
+  size: string
+  width: string
+  lugPattern: string
+  quantity: string
+}
+
+type OrderItem = {
+  id: string
+  wheelId: string
+  wheelName: string
+  image: string
+  size: string
+  width: string
+  lugPattern: string
+  quantity: number
+  unitPrice: number
+  total: number
+}
+
+const emptySelection: WheelSelection = {
+  size: '',
+  width: '',
+  lugPattern: '',
+  quantity: '',
+}
+
+function dollars(value: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
+}
+
+function unitPriceFor(size: string) {
+  return PRICE_BY_SIZE[size as keyof typeof PRICE_BY_SIZE] ?? 0
+}
+
+function SelectField({
+  label,
+  value,
+  options,
+  placeholder,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: readonly (string | number)[]
+  placeholder: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="preorder-field">
+      <span>{label}</span>
+      <select value={value} onChange={event => onChange(event.target.value)}>
+        <option value="">{placeholder}</option>
+        {options.map(option => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+function PreorderCard({
+  wheel,
+  selection,
+  onSelectionChange,
+  onAdd,
+}: {
+  wheel: PreorderWheel
+  selection: WheelSelection
+  onSelectionChange: (wheelId: string, patch: Partial<WheelSelection>) => void
+  onAdd: (wheel: PreorderWheel, selection: WheelSelection) => void
+}) {
+  const quantity = Number(selection.quantity)
+  const unitPrice = unitPriceFor(selection.size)
+  const total = unitPrice * quantity
+  const isComplete = Boolean(selection.size && selection.width && selection.lugPattern && selection.quantity)
+
+  return (
+    <article className="preorder-card">
+      <div className="image-shell">
+        <img src={wheel.image} alt={`${wheel.name} wheel preorder style`} loading="lazy" />
+      </div>
+      <div className="card-copy">
+        <div>
+          <p className="eyebrow">New style</p>
+          <h2>{wheel.name}</h2>
+        </div>
+        <div className="selectors">
+          <SelectField label="Wheel size" value={selection.size} options={SIZES} placeholder="Select size" onChange={size => onSelectionChange(wheel.id, { size })} />
+          <SelectField label="Width" value={selection.width} options={WIDTHS} placeholder="Select width" onChange={width => onSelectionChange(wheel.id, { width })} />
+          <SelectField label="Lug pattern" value={selection.lugPattern} options={LUG_PATTERNS} placeholder="Select lug" onChange={lugPattern => onSelectionChange(wheel.id, { lugPattern })} />
+          <SelectField label="Quantity" value={selection.quantity} options={QUANTITIES} placeholder="Select qty" onChange={quantity => onSelectionChange(wheel.id, { quantity })} />
+        </div>
+        <div className="card-footer">
+          <div>
+            <span className="price-label">Estimated total</span>
+            <strong>{isComplete ? dollars(total) : 'Select options'}</strong>
+            {selection.size && <small>{dollars(unitPrice)} / wheel</small>}
+          </div>
+          <button type="button" disabled={!isComplete} onClick={() => onAdd(wheel, selection)}>
+            Add to Order
+          </button>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export default function PreorderPage() {
+  const [selections, setSelections] = useState<Record<string, WheelSelection>>({})
+  const [order, setOrder] = useState<OrderItem[]>([])
+
+  const grandTotal = useMemo(() => order.reduce((sum, item) => sum + item.total, 0), [order])
+
+  const updateSelection = (wheelId: string, patch: Partial<WheelSelection>) => {
+    setSelections(current => ({
+      ...current,
+      [wheelId]: { ...(current[wheelId] ?? emptySelection), ...patch },
+    }))
+  }
+
+  const addToOrder = (wheel: PreorderWheel, selection: WheelSelection) => {
+    if (!selection.size || !selection.width || !selection.lugPattern || !selection.quantity) return
+
+    const quantity = Number(selection.quantity)
+    const unitPrice = unitPriceFor(selection.size)
+
+    setOrder(current => [
+      ...current,
+      {
+        id: `${wheel.id}-${Date.now()}-${current.length}`,
+        wheelId: wheel.id,
+        wheelName: wheel.name,
+        image: wheel.image,
+        size: selection.size,
+        width: selection.width,
+        lugPattern: selection.lugPattern,
+        quantity,
+        unitPrice,
+        total: unitPrice * quantity,
+      },
+    ])
+  }
+
+  return (
+    <div className="preorder-page">
+      <style jsx>{`
+        .preorder-page {
+          min-height: 100vh;
+          color: #f7f7f8;
+          background:
+            radial-gradient(circle at 12% 8%, rgba(220, 38, 38, 0.22), transparent 32%),
+            radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.09), transparent 28%),
+            linear-gradient(180deg, #070707 0%, #101012 52%, #050505 100%);
+        }
+
+        .preorder-page::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.2;
+          background-image:
+            linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+          background-size: 58px 58px;
+          mask-image: linear-gradient(to bottom, black, transparent 76%);
+        }
+
+        header,
+        main {
+          position: relative;
+          z-index: 1;
+        }
+
+        header {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(5, 5, 5, 0.76);
+          backdrop-filter: blur(14px);
+          padding: 16px 24px;
+        }
+
+        .header-inner {
+          align-items: center;
+          display: flex;
+          gap: 16px;
+          justify-content: space-between;
+          margin: 0 auto;
+          max-width: 1280px;
+        }
+
+        .brand-lockup {
+          align-items: center;
+          color: #fff;
+          display: inline-flex;
+          gap: 12px;
+          text-decoration: none;
+        }
+
+        .brand-lockup img {
+          height: 28px;
+          width: auto;
+        }
+
+        .brand-lockup span {
+          border-left: 1px solid rgba(255, 255, 255, 0.14);
+          color: #d8d8dc;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          padding-left: 12px;
+          text-transform: uppercase;
+        }
+
+        .back-link {
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 999px;
+          color: #f4f4f5;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          padding: 9px 13px;
+          text-decoration: none;
+          text-transform: uppercase;
+        }
+
+        main {
+          margin: 0 auto;
+          max-width: 1280px;
+          padding: 54px 24px 72px;
+        }
+
+        .hero {
+          display: grid;
+          gap: 24px;
+          grid-template-columns: minmax(0, 1fr) 360px;
+          margin-bottom: 34px;
+        }
+
+        .hero-card,
+        .summary,
+        .preorder-card {
+          background: rgba(255, 255, 255, 0.045);
+          border: 1px solid rgba(255, 255, 255, 0.09);
+          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(16px);
+        }
+
+        .hero-card {
+          border-radius: 28px;
+          overflow: hidden;
+          padding: clamp(28px, 5vw, 52px);
+        }
+
+        .badge,
+        .eyebrow {
+          color: #fecaca;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+          margin: 0;
+          text-transform: uppercase;
+        }
+
+        h1 {
+          font-size: clamp(42px, 7vw, 86px);
+          font-weight: 950;
+          letter-spacing: -0.04em;
+          line-height: 0.92;
+          margin: 14px 0 18px;
+          max-width: 860px;
+          text-transform: uppercase;
+        }
+
+        .hero-card p:not(.badge) {
+          color: #c8c8cf;
+          font-size: 18px;
+          line-height: 1.6;
+          margin: 0;
+          max-width: 760px;
+        }
+
+        .hero-stats {
+          display: grid;
+          gap: 12px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          margin-top: 28px;
+        }
+
+        .hero-stats div {
+          background: rgba(0, 0, 0, 0.24);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 14px;
+        }
+
+        .hero-stats strong {
+          display: block;
+          font-size: 24px;
+        }
+
+        .hero-stats span {
+          color: #a1a1aa;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .summary {
+          align-self: start;
+          border-radius: 24px;
+          padding: 22px;
+          position: sticky;
+          top: 18px;
+        }
+
+        .summary h2 {
+          font-size: 22px;
+          margin: 0 0 6px;
+          text-transform: uppercase;
+        }
+
+        .summary-note {
+          color: #a1a1aa;
+          font-size: 13px;
+          line-height: 1.5;
+          margin: 0 0 18px;
+        }
+
+        .empty-cart {
+          border: 1px dashed rgba(255, 255, 255, 0.16);
+          border-radius: 16px;
+          color: #b9b9c0;
+          font-size: 14px;
+          line-height: 1.5;
+          padding: 18px;
+        }
+
+        .order-list {
+          display: grid;
+          gap: 12px;
+        }
+
+        .order-item {
+          align-items: center;
+          background: rgba(0, 0, 0, 0.22);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          display: grid;
+          gap: 12px;
+          grid-template-columns: 58px 1fr auto;
+          padding: 10px;
+        }
+
+        .order-item img {
+          aspect-ratio: 1;
+          background: #fff;
+          border-radius: 12px;
+          object-fit: contain;
+          width: 58px;
+        }
+
+        .order-item h3 {
+          font-size: 14px;
+          margin: 0 0 4px;
+        }
+
+        .order-item p {
+          color: #a1a1aa;
+          font-size: 12px;
+          line-height: 1.45;
+          margin: 0;
+        }
+
+        .remove-button {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 999px;
+          color: #fff;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 900;
+          padding: 8px 10px;
+        }
+
+        .grand-total {
+          align-items: baseline;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          display: flex;
+          justify-content: space-between;
+          margin-top: 18px;
+          padding-top: 16px;
+        }
+
+        .grand-total span {
+          color: #a1a1aa;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .grand-total strong {
+          color: #fff;
+          font-size: 28px;
+        }
+
+        .grid {
+          display: grid;
+          gap: 18px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .preorder-card {
+          border-radius: 24px;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          overflow: hidden;
+        }
+
+        .image-shell {
+          align-items: center;
+          background: radial-gradient(circle, #ffffff 0%, #f5f5f5 56%, #d7d7db 100%);
+          display: flex;
+          justify-content: center;
+          min-height: 265px;
+          padding: 22px;
+        }
+
+        .image-shell img {
+          filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.24));
+          height: 235px;
+          max-width: 100%;
+          object-fit: contain;
+          width: 100%;
+        }
+
+        .card-copy {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          gap: 18px;
+          padding: 20px;
+        }
+
+        .card-copy h2 {
+          font-size: 21px;
+          margin: 4px 0 0;
+          text-transform: uppercase;
+        }
+
+        .selectors {
+          display: grid;
+          gap: 10px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .preorder-field {
+          display: grid;
+          gap: 6px;
+        }
+
+        .preorder-field span {
+          color: #a1a1aa;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        select {
+          appearance: none;
+          background: #151518;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 12px;
+          color: #fff;
+          cursor: pointer;
+          min-width: 0;
+          outline: none;
+          padding: 11px 12px;
+        }
+
+        select:focus {
+          border-color: rgba(220, 38, 38, 0.82);
+          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+        }
+
+        .card-footer {
+          align-items: center;
+          display: flex;
+          gap: 12px;
+          justify-content: space-between;
+          margin-top: auto;
+        }
+
+        .price-label,
+        .card-footer small {
+          color: #a1a1aa;
+          display: block;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .card-footer strong {
+          display: block;
+          font-size: 24px;
+          margin: 2px 0;
+        }
+
+        .card-footer button {
+          background: #dc2626;
+          border: 0;
+          border-radius: 14px;
+          color: #fff;
+          cursor: pointer;
+          font-weight: 950;
+          padding: 13px 16px;
+          text-transform: uppercase;
+          transition: background 160ms ease, opacity 160ms ease, transform 160ms ease;
+          white-space: nowrap;
+        }
+
+        .card-footer button:hover:not(:disabled) {
+          background: #ef4444;
+          transform: translateY(-1px);
+        }
+
+        .card-footer button:disabled {
+          cursor: not-allowed;
+          opacity: 0.42;
+        }
+
+        @media (max-width: 1100px) {
+          .hero {
+            grid-template-columns: 1fr;
+          }
+
+          .summary {
+            position: static;
+          }
+
+          .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 680px) {
+          header {
+            padding: 14px 16px;
+          }
+
+          .header-inner,
+          .card-footer {
+            align-items: stretch;
+            flex-direction: column;
+          }
+
+          main {
+            padding: 34px 16px 56px;
+          }
+
+          .hero-stats,
+          .grid,
+          .selectors {
+            grid-template-columns: 1fr;
+          }
+
+          .brand-lockup span {
+            display: none;
+          }
+
+          .card-footer button {
+            width: 100%;
+          }
+        }
+      `}</style>
+
+      <header>
+        <div className="header-inner">
+          <a className="brand-lockup" href="/">
+            <img src="/tis-logo.png" alt="TIS" />
+            <span>Dealer preorder</span>
+          </a>
+          <a className="back-link" href="/">
+            Back to Search
+          </a>
+        </div>
+      </header>
+
+      <main>
+        <section className="hero" aria-label="New TIS Wheel Preorder">
+          <div className="hero-card">
+            <p className="badge">Retailer commitment preview</p>
+            <h1>New TIS Wheel Preorder</h1>
+            <p>
+              Review upcoming wheel styles, choose a size package, and build a no-pressure preorder summary for retailer commitments. Pricing starts at $300 per wheel for 20&quot; and steps up $40 per diameter.
+            </p>
+            <div className="hero-stats">
+              <div>
+                <strong>{preorderWheels.length}</strong>
+                <span>New styles</span>
+              </div>
+              <div>
+                <strong>$300+</strong>
+                <span>Per wheel</span>
+              </div>
+              <div>
+                <strong>4x</strong>
+                <span>Qty increments</span>
+              </div>
+            </div>
+          </div>
+
+          <aside className="summary" aria-label="Order summary">
+            <h2>Order Summary</h2>
+            <p className="summary-note">Add configured styles here. This is client-side only for now; no backend order is submitted.</p>
+            {order.length === 0 ? (
+              <div className="empty-cart">No styles added yet. Select all options on any wheel card to unlock Add to Order.</div>
+            ) : (
+              <>
+                <div className="order-list">
+                  {order.map(item => (
+                    <div className="order-item" key={item.id}>
+                      <img src={item.image} alt="" />
+                      <div>
+                        <h3>{item.wheelName}</h3>
+                        <p>
+                          {item.size} × {item.width} · {item.lugPattern}<br />
+                          Qty {item.quantity} · {dollars(item.unitPrice)} ea · {dollars(item.total)}
+                        </p>
+                      </div>
+                      <button className="remove-button" type="button" onClick={() => setOrder(current => current.filter(orderItem => orderItem.id !== item.id))}>
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="grand-total">
+                  <span>Grand total</span>
+                  <strong>{dollars(grandTotal)}</strong>
+                </div>
+              </>
+            )}
+          </aside>
+        </section>
+
+        <section className="grid" aria-label="Preorder wheel styles">
+          {preorderWheels.map(wheel => (
+            <PreorderCard
+              key={wheel.id}
+              wheel={wheel}
+              selection={selections[wheel.id] ?? emptySelection}
+              onSelectionChange={updateSelection}
+              onAdd={addToOrder}
+            />
+          ))}
+        </section>
+      </main>
+    </div>
+  )
+}
