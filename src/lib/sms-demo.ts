@@ -57,6 +57,9 @@ type ParsedSms = {
   brand?: string | null
   wantsEmail?: boolean
   email?: string | null
+  boltPattern?: string | null
+  catalogTerms?: string[]
+  stockFilter?: 'in_stock' | 'out_of_stock' | 'all'
 }
 
 type SmsDemoOptions = {
@@ -64,6 +67,15 @@ type SmsDemoOptions = {
 }
 
 const WHEEL_FIELDS = 'id, supplier_pn, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, map_price, atd_url, in_stock, stock_today, stock_tomorrow, stock_national, total_stock, ta_image_url, atd_image_url'
+
+const SEARCH_FIELDS = ['supplier_pn', 'model', 'color_finish', 'size', 'bolt_pattern', 'upc', 'brand']
+const SEARCH_STOPWORDS = new Set([
+  'what', 'which', 'show', 'find', 'have', 'with', 'wheel', 'wheels', 'rim', 'rims',
+  'stock', 'stocked', 'available', 'availability', 'price', 'pricing', 'map', 'for', 'the',
+  'and', 'that', 'are', 'all', 'any', 'options', 'option', 'catalog', 'data', 'demo',
+  'inch', 'inches', 'send', 'email', 'quote', 'share', 'please', 'lookup', 'search',
+  'out', 'oos', 'not',
+])
 
 const FINISH_TERMS: Record<string, string> = {
   chrome: 'Chrome',
@@ -124,6 +136,7 @@ export function parseSmsText(text: string): ParsedSms {
   const email = q.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || null
 
   const size = lower.match(/\b(17|18|20|22|24|26|28|30)\s*(?:in|inch|inches|\")?\b/)?.[1] || null
+  const boltPattern = lower.match(/\b([568]\s*x\s*(?:\d{3}(?:\.\d)?|\d(?:\.\d{1,2})?))\b/i)?.[1]?.replace(/\s+/g, '').toUpperCase() || null
 
   let finish: string | null = null
   const finishEntries = Object.entries(FINISH_TERMS).sort((a, b) => b[0].length - a[0].length)
@@ -139,6 +152,29 @@ export function parseSmsText(text: string): ParsedSms {
   else if (/motorsports/.test(lower)) brand = 'TIS Motorsports'
   else if (/\btis\b/.test(lower)) brand = 'TIS'
 
+  const stockFilter = /\bout of stock|not in stock|oos\b/.test(lower)
+    ? 'out_of_stock'
+    : /\ball catalog|all data|entire catalog|include out of stock|everything\b/.test(lower)
+      ? 'all'
+      : undefined
+
+  const catalogTerms = [...new Set(
+    q
+      .replace(email || '', ' ')
+      .match(/[a-z0-9][a-z0-9+.-]{1,}/gi)
+      ?.map(term => term.toUpperCase())
+      .filter(term => {
+        const lowerTerm = term.toLowerCase()
+        if (SEARCH_STOPWORDS.has(lowerTerm)) return false
+        if (/^(19|20)\d{2}$/.test(term)) return false
+        if (/^(17|18|20|22|24|26|28|30)$/.test(term)) return false
+        if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP'].includes(term)) return false
+        if (['F150', 'F-150', 'F250', 'F-250', 'F350', 'F-350', 'SILVERADO', 'SIERRA', 'TACOMA', 'TUNDRA', '4RUNNER', 'WRANGLER', 'GLADIATOR', 'BRONCO', 'RANGER'].includes(term)) return false
+        if (Object.keys(FINISH_TERMS).some(finishTerm => finishTerm.toUpperCase() === term)) return false
+        return term.length >= 3 || /^[A-Z]\d+$/.test(term)
+      }) || []
+  )].slice(0, 5)
+
   return {
     vehicle: extractVehicle(q),
     size,
@@ -146,6 +182,9 @@ export function parseSmsText(text: string): ParsedSms {
     brand,
     wantsEmail: /\b(email|send|quote|share)\b/.test(lower),
     email,
+    boltPattern,
+    catalogTerms,
+    stockFilter,
   }
 }
 
@@ -207,15 +246,23 @@ function findBoltPatterns(vehicle: SmsDemoVehicle) {
   return [...new Set(rows.flatMap(row => normalizeBoltPattern(row.bolt_pattern)))]
 }
 
-function searchCards(state: SmsDemoState): SmsDemoCard[] {
+function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
   const db = getDb()
-  const conditions = ['in_stock = 1']
+  const conditions: string[] = []
   const params: (string | number)[] = []
 
+  if (parsed?.stockFilter === 'in_stock') {
+    conditions.push('in_stock = 1')
+  } else if (parsed?.stockFilter === 'out_of_stock') {
+    conditions.push('COALESCE(in_stock, 0) = 0')
+  }
+
   const boltPatterns = state.vehicle ? findBoltPatterns(state.vehicle) : []
-  if (boltPatterns.length) {
-    conditions.push(`(${boltPatterns.map(pattern => `UPPER(bolt_pattern) LIKE UPPER(?)`).join(' OR ')})`)
-    params.push(...boltPatterns.map(pattern => `%${pattern}%`))
+  const requestedBoltPatterns = parsed?.boltPattern ? normalizeBoltPattern(parsed.boltPattern) : []
+  const allBoltPatterns = [...new Set([...boltPatterns, ...requestedBoltPatterns])]
+  if (allBoltPatterns.length) {
+    conditions.push(`(${allBoltPatterns.map(() => `UPPER(bolt_pattern) LIKE UPPER(?)`).join(' OR ')})`)
+    params.push(...allBoltPatterns.map(pattern => `%${pattern}%`))
   }
 
   if (state.size && state.size !== 'all') {
@@ -233,26 +280,35 @@ function searchCards(state: SmsDemoState): SmsDemoCard[] {
     params.push(state.brand)
   }
 
-  const where = conditions.join(' AND ')
+  for (const term of parsed?.catalogTerms || []) {
+    conditions.push(`(${SEARCH_FIELDS.map(field => `UPPER(${field}) LIKE UPPER(?)`).join(' OR ')})`)
+    params.push(...SEARCH_FIELDS.map(() => `%${term}%`))
+  }
+
+  const where = conditions.length ? conditions.join(' AND ') : '1=1'
   let cards = db.prepare(`
     SELECT ${WHEEL_FIELDS}
     FROM wheels
     WHERE ${where}
-    ORDER BY COALESCE(total_stock, 0) DESC, map_price ASC
+    ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
     LIMIT 6
   `).all(...params) as SmsDemoCard[]
 
   if (!cards.length && state.finish) {
     const relaxed = { ...state, finish: null }
-    cards = searchCards(relaxed)
+    cards = searchCards(relaxed, parsed)
+  }
+
+  if (!cards.length && parsed?.catalogTerms && parsed.catalogTerms.length > 1) {
+    const relaxedParsed = { ...parsed, catalogTerms: parsed.catalogTerms.slice(0, 1) }
+    cards = searchCards({ ...state, finish: null }, relaxedParsed)
   }
 
   if (!cards.length) {
     cards = db.prepare(`
       SELECT ${WHEEL_FIELDS}
       FROM wheels
-      WHERE in_stock = 1 AND ta_image_url IS NOT NULL
-      ORDER BY COALESCE(total_stock, 0) DESC, map_price ASC
+      ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
       LIMIT 6
     `).all() as SmsDemoCard[]
   }
@@ -295,6 +351,19 @@ function resultUrlForIds(ids: number[] | undefined, baseUrl?: string) {
   return url
 }
 
+function hasCatalogCriteria(parsed: ParsedSms, state: SmsDemoState) {
+  return Boolean(
+    parsed.boltPattern ||
+    parsed.catalogTerms?.length ||
+    parsed.stockFilter ||
+    state.brand ||
+    state.size ||
+    state.finish ||
+    state.vehicle?.make ||
+    state.vehicle?.model
+  )
+}
+
 function summarizeCards(cards: SmsDemoCard[]) {
   return cards.slice(0, 3).map((card, index) => {
     const price = card.map_price ? `$${Math.round(card.map_price)}` : 'price TBD'
@@ -329,32 +398,52 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     }
   }
 
-  if (!state.vehicle?.year || !state.vehicle?.make || !state.vehicle?.model) {
+  const standaloneCatalogSearch = Boolean(
+    !parsed.vehicle &&
+    incomingState.awaiting !== 'size' &&
+    incomingState.awaiting !== 'finish' &&
+    incomingState.awaiting !== 'email' &&
+    (parsed.catalogTerms?.length || parsed.boltPattern || parsed.brand || parsed.stockFilter || parsed.size || parsed.finish) &&
+    !/\b(same|this|that|current)\s+(truck|vehicle|fitment|one)\b/.test(lower)
+  )
+  const searchState: SmsDemoState = standaloneCatalogSearch
+    ? {
+        vehicle: null,
+        size: parsed.size || null,
+        finish: parsed.finish || null,
+        brand: parsed.brand || null,
+        email: state.email || null,
+        finishPreferenceAsked: true,
+      }
+    : state
+  const broadCatalogSearch = hasCatalogCriteria(parsed, searchState)
+
+  if (!broadCatalogSearch && (!searchState.vehicle?.year || !searchState.vehicle?.make || !searchState.vehicle?.model)) {
     return {
       state: { ...state, awaiting: 'vehicle' },
       messages: ['Got it. What vehicle year, make, and model? Example: 2022 Ford F-150.'],
     }
   }
 
-  if (!state.size) {
+  if (!broadCatalogSearch && !searchState.size) {
     return {
-      state: { ...state, awaiting: 'size' },
-      messages: [`Nice. What wheel diameter for the ${describeVehicle(state.vehicle)} — 20, 22, 24, or show me all?`],
+      state: { ...searchState, awaiting: 'size' },
+      messages: [`Nice. What wheel diameter for the ${describeVehicle(searchState.vehicle)} — 20, 22, 24, or show me all?`],
     }
   }
 
-  if (!state.finishPreferenceAsked && !state.finish && !/\b(all|any|show all)\b/.test(lower)) {
+  if (!broadCatalogSearch && !searchState.finishPreferenceAsked && !searchState.finish && !/\b(all|any|show all)\b/.test(lower)) {
     return {
-      state: { ...state, awaiting: 'finish', finishPreferenceAsked: true },
-      messages: [`Any finish preference for the ${state.size}" options — black, chrome, machined, bronze, or show all?`],
+      state: { ...searchState, awaiting: 'finish', finishPreferenceAsked: true },
+      messages: [`Any finish preference for the ${searchState.size}" options — black, chrome, machined, bronze, or show all?`],
     }
   }
 
-  const cards = searchCards(state)
+  const cards = searchCards(searchState, parsed)
   const resultUrl = resultUrlFor(cards, options.baseUrl)
-  const sizeLabel = state.size === 'all' ? 'all-size' : `${state.size}"`
+  const sizeLabel = searchState.size && searchState.size !== 'all' ? `${searchState.size}"` : 'catalog'
   const nextState: SmsDemoState = {
-    ...state,
+    ...searchState,
     awaiting: null,
     lastResultIds: cards.map(card => card.id),
   }
@@ -362,7 +451,7 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   return {
     state: nextState,
     messages: [
-      `I found ${cards.length} stocked ${sizeLabel} option${cards.length === 1 ? '' : 's'} for ${describeVehicle(state.vehicle)}${state.finish ? ` in ${state.finish}` : ''}.`,
+      `I found ${cards.length} ${sizeLabel} option${cards.length === 1 ? '' : 's'}${describeVehicle(searchState.vehicle) ? ` for ${describeVehicle(searchState.vehicle)}` : ''}${searchState.finish ? ` in ${searchState.finish}` : ''}.`,
       summarizeCards(cards),
       'Want me to email these cards and ATD buy links? Reply with an email address.',
     ],
