@@ -139,11 +139,10 @@ function canonicalizeVehicle(vehicle: SmsDemoVehicle | null, text: string): SmsD
   return vehicle
 }
 
-function shouldExactMatchVehicleModel(make: string | null, model: string | null) {
-  if (!model) return false
-  return (make === 'Chevrolet' && /^Silverado (1500|2500|3500)$/i.test(model))
-    || (make === 'GMC' && /^Sierra (1500|2500|3500)$/i.test(model))
-    || (make === 'RAM' && /^(1500|2500|3500|1500 Classic)$/i.test(model))
+function shouldExactMatchVehicleModel(_make: string | null, model: string | null) {
+  // Vehicle fitment must not infer across model names. Parser aliases should canonicalize
+  // to seed-table names before this point; if they do not, prefer no match over guess-fit.
+  return Boolean(model?.trim())
 }
 
 function extractVehicle(q: string): SmsDemoVehicle | null {
