@@ -1075,7 +1075,7 @@ export default function Home() {
           min-height: 100%;
           transform: translate(-50%, -50%);
           object-fit: cover;
-          opacity: 0.74;
+          opacity: 0.64;
           filter: saturate(1.08) contrast(1.06);
         }
 
@@ -1089,30 +1089,30 @@ export default function Home() {
 
         .home-video-bg::before {
           background:
-            radial-gradient(circle at 50% 36%, rgba(0,0,0,0.34) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0.94) 100%),
-            linear-gradient(180deg, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.38) 30%, rgba(0,0,0,0.46) 62%, rgba(0,0,0,0.96) 100%);
+            radial-gradient(circle at 50% 36%, rgba(0,0,0,0.46) 0%, rgba(0,0,0,0.74) 58%, rgba(0,0,0,0.98) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.52) 30%, rgba(0,0,0,0.62) 62%, rgba(0,0,0,0.98) 100%);
         }
 
         .home-video-bg::after {
           background:
-            linear-gradient(90deg, rgba(0,0,0,0.90) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.90) 100%),
-            linear-gradient(180deg, rgba(0,0,0,0.84) 0%, transparent 18%, transparent 70%, var(--page-bg) 100%);
+            linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.18) 82%, rgba(0,0,0,0.95) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.24) 70%, var(--page-bg) 100%);
         }
 
         .theme-light .home-video-bg video {
-          opacity: 0.52;
+          opacity: 0.46;
         }
 
         .theme-light .home-video-bg::before {
           background:
-            radial-gradient(circle at 50% 34%, rgba(255,255,255,0.48) 0%, rgba(246,246,247,0.58) 46%, rgba(0,0,0,0.52) 100%),
-            linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 38%, rgba(255,255,255,0.40) 64%, rgba(246,246,247,0.94) 100%);
+            radial-gradient(circle at 50% 34%, rgba(255,255,255,0.40) 0%, rgba(246,246,247,0.50) 46%, rgba(0,0,0,0.64) 100%),
+            linear-gradient(180deg, rgba(255,255,255,0.66) 0%, rgba(255,255,255,0.18) 38%, rgba(0,0,0,0.16) 64%, rgba(246,246,247,0.96) 100%);
         }
 
         .theme-light .home-video-bg::after {
           background:
-            linear-gradient(90deg, rgba(246,246,247,0.88) 0%, transparent 18%, transparent 82%, rgba(246,246,247,0.88) 100%),
-            linear-gradient(180deg, rgba(246,246,247,0.82) 0%, transparent 24%, transparent 70%, var(--page-bg) 100%);
+            linear-gradient(90deg, rgba(246,246,247,0.92) 0%, rgba(0,0,0,0.10) 18%, rgba(0,0,0,0.10) 82%, rgba(246,246,247,0.92) 100%),
+            linear-gradient(180deg, rgba(246,246,247,0.86) 0%, rgba(0,0,0,0.08) 24%, rgba(0,0,0,0.14) 70%, var(--page-bg) 100%);
         }
 
         .theme-dark.results-view {
