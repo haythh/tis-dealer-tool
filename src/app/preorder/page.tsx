@@ -51,6 +51,8 @@ type CheckoutForm = {
   email: string
 }
 
+type UpvoteCounts = Record<string, number>
+
 const emptySelection: WheelSelection = {
   size: '',
   width: '',
@@ -105,15 +107,21 @@ function SelectField({
 function PreorderCard({
   wheel,
   selection,
+  upvoteCount,
+  upvotePending,
   onSelectionChange,
   onAdd,
   onImageOpen,
+  onUpvote,
 }: {
   wheel: PreorderWheel
   selection: WheelSelection
+  upvoteCount: number
+  upvotePending: boolean
   onSelectionChange: (wheelId: string, patch: Partial<WheelSelection>) => void
   onAdd: (wheel: PreorderWheel, selection: WheelSelection) => void
   onImageOpen: (wheel: PreorderWheel) => void
+  onUpvote: (wheel: PreorderWheel) => void
 }) {
   const quantity = Number(selection.quantity)
   const unitPrice = unitPriceFor(selection.size)
@@ -122,6 +130,19 @@ function PreorderCard({
 
   return (
     <article className="preorder-card">
+      <button
+        className="upvote-button"
+        type="button"
+        disabled={upvotePending}
+        onClick={() => onUpvote(wheel)}
+        aria-label={`Upvote ${wheel.code}. Current count ${upvoteCount}`}
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <path d="M7.3 10.6v9H4.1v-9h3.2Zm2 9V10l4.9-6.8c.5-.7 1.6-.5 1.8.3l.2.8c.3 1.1.1 2.3-.5 3.3l-1.4 2.2h4.6c1.2 0 2.1 1.1 1.8 2.3l-1.2 5.6c-.2 1.1-1.2 1.9-2.3 1.9H9.3Z" />
+        </svg>
+        <span>UPVOTE</span>
+        <strong>{upvoteCount}</strong>
+      </button>
       <button className="image-shell image-button" type="button" onClick={() => onImageOpen(wheel)} aria-label={`View larger image of ${wheel.code}`}>
         <img src={wheel.image} alt={`${wheel.code} ${wheel.name} wheel preorder style`} loading="lazy" />
       </button>
@@ -144,7 +165,7 @@ function PreorderCard({
             {selection.size && <small>{dollars(unitPrice)} / wheel</small>}
           </div>
           <button type="button" disabled={!isComplete} onClick={() => onAdd(wheel, selection)}>
-            Add to Order
+            Add to Pre-Order
           </button>
         </div>
       </div>
@@ -161,10 +182,33 @@ export default function PreorderPage() {
   const [checkoutStatus, setCheckoutStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [checkoutMessage, setCheckoutMessage] = useState('')
   const [lightboxWheel, setLightboxWheel] = useState<PreorderWheel | null>(null)
+  const [upvoteCounts, setUpvoteCounts] = useState<UpvoteCounts>({})
+  const [pendingUpvotes, setPendingUpvotes] = useState<Record<string, boolean>>({})
 
   const activeCategory = PREORDER_CATEGORIES.find(category => category.id === activeCategoryId) ?? PREORDER_CATEGORIES[0]
   const visibleWheels = activeCategory.wheels
   const grandTotal = useMemo(() => order.reduce((sum, item) => sum + item.total, 0), [order])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadUpvotes = async () => {
+      try {
+        const response = await fetch('/api/preorder/upvotes')
+        const data = (await response.json().catch(() => ({}))) as { counts?: UpvoteCounts }
+        if (!cancelled && response.ok && data.counts) {
+          setUpvoteCounts(data.counts)
+        }
+      } catch (error) {
+        console.warn('Unable to load preorder upvotes:', error)
+      }
+    }
+
+    loadUpvotes()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!lightboxWheel) return
@@ -186,6 +230,30 @@ export default function PreorderPage() {
 
   const updateCheckoutForm = (field: keyof CheckoutForm, value: string) => {
     setCheckoutForm(current => ({ ...current, [field]: value }))
+  }
+
+  const upvoteWheel = async (wheel: PreorderWheel) => {
+    if (pendingUpvotes[wheel.code]) return
+
+    setPendingUpvotes(current => ({ ...current, [wheel.code]: true }))
+    try {
+      const response = await fetch('/api/preorder/upvotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wheelCode: wheel.code }),
+      })
+      const data = (await response.json().catch(() => ({}))) as { wheelCode?: string; count?: number; error?: string }
+
+      if (!response.ok || typeof data.count !== 'number' || !data.wheelCode) {
+        throw new Error(data.error || 'Unable to save upvote.')
+      }
+
+      setUpvoteCounts(current => ({ ...current, [data.wheelCode as string]: data.count as number }))
+    } catch (error) {
+      console.warn('Unable to save preorder upvote:', error)
+    } finally {
+      setPendingUpvotes(current => ({ ...current, [wheel.code]: false }))
+    }
   }
 
   const addToOrder = (wheel: PreorderWheel, selection: WheelSelection) => {
@@ -705,6 +773,50 @@ export default function PreorderPage() {
           transform: translateY(-2px);
         }
 
+        .upvote-button {
+          align-items: center;
+          background: rgba(255, 255, 255, 0.94);
+          border: 1px solid rgba(220, 38, 38, 0.22);
+          border-radius: 999px;
+          box-shadow: 0 10px 24px rgba(15, 15, 18, 0.12);
+          color: #111113;
+          cursor: pointer;
+          display: inline-flex;
+          gap: 6px;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+          padding: 8px 10px;
+          position: absolute;
+          right: 12px;
+          text-transform: uppercase;
+          top: 12px;
+          transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, opacity 160ms ease;
+          z-index: 2;
+        }
+
+        .upvote-button:hover:not(:disabled) {
+          border-color: rgba(220, 38, 38, 0.7);
+          box-shadow: 0 14px 30px rgba(220, 38, 38, 0.16);
+          transform: translateY(-1px);
+        }
+
+        .upvote-button:disabled {
+          cursor: wait;
+          opacity: 0.7;
+        }
+
+        .upvote-button svg {
+          fill: #dc2626;
+          height: 15px;
+          width: 15px;
+        }
+
+        .upvote-button strong {
+          color: #dc2626;
+          font-size: 12px;
+        }
+
         .image-shell {
           align-items: center;
           background: #f4f4f5;
@@ -1105,9 +1217,12 @@ export default function PreorderPage() {
               key={wheel.id}
               wheel={wheel}
               selection={selections[wheel.id] ?? emptySelection}
+              upvoteCount={upvoteCounts[wheel.code] ?? 0}
+              upvotePending={Boolean(pendingUpvotes[wheel.code])}
               onSelectionChange={updateSelection}
               onAdd={addToOrder}
               onImageOpen={setLightboxWheel}
+              onUpvote={upvoteWheel}
             />
           ))}
         </section>
