@@ -1054,6 +1054,65 @@ export default function Home() {
           position: relative;
           overflow: hidden;
           background: var(--shell-gradient);
+          isolation: isolate;
+        }
+
+        .home-video-bg {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          overflow: hidden;
+          background: #000;
+        }
+
+        .home-video-bg video {
+          position: absolute;
+          inset: 50% auto auto 50%;
+          width: max(100vw, 100vh);
+          height: max(100vw, 100vh);
+          min-width: 100%;
+          min-height: 100%;
+          transform: translate(-50%, -50%);
+          object-fit: cover;
+          opacity: 0.74;
+          filter: saturate(1.08) contrast(1.06);
+        }
+
+        .home-video-bg::before,
+        .home-video-bg::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .home-video-bg::before {
+          background:
+            radial-gradient(circle at 50% 36%, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.46) 58%, rgba(0,0,0,0.88) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.22) 30%, rgba(0,0,0,0.30) 62%, rgba(0,0,0,0.92) 100%);
+        }
+
+        .home-video-bg::after {
+          background:
+            linear-gradient(90deg, rgba(0,0,0,0.82) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.82) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.74) 0%, transparent 18%, transparent 70%, var(--page-bg) 100%);
+        }
+
+        .theme-light .home-video-bg video {
+          opacity: 0.52;
+        }
+
+        .theme-light .home-video-bg::before {
+          background:
+            radial-gradient(circle at 50% 34%, rgba(255,255,255,0.48) 0%, rgba(246,246,247,0.58) 46%, rgba(0,0,0,0.52) 100%),
+            linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 38%, rgba(255,255,255,0.40) 64%, rgba(246,246,247,0.94) 100%);
+        }
+
+        .theme-light .home-video-bg::after {
+          background:
+            linear-gradient(90deg, rgba(246,246,247,0.88) 0%, transparent 18%, transparent 82%, rgba(246,246,247,0.88) 100%),
+            linear-gradient(180deg, rgba(246,246,247,0.82) 0%, transparent 24%, transparent 70%, var(--page-bg) 100%);
         }
 
         .theme-dark.results-view {
@@ -1201,6 +1260,13 @@ export default function Home() {
         }
       `}</style>
       <div ref={pageRef} className={`demo-shell theme-${themeMode}${isResultsView ? ' results-view' : ''}`} style={{ minHeight: '100vh', color: 'var(--page-text)', fontFamily: 'inherit' }}>
+      {isHomeView && (
+        <div className="home-video-bg" aria-hidden="true">
+          <video data-testid="home-background-video" autoPlay muted loop playsInline preload="metadata">
+            <source src="/backgroundvideo-tis.mp4" type="video/mp4" />
+          </video>
+        </div>
+      )}
       <div className="ambient-orb" style={{ width: 260, height: 260, left: -80, top: 120, background: 'rgba(220,38,38,0.24)' }} />
       <div className="ambient-orb" style={{ width: 220, height: 220, right: -70, top: 48, background: 'rgba(255,255,255,0.12)' }} />
       <div className="ambient-orb" style={{ width: 320, height: 320, right: '12%', bottom: 180, background: 'rgba(220,38,38,0.12)' }} />
