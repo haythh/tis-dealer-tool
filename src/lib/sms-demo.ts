@@ -106,6 +106,46 @@ const FINISH_TERMS: Record<string, string> = {
   silver: 'Silver',
 }
 
+const SERIES_MODELS = new Set(['1500', '2500', '3500'])
+
+function requestedSeries(text: string) {
+  return text.toLowerCase().match(/\b(1500|2500|3500)\b/)?.[1] || null
+}
+
+function canonicalizeVehicle(vehicle: SmsDemoVehicle | null, text: string): SmsDemoVehicle | null {
+  if (!vehicle) return vehicle
+  const make = vehicle.make
+  const model = (vehicle.model || '').trim()
+  const modelLower = model.toLowerCase()
+  const series = requestedSeries(text)
+
+  if (make === 'Chevrolet') {
+    if (SERIES_MODELS.has(model) || ((modelLower === 'silverado' || !model) && series && /\b(chevy|chevrolet|silverado)\b/i.test(text))) {
+      return { ...vehicle, model: `Silverado ${series || model}` }
+    }
+  }
+
+  if (make === 'GMC') {
+    if (SERIES_MODELS.has(model) || ((modelLower === 'sierra' || !model) && series && /\b(gmc|sierra)\b/i.test(text))) {
+      return { ...vehicle, model: `Sierra ${series || model}` }
+    }
+  }
+
+  if (make === 'RAM' || make === 'Dodge') {
+    if (modelLower === 'ram' && series) return { ...vehicle, make: 'RAM', model: series }
+    if (SERIES_MODELS.has(model)) return { ...vehicle, make: 'RAM', model }
+  }
+
+  return vehicle
+}
+
+function shouldExactMatchVehicleModel(make: string | null, model: string | null) {
+  if (!model) return false
+  return (make === 'Chevrolet' && /^Silverado (1500|2500|3500)$/i.test(model))
+    || (make === 'GMC' && /^Sierra (1500|2500|3500)$/i.test(model))
+    || (make === 'RAM' && /^(1500|2500|3500|1500 Classic)$/i.test(model))
+}
+
 function extractVehicle(q: string): SmsDemoVehicle | null {
   const lower = q.toLowerCase()
   const yearMatch = lower.match(/\b(19|20)\d{2}\b/)
@@ -146,11 +186,11 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
   for (const [pattern, make, defaultModel] of modelMap) {
     const match = lower.match(pattern)
     if (match) {
-      return {
+      return canonicalizeVehicle({
         year,
         make,
         model: make === 'RAM' && match[1] ? match[1] : defaultModel.replace('$1', match[1] || ''),
-      }
+      }, q)
     }
   }
 
@@ -161,7 +201,7 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
       : makeOnly[1] === 'bmw'
         ? 'BMW'
         : makeOnly[1].charAt(0).toUpperCase() + makeOnly[1].slice(1)
-    return { year, make, model: null }
+    return canonicalizeVehicle({ year, make, model: null }, q)
   }
 
   return year ? { year, make: null, model: null } : null
@@ -197,7 +237,8 @@ export function parseSmsText(text: string): ParsedSms {
   let finish: string | null = null
   const finishEntries = Object.entries(FINISH_TERMS).sort((a, b) => b[0].length - a[0].length)
   for (const [term, value] of finishEntries) {
-    if (lower.includes(term)) {
+    const pattern = new RegExp(`\\b${term.replace(/\\s+/g, '\\s+')}\\b`, 'i')
+    if (pattern.test(lower)) {
       finish = value
       break
     }
@@ -260,6 +301,7 @@ function mergeState(state: SmsDemoState, parsed: ParsedSms, rawText: string): Sm
       make: parsed.vehicle.make ?? next.vehicle?.make ?? null,
       model: makeOnly ? null : parsed.vehicle.model ?? next.vehicle?.model ?? null,
     }
+    next.vehicle = canonicalizeVehicle(next.vehicle, rawText)
   }
   if (parsed.size) next.size = parsed.size
   if (parsed.finish) next.finish = parsed.finish
@@ -312,8 +354,13 @@ function findVehicleFitment(vehicle: SmsDemoVehicle): VehicleFitmentContext {
     params.push(vehicle.make)
   }
   if (vehicle.model) {
-    query += ' AND LOWER(model) LIKE LOWER(?)'
-    params.push(`%${vehicle.model}%`)
+    if (shouldExactMatchVehicleModel(vehicle.make, vehicle.model)) {
+      query += ' AND LOWER(model) = LOWER(?)'
+      params.push(vehicle.model)
+    } else {
+      query += ' AND LOWER(model) LIKE LOWER(?)'
+      params.push(`%${vehicle.model}%`)
+    }
   }
   if (vehicle.year) {
     query += ' AND year_start <= ? AND year_end >= ?'

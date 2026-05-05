@@ -14,6 +14,55 @@ interface ParsedQuery {
 type FitmentStatus = 'exact' | 'bolt_pattern' | 'demo_fallback' | 'catalog_search'
 type VehicleSegment = 'truck' | 'passenger'
 
+const SERIES_MODELS = new Set(['1500', '2500', '3500'])
+
+function requestedSeries(query: string): string | null {
+  return query.toLowerCase().match(/\b(1500|2500|3500)\b/)?.[1] || null
+}
+
+function canonicalizeVehicle(vehicle: ParsedQuery['vehicle'], query: string): ParsedQuery['vehicle'] {
+  if (!vehicle) return vehicle
+  const make = vehicle.make
+  const model = (vehicle.model || '').trim()
+  const modelLower = model.toLowerCase()
+  const series = requestedSeries(query)
+
+  if (make === 'Chevrolet') {
+    if (SERIES_MODELS.has(model) || ((modelLower === 'silverado' || !model) && series && /\b(chevy|chevrolet|silverado)\b/i.test(query))) {
+      return { ...vehicle, model: `Silverado ${series || model}` }
+    }
+  }
+
+  if (make === 'GMC') {
+    if (SERIES_MODELS.has(model) || ((modelLower === 'sierra' || !model) && series && /\b(gmc|sierra)\b/i.test(query))) {
+      return { ...vehicle, model: `Sierra ${series || model}` }
+    }
+  }
+
+  if (make === 'RAM' || make === 'Dodge') {
+    if (modelLower === 'ram' && series) return { ...vehicle, make: 'RAM', model: series }
+    if (SERIES_MODELS.has(model)) return { ...vehicle, make: 'RAM', model }
+  }
+
+  return vehicle
+}
+
+function seriesClarificationPrompt(vehicle: ParsedQuery['vehicle']): string | null {
+  if (!vehicle?.model) return null
+  const model = vehicle.model.toLowerCase()
+  if (vehicle.make === 'Chevrolet' && model === 'silverado') return 'Which Silverado: 1500, 2500, or 3500? Bolt pattern changes, so I won’t guess-fit it.'
+  if (vehicle.make === 'GMC' && model === 'sierra') return 'Which Sierra: 1500, 2500, or 3500? Bolt pattern changes, so I won’t guess-fit it.'
+  if (vehicle.make === 'RAM' && model === 'ram') return 'Which RAM model: 1500, 2500, or 3500? Bolt pattern changes, so I won’t guess-fit it.'
+  return null
+}
+
+function shouldExactMatchVehicleModel(make: string | null, model: string | null) {
+  if (!model) return false
+  return (make === 'Chevrolet' && /^Silverado (1500|2500|3500)$/i.test(model))
+    || (make === 'GMC' && /^Sierra (1500|2500|3500)$/i.test(model))
+    || (make === 'RAM' && /^(1500|2500|3500|1500 Classic)$/i.test(model))
+}
+
 function vehicleSegmentFromRows(rows: { segment?: string | null }[]): VehicleSegment | null {
   if (!rows.length) return null
   return rows.every(row => row.segment === 'passenger') ? 'passenger' : 'truck'
@@ -204,19 +253,19 @@ function parseQueryFallback(query: string): ParsedQuery {
     }
   }
 
-  // Detect RAM 1500/2500/3500
-  if (q.includes('ram') || q.includes('1500') || q.includes('2500') || q.includes('3500')) {
-    if (q.includes('ram')) {
-      detectedMake = 'RAM'
-      if (q.includes('1500')) detectedModel = '1500'
-      else if (q.includes('2500')) detectedModel = '2500'
-      else if (q.includes('3500')) detectedModel = '3500'
-      else detectedModel = '1500'
-    }
+  const series = requestedSeries(query)
+  if (detectedMake === 'Chevrolet' && series && (!detectedModel || detectedModel === 'Silverado')) detectedModel = `Silverado ${series}`
+  if (detectedMake === 'GMC' && series && (!detectedModel || detectedModel === 'Sierra')) detectedModel = `Sierra ${series}`
+
+  // Detect RAM 1500/2500/3500 without defaulting ambiguous RAM to 1500
+  if (q.includes('ram')) {
+    detectedMake = 'RAM'
+    if (series) detectedModel = series
+    else detectedModel = 'RAM'
   }
 
   if (detectedMake) {
-    parsed.vehicle = { year, make: detectedMake, model: detectedModel || '' }
+    parsed.vehicle = canonicalizeVehicle({ year, make: detectedMake, model: detectedModel || '' }, query)
   }
 
   // Extract size (diameter)
@@ -228,9 +277,10 @@ function parseQueryFallback(query: string): ParsedQuery {
   if (modelMatch) parsed.wheelModel = modelMatch[1]
 
   // Extract finish
-  const finishes = ['chrome', 'black', 'gloss black', 'matte black', 'satin black', 'machined', 'bronze', 'gunmetal', 'silver', 'white', 'gold', 'blue', 'red']
+  const finishes = ['gloss black', 'matte black', 'satin black', 'machined', 'gunmetal', 'chrome', 'black', 'bronze', 'silver', 'white', 'gold', 'blue', 'red']
   for (const finish of finishes) {
-    if (q.includes(finish)) {
+    const pattern = new RegExp(`\\b${finish.replace(/\\s+/g, '\\s+')}\\b`, 'i')
+    if (pattern.test(q)) {
       parsed.finish = finish.charAt(0).toUpperCase() + finish.slice(1)
       break
     }
@@ -261,6 +311,14 @@ export async function POST(request: NextRequest) {
     if (parsed.vehicle?.make && !parsed.vehicle.model && fallbackParsed.vehicle?.model) {
       parsed.vehicle = fallbackParsed.vehicle
     }
+    if (fallbackParsed.vehicle?.make && fallbackParsed.vehicle.model) {
+      const fallbackModelToken = fallbackParsed.vehicle.model.toLowerCase().replace(/\s+\d+$/, '')
+      const parsedLooksDifferent = parsed.vehicle?.make !== fallbackParsed.vehicle.make || parsed.vehicle?.model !== fallbackParsed.vehicle.model
+      if (parsedLooksDifferent && query.toLowerCase().includes(fallbackModelToken)) {
+        parsed.vehicle = fallbackParsed.vehicle
+      }
+    }
+    parsed.vehicle = canonicalizeVehicle(parsed.vehicle, query)
     // Sanitize: if wheelModel looks like a year (4 digits, starts with 19/20), clear it
     if (parsed.wheelModel && /^(19|20)\d{2}$/.test(parsed.wheelModel)) {
       parsed.wheelModel = null
@@ -275,6 +333,8 @@ export async function POST(request: NextRequest) {
     // Strategy: if vehicle detected, look up bolt pattern first
     if (parsed.vehicle && parsed.vehicle.make && !parsed.vehicle.model) {
       notice = `I found ${parsed.vehicle.make}, but need the model before checking fitment. I’m not showing guess-fit wheels.`
+    } else if (seriesClarificationPrompt(parsed.vehicle)) {
+      notice = seriesClarificationPrompt(parsed.vehicle)
     } else if (parsed.vehicle && (parsed.vehicle.make || parsed.vehicle.model)) {
       const { year, make, model } = parsed.vehicle
 
@@ -287,8 +347,13 @@ export async function POST(request: NextRequest) {
         vehicleParams.push(make)
       }
       if (model) {
-        vehicleQuery += ' AND LOWER(model) LIKE LOWER(?)'
-        vehicleParams.push(`%${model}%`)
+        if (shouldExactMatchVehicleModel(make, model)) {
+          vehicleQuery += ' AND LOWER(model) = LOWER(?)'
+          vehicleParams.push(model)
+        } else {
+          vehicleQuery += ' AND LOWER(model) LIKE LOWER(?)'
+          vehicleParams.push(`%${model}%`)
+        }
       }
       if (year && year > 0) {
         vehicleQuery += ' AND year_start <= ? AND year_end >= ?'
