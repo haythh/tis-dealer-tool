@@ -29,6 +29,9 @@ const queries = [
   '2022 Silverado 1500 20 black',
   '2022 Silverado 2500 20 black',
   '2022 Silverado',
+  'Chrome wheels for Chevy Silverado',
+  '20" wheels for RAM 1500',
+  'RAM',
   'Jeep Wrangler',
   'show wheels for Jeep Wrangler',
   'show 20 black wheels for Jeep Wrangler',
@@ -71,6 +74,20 @@ function assertApiInvariant(query, response) {
   if (/Silverado$/.test(query)) {
     assert.equal(response.total, 0, `${query}: ambiguous Silverado should not return wheels`)
     assert.match(notice, /Which Silverado/i, `${query}: should ask for 1500/2500/3500`)
+  }
+
+  if (query === 'RAM') {
+    assert.equal(response.total, 0, `${query}: ambiguous RAM should not return wheels`)
+    assert.match(notice, /Which RAM model/i, `${query}: should ask for 1500/2500/3500`)
+  }
+
+  if (query === '20" wheels for RAM 1500') {
+    assert.equal(vehicle?.make, 'RAM', `${query}: should parse RAM make`)
+    assert.equal(vehicle?.model, '1500', `${query}: should parse RAM 1500 model`)
+    assert.equal(parsed?.wheelModel, null, `${query}: should not treat 1500 series as wheel model/SKU`)
+    assert.deepEqual(patterns, ['5x139.7', '6x139.7'], `${query}: no-year RAM 1500 should match known 5- and 6-lug eras`)
+    assert.ok(!wheelBolts.some(bp => /^8/i.test(bp)), `${query}: returned 8-lug wheel bolt pattern`)
+    assert.ok(response.total > 0, `${query}: expected RAM 1500-compatible wheels`)
   }
 
   if (/Silverado 1500|Chevy 1500/.test(query)) {
@@ -136,7 +153,21 @@ function assertSmsInvariant(query, reply) {
   const brands = unique((reply.cards || []).map(card => card.brand))
   const bolts = unique((reply.cards || []).map(card => card.bolt_pattern))
 
-  if (/Silverado$/.test(query)) assert.match(text, /Which Silverado/i, `${query}: SMS should clarify ambiguous Silverado`)
+  if (/Silverado$/.test(query)) {
+    assert.equal(reply.cards?.length || 0, 0, `${query}: SMS ambiguous Silverado should not return cards`)
+    assert.match(text, /Which Silverado/i, `${query}: SMS should clarify ambiguous Silverado`)
+  }
+  if (query === 'RAM') {
+    assert.equal(reply.cards?.length || 0, 0, `${query}: SMS ambiguous RAM should not return cards`)
+    assert.match(text, /Which RAM model/i, `${query}: SMS should clarify ambiguous RAM`)
+  }
+  if (query === '20" wheels for RAM 1500') {
+    assert.equal(vehicle?.make, 'RAM', `${query}: SMS should parse RAM make`)
+    assert.equal(vehicle?.model, '1500', `${query}: SMS should parse RAM 1500 model`)
+    assert.ok((reply.cards?.length || 0) > 0, `${query}: SMS expected RAM 1500-compatible cards`)
+    assert.ok(!bolts.some(bp => /^8/i.test(bp)), `${query}: SMS returned 8-lug card for RAM 1500`)
+    assert.match(text, /I found/i, `${query}: SMS should return results, not no-match`)
+  }
   if (/Silverado 1500|Chevy 1500/.test(query)) {
     assert.equal(vehicle?.model, 'Silverado 1500', `${query}: SMS should canonicalize Silverado 1500`)
     assert.ok(!bolts.some(bp => /^8/i.test(bp)), `${query}: SMS returned 8-lug for 1500`)
@@ -154,6 +185,46 @@ function assertSmsInvariant(query, reply) {
   }
   if (passengerQueries.has(query)) assert.deepEqual(brands, ['TIS Motorsports'], `${query}: SMS passenger fitment must only show TIS Motorsports`)
   if (query === 'show TIS wheels for 2022 Honda Accord') assert.match(text, /limited to TIS Motorsports/i, `${query}: SMS should block explicit TIS passenger request`)
+}
+
+async function runSmsDemoApi(baseUrl) {
+  console.log(`\nSMS demo API smoke: ${baseUrl}`)
+  for (const query of ['20" wheels for RAM 1500', 'RAM', 'Chrome wheels for Chevy Silverado']) {
+    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/api/sms-demo`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ message: query, state: {} }),
+      signal: AbortSignal.timeout(10000),
+    })
+    assert.equal(res.status, 200, `${query}: /api/sms-demo expected HTTP 200, got ${res.status}`)
+    const json = await res.json()
+    assertSmsInvariant(query, json)
+    console.log(`  ✓ ${query} → ${json.cards?.length || 0} card preview(s)`)
+  }
+}
+
+async function runTwilioSmsApi(baseUrl) {
+  console.log(`\nTwilio SMS API smoke: ${baseUrl}`)
+  const cases = [
+    ['20" wheels for RAM 1500', /I found[\s\S]*RAM 1500/i],
+    ['RAM', /Which RAM model: 1500, 2500, or 3500/i],
+    ['Chrome wheels for Chevy Silverado', /Which Silverado: 1500, 2500, or 3500/i],
+  ]
+
+  for (const [query, pattern] of cases) {
+    const form = new URLSearchParams({ From: `+1555000${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, Body: query })
+    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/api/twilio/sms`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: form,
+      signal: AbortSignal.timeout(10000),
+    })
+    const text = await res.text()
+    assert.equal(res.status, 200, `${query}: /api/twilio/sms expected HTTP 200, got ${res.status}`)
+    assert.match(text, /^<\?xml[\s\S]*<Response><Message>/, `${query}: should return TwiML Message`)
+    assert.match(text, pattern, `${query}: TwiML did not include expected reply`)
+    console.log(`  ✓ ${query} → TwiML ${res.status}`)
+  }
 }
 
 function runSms() {
@@ -177,6 +248,8 @@ if (!smsOnly) {
     console.log('\nSkipping API smoke: set FITMENT_BASE_URL or pass --base-url=http://localhost:PORT')
   } else {
     await runApi(baseUrl)
+    await runSmsDemoApi(baseUrl)
+    await runTwilioSmsApi(baseUrl)
   }
 }
 

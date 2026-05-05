@@ -293,9 +293,10 @@ function parseQueryFallback(query: string): ParsedQuery {
   const sizeMatch = q.match(/\b(17|18|19|20|22|24|26|28|30)\b/)
   if (sizeMatch) parsed.size = sizeMatch[0]
 
-  // Extract wheel model number (TIS uses 3-digit numbers)
+  // Extract wheel model number (TIS uses 3-digit numbers), but don't treat truck series
+  // tokens like RAM 1500 / Silverado 2500 as wheel model filters.
   const modelMatch = q.match(/\btis\s*(\d{3,4})\b/i) || q.match(/\b(\d{3,4})\b(?=\s|$)/)
-  if (modelMatch) parsed.wheelModel = modelMatch[1]
+  if (modelMatch && !SERIES_MODELS.has(modelMatch[1])) parsed.wheelModel = modelMatch[1]
 
   // Extract finish
   const finishes = ['gloss black', 'matte black', 'satin black', 'machined', 'gunmetal', 'chrome', 'black', 'bronze', 'silver', 'white', 'gold', 'blue', 'red']
@@ -343,8 +344,8 @@ export async function POST(request: NextRequest) {
       }
     }
     parsed.vehicle = canonicalizeVehicle(parsed.vehicle, query)
-    // Sanitize: if wheelModel looks like a year (4 digits, starts with 19/20), clear it
-    if (parsed.wheelModel && /^(19|20)\d{2}$/.test(parsed.wheelModel)) {
+    // Sanitize: if wheelModel looks like a year or truck series token, clear it.
+    if (parsed.wheelModel && (/^(19|20)\d{2}$/.test(parsed.wheelModel) || SERIES_MODELS.has(parsed.wheelModel))) {
       parsed.wheelModel = null
     }
     const db = getDb()

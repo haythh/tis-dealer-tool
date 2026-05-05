@@ -2,7 +2,7 @@
 
 ## Integrity Summary
 
-Fitment integrity had two dangerous failure modes: ambiguous truck series were allowed to resolve too broadly, and vehicle lookup used `LIKE` model matching after parsing. That made it possible for 1500/2500/3500 trucks to share fitment rows and for unrelated/nearby model names to leak into results. Critical paths now prefer clarification/no result over guess-fit, exact-match parsed vehicle models, and keep passenger vehicles limited to TIS Motorsports.
+Fitment integrity had three dangerous failure modes: ambiguous truck series were allowed to resolve too broadly, vehicle lookup used `LIKE` model matching after parsing, and no-year series queries like `RAM 1500` could be mistaken for wheel/SKU model filters. That made it possible for 1500/2500/3500 trucks to share fitment rows, for unrelated/nearby model names to leak into results, or for valid no-year fitment searches to return no results. Critical paths now prefer clarification/no result over guess-fit, exact-match parsed vehicle models, keep passenger vehicles limited to TIS Motorsports, and allow known no-year series searches to return compatible era bolt patterns.
 
 ## Findings by Severity
 
@@ -18,7 +18,13 @@ Fitment integrity had two dangerous failure modes: ambiguous truck series were a
    - **Where:** homepage parser and SMS parser/state flow
    - **What was wrong:** RAM defaulted to 1500 in SMS/homepage-style parsing, and Silverado/Sierra without a series could proceed into broad model matching.
    - **Why it matters:** 1500/2500/3500 have different bolt patterns; guessing is unsafe.
-   - **Fix:** Silverado/Sierra/RAM without 1500/2500/3500 now return clarification and no wheels.
+   - **Fix:** Silverado/Sierra/RAM without 1500/2500/3500 now return clarification and no wheels, including `Chrome wheels for Chevy Silverado` across homepage API, SMS demo, and Twilio SMS.
+
+3. **No-year RAM 1500 was parsed as a wheel model/SKU filter**
+   - **Where:** `src/app/api/search/route.ts`
+   - **What was wrong:** The fallback parser extracted any 3-4 digit token as a wheel model, so `20" wheels for RAM 1500` applied `model LIKE '%1500%'` after finding RAM 1500 fitment.
+   - **Why it matters:** Dealers expect no-year `RAM 1500` to show compatible 1500 options; instead the homepage API returned no wheels while SMS already found cards.
+   - **Fix:** Truck series tokens `1500`, `2500`, and `3500` are no longer treated as wheel model filters. No-year `RAM 1500` now matches known 5- and 6-lug RAM 1500 eras and returns compatible non-8-lug cards.
 
 ### High
 
@@ -68,9 +74,10 @@ Fitment integrity had two dangerous failure modes: ambiguous truck series were a
 2. **Done:** Canonicalize Chevy/GMC/RAM series aliases in homepage + SMS.
 3. **Done:** Replace broad vehicle model `LIKE` matching with exact matching for parsed vehicle models.
 4. **Done:** Add fitment smoke coverage for homepage API + SMS logic.
-5. **Next:** Extract shared vehicle parser/canonicalization helpers so homepage and SMS cannot drift.
-6. **Next:** Normalize wheel bolt patterns into queryable tokens instead of substring matching against display strings.
-7. **Monitor:** Every new seed vehicle row should be reviewed for segment (`truck`/`passenger`) and ambiguity risk.
+5. **Done:** Extend smoke coverage to `/api/sms-demo` and `/api/twilio/sms` for no-year RAM 1500 and ambiguous Silverado/RAM clarifications.
+6. **Next:** Extract shared vehicle parser/canonicalization helpers so homepage and SMS cannot drift.
+7. **Next:** Normalize wheel bolt patterns into queryable tokens instead of substring matching against display strings.
+8. **Monitor:** Every new seed vehicle row should be reviewed for segment (`truck`/`passenger`) and ambiguity risk.
 
 ## Actual Test Matrix
 
@@ -83,6 +90,9 @@ Ran after fixes with `FITMENT_BASE_URL=http://localhost:4466 node scripts/smoke-
 | `2022 Silverado 1500 20 black` | 100 exact | 10 preview cards | Parsed `Silverado 1500`; matched `6x139.7`; no 8-lug wheels. |
 | `2022 Silverado 2500 20 black` | 71 exact | 10 preview cards | Parsed `Silverado 2500`; matched `8x180`. |
 | `2022 Silverado` | 0 | 0 | Clarifies `1500, 2500, or 3500`; no guess-fit wheels. |
+| `Chrome wheels for Chevy Silverado` | 0 | 0 | Clarifies `Which Silverado: 1500, 2500, or 3500?`; no silent no-result or guess-fit. Twilio returns the same clarification as TwiML. |
+| `20" wheels for RAM 1500` | 100 exact | 10 preview cards | Parsed no-year `RAM 1500`; `1500` is not treated as a wheel model; returns compatible 5-/6-lug RAM 1500 options, no 8-lug cards. Twilio returns result TwiML. |
+| `RAM` | 0 | 0 | Clarifies `Which RAM model: 1500, 2500, or 3500?`; no guess-fit wheels. Twilio returns the same clarification as TwiML. |
 | `Jeep Wrangler` | 100 exact | 10 preview cards | Parsed `Jeep Wrangler`; matched `5x127`; no Ranger parse/notice. |
 | `show wheels for Jeep Wrangler` | 100 exact | 10 preview cards | Parsed `Jeep Wrangler`; matched `5x127`; no Ranger parse/notice. |
 | `show 20 black wheels for Jeep Wrangler` | 66 exact | 10 preview cards | Parsed `Jeep Wrangler`; matched `5x127`; no Ranger parse/notice. |
@@ -101,6 +111,6 @@ Ran after fixes with `FITMENT_BASE_URL=http://localhost:4466 node scripts/smoke-
 ## Verification Commands
 
 - `npm run import-data` ✅
-- `FITMENT_BASE_URL=http://localhost:4466 node scripts/smoke-fitment.mjs` ✅
+- `FITMENT_BASE_URL=http://localhost:4466 node scripts/smoke-fitment.mjs` ✅ — includes homepage API, direct SMS handler, `/api/sms-demo`, and `/api/twilio/sms`.
 - `npx tsc --noEmit` ✅
 - `npm run build` ✅
