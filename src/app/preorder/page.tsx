@@ -486,12 +486,17 @@ export default function PreorderPage() {
         }
 
         h1 {
+          background: linear-gradient(180deg, #ffffff 0%, #ececf0 46%, #b8b8c0 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
           font-size: clamp(42px, 7vw, 86px);
           font-weight: 950;
           letter-spacing: -0.04em;
           line-height: 0.92;
           margin: 14px 0 18px;
           max-width: 860px;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
           text-transform: uppercase;
         }
 
@@ -500,7 +505,7 @@ export default function PreorderPage() {
         }
 
         .hero-card p:not(.badge) {
-          color: #c8c8cf;
+          color: #fff;
           font-size: 18px;
           line-height: 1.6;
           margin: 0;
@@ -523,7 +528,7 @@ export default function PreorderPage() {
         }
 
         .summary-note {
-          color: #a1a1aa;
+          color: #fff;
           font-size: 13px;
           line-height: 1.5;
           margin: 0 0 18px;
@@ -569,7 +574,7 @@ export default function PreorderPage() {
         }
 
         .order-item p {
-          color: #a1a1aa;
+          color: #fff;
           font-size: 12px;
           line-height: 1.45;
           margin: 0;
@@ -719,7 +724,7 @@ export default function PreorderPage() {
         }
 
         .grand-total span {
-          color: #a1a1aa;
+          color: #fff;
           font-size: 12px;
           font-weight: 900;
           letter-spacing: 0.08em;
@@ -1076,7 +1081,7 @@ export default function PreorderPage() {
         }
 
         .lightbox-caption p {
-          color: #71717a;
+          color: #111113;
           font-size: 12px;
           font-weight: 900;
           letter-spacing: 0.08em;

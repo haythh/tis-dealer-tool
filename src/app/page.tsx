@@ -754,7 +754,7 @@ function TireSearchPanel({ themeMode }: { themeMode: 'dark' | 'light' }) {
         <div className="search-animate" style={{ display: 'inline-block', border: '1px solid rgba(220,38,38,0.32)', borderRadius: 999, padding: '7px 16px', fontSize: 12, fontWeight: 800, color: isLightMode ? '#991b1b' : '#fecaca', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
           TIS Tires × Hercules specs
         </div>
-        <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
+        <h1 className="search-animate gradient-headline" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
           TIRE SEARCH
         </h1>
         <p className="search-animate" style={{ fontSize: 18, color: 'var(--muted-text)', margin: '0 auto', maxWidth: 680, lineHeight: 1.6 }}>
@@ -997,6 +997,22 @@ export default function Home() {
           --search-bg: rgba(255,255,255,0.88);
           --grid-line: rgba(15,15,18,0.055);
           --shell-gradient: radial-gradient(circle at 16% 8%, rgba(220,38,38,0.10), transparent 28%), radial-gradient(circle at 86% 0%, rgba(0,0,0,0.06), transparent 22%), linear-gradient(180deg, #ffffff 0%, #f6f6f7 54%, #eeeeef 100%);
+        }
+
+        .gradient-headline {
+          background: linear-gradient(180deg, #ffffff 0%, #e6e6ea 46%, #a8a8b0 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .theme-light .gradient-headline {
+          background: linear-gradient(180deg, #17171a 0%, #3e3e45 52%, #73737d 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          text-shadow: none;
         }
 
         .btn-slide {
@@ -1389,7 +1405,7 @@ export default function Home() {
               }}>
                 TIS Wheels × ATDOnline concept preview
               </div>
-              <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 86px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
+              <h1 className="search-animate gradient-headline" style={{ fontSize: 'clamp(38px, 7vw, 86px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
                 FIND THE WHEEL YOU NEED FAST AND EASY
               </h1>
               <p className="search-animate" style={{ fontSize: '18px', color: 'var(--muted-text)', margin: '0 0 34px', maxWidth: '680px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
@@ -1403,7 +1419,7 @@ export default function Home() {
               <div className="search-animate" style={{ display: 'inline-block', border: '1px solid rgba(220,38,38,0.32)', borderRadius: 999, padding: '7px 16px', fontSize: 12, fontWeight: 800, color: isLightMode ? '#991b1b' : '#fecaca', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 18 }}>
                 TIS Wheels × ATDOnline catalog
               </div>
-              <h1 className="search-animate" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
+              <h1 className="search-animate gradient-headline" style={{ fontSize: 'clamp(38px, 7vw, 80px)', fontWeight: 950, margin: '0 0 14px', letterSpacing: 0, lineHeight: 0.92, textTransform: 'uppercase' }}>
                 WHEEL SEARCH
               </h1>
               <p className="search-animate" style={{ fontSize: 18, color: 'var(--muted-text)', margin: '0 auto', maxWidth: 700, lineHeight: 1.6 }}>
