@@ -14,6 +14,10 @@ const PREORDER_CATEGORIES = [
 ] as const
 const allPreorderWheels = [...preorderWheels, ...preorderOffroadWheels]
 const SUCCESS_MESSAGE = 'Thank You! Your order has been submitted and an ATD representative will contact you soon.'
+const PREORDER_BRAND_LOGOS: Record<PreorderWheel['category'], { src: string; alt: string; height: number }> = {
+  'TIS MOTORSPORTS FORGED': { src: '/tismotorsports-word-logo-black.png', alt: 'TIS Motorsports', height: 19 },
+  'TIS OFFROAD FORGED': { src: '/tislogo-lightmode.png', alt: 'TIS', height: 22 },
+}
 
 const PRICE_BY_SIZE: Record<(typeof SIZES)[number], number> = {
   '20"': 300,
@@ -127,6 +131,7 @@ function PreorderCard({
   const unitPrice = unitPriceFor(selection.size)
   const total = unitPrice * quantity
   const isComplete = Boolean(selection.size && selection.width && selection.lugPattern && selection.quantity)
+  const brandLogo = PREORDER_BRAND_LOGOS[wheel.category]
 
   return (
     <article className="preorder-card">
@@ -148,7 +153,9 @@ function PreorderCard({
       </button>
       <div className="card-copy">
         <div>
-          <p className="eyebrow">New style</p>
+          <div className="card-brand-logo" aria-label={brandLogo.alt}>
+            <img src={brandLogo.src} alt={brandLogo.alt} style={{ height: `${brandLogo.height}px` }} />
+          </div>
           <h2>{wheel.code}</h2>
           <p className="style-name">{wheel.category}</p>
         </div>
@@ -327,9 +334,9 @@ export default function PreorderPage() {
           min-height: 100vh;
           color: #f7f7f8;
           background:
-            radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.14), transparent 32%),
-            radial-gradient(circle at 88% 18%, rgba(24, 24, 27, 0.18), transparent 30%),
-            linear-gradient(180deg, #71717a 0%, #52525b 48%, #3f3f46 100%);
+            radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.1), transparent 32%),
+            radial-gradient(circle at 88% 18%, rgba(24, 24, 27, 0.2), transparent 30%),
+            linear-gradient(180deg, #62626b 0%, #494952 48%, #37373d 100%);
         }
 
         .preorder-page::before {
@@ -431,12 +438,31 @@ export default function PreorderPage() {
 
         .badge,
         .eyebrow {
-          color: #fecaca;
           font-size: 12px;
           font-weight: 900;
           letter-spacing: 0.12em;
           margin: 0;
           text-transform: uppercase;
+        }
+
+        .badge {
+          color: #2f3338;
+        }
+
+        .eyebrow {
+          color: #fecaca;
+        }
+
+        .card-brand-logo {
+          align-items: center;
+          display: flex;
+          min-height: 22px;
+        }
+
+        .card-brand-logo img {
+          display: inline-block;
+          object-fit: contain;
+          width: auto;
         }
 
         h1 {
