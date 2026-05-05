@@ -1,6 +1,6 @@
 'use client'
 
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { preorderOffroadWheels } from '@/data/preorder-offroad-wheels'
 import { preorderWheels, type PreorderWheel } from '@/data/preorder-wheels'
 
@@ -113,6 +113,7 @@ function PreorderCard({
   selection,
   upvoteCount,
   upvotePending,
+  addFeedbackActive,
   onSelectionChange,
   onAdd,
   onImageOpen,
@@ -122,6 +123,7 @@ function PreorderCard({
   selection: WheelSelection
   upvoteCount: number
   upvotePending: boolean
+  addFeedbackActive: boolean
   onSelectionChange: (wheelId: string, patch: Partial<WheelSelection>) => void
   onAdd: (wheel: PreorderWheel, selection: WheelSelection) => void
   onImageOpen: (wheel: PreorderWheel) => void
@@ -171,8 +173,8 @@ function PreorderCard({
             <strong>{isComplete ? dollars(total) : 'Select options'}</strong>
             {selection.size && <small>{dollars(unitPrice)} / wheel</small>}
           </div>
-          <button type="button" disabled={!isComplete} onClick={() => onAdd(wheel, selection)}>
-            Add to Pre-Order
+          <button type="button" className={addFeedbackActive ? 'added' : ''} disabled={!isComplete} onClick={() => onAdd(wheel, selection)}>
+            {addFeedbackActive ? '✓ Added' : 'Add to Pre-Order'}
           </button>
         </div>
       </div>
@@ -191,6 +193,9 @@ export default function PreorderPage() {
   const [lightboxWheel, setLightboxWheel] = useState<PreorderWheel | null>(null)
   const [upvoteCounts, setUpvoteCounts] = useState<UpvoteCounts>({})
   const [pendingUpvotes, setPendingUpvotes] = useState<Record<string, boolean>>({})
+  const [addedWheelId, setAddedWheelId] = useState<string | null>(null)
+  const summaryRef = useRef<HTMLElement | null>(null)
+  const addFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const activeCategory = PREORDER_CATEGORIES.find(category => category.id === activeCategoryId) ?? PREORDER_CATEGORIES[0]
   const visibleWheels = activeCategory.wheels
@@ -227,6 +232,12 @@ export default function PreorderPage() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [lightboxWheel])
+
+  useEffect(() => {
+    return () => {
+      if (addFeedbackTimerRef.current) clearTimeout(addFeedbackTimerRef.current)
+    }
+  }, [])
 
   const updateSelection = (wheelId: string, patch: Partial<WheelSelection>) => {
     setSelections(current => ({
@@ -271,6 +282,12 @@ export default function PreorderPage() {
 
     setCheckoutStatus('idle')
     setCheckoutMessage('')
+    setAddedWheelId(wheel.id)
+    if (addFeedbackTimerRef.current) clearTimeout(addFeedbackTimerRef.current)
+    addFeedbackTimerRef.current = setTimeout(() => setAddedWheelId(null), 1400)
+    requestAnimationFrame(() => {
+      summaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
     setOrder(current => [
       ...current,
       {
@@ -964,9 +981,28 @@ export default function PreorderPage() {
           transform: translateY(-1px);
         }
 
+        .card-footer button.added {
+          animation: preorder-added-pulse 900ms ease;
+          background: #111113;
+          box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.16), 0 14px 30px rgba(17, 17, 19, 0.22);
+          transform: translateY(-1px) scale(1.02);
+        }
+
         .card-footer button:disabled {
           cursor: not-allowed;
           opacity: 0.42;
+        }
+
+        @keyframes preorder-added-pulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.42), 0 14px 30px rgba(17, 17, 19, 0.22);
+          }
+          70% {
+            box-shadow: 0 0 0 10px rgba(220, 38, 38, 0), 0 14px 30px rgba(17, 17, 19, 0.22);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0), 0 14px 30px rgba(17, 17, 19, 0.22);
+          }
         }
 
         .lightbox-backdrop {
@@ -1106,7 +1142,7 @@ export default function PreorderPage() {
             </p>
           </div>
 
-          <aside className="summary" aria-label="Order summary">
+          <aside ref={summaryRef} className="summary" aria-label="Order summary">
             <h2>Order Summary</h2>
             <p className="summary-note">Add configured styles here, then submit checkout to send the preorder request to TIS.</p>
             {order.length === 0 ? (
@@ -1204,6 +1240,7 @@ export default function PreorderPage() {
               selection={selections[wheel.id] ?? emptySelection}
               upvoteCount={upvoteCounts[wheel.code] ?? 0}
               upvotePending={Boolean(pendingUpvotes[wheel.code])}
+              addFeedbackActive={addedWheelId === wheel.id}
               onSelectionChange={updateSelection}
               onAdd={addToOrder}
               onImageOpen={setLightboxWheel}
