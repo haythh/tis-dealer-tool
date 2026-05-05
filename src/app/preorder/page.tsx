@@ -834,11 +834,11 @@ export default function PreorderPage() {
           font-size: 12px;
         }
 
-        .image-shell {
+        .preorder-card .image-shell {
           align-items: center;
           background: #f4f4f5;
           display: flex;
-          height: 380px;
+          height: 437px;
           justify-content: center;
           padding: 12px;
           position: relative;
@@ -855,7 +855,7 @@ export default function PreorderPage() {
           outline-offset: -3px;
         }
 
-        .image-shell img {
+        .preorder-card .image-shell img {
           filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.24));
           height: 100%;
           max-width: 100%;
@@ -1124,7 +1124,7 @@ export default function PreorderPage() {
         <div className="header-inner">
           <a className="brand-lockup" href="/">
             <img src="/tis-logo.png" alt="TIS" />
-            <span>Dealer preorder</span>
+            <span>Dealer pre-order</span>
           </a>
           <a className="back-link" href="/">
             Back to Search
@@ -1133,17 +1133,17 @@ export default function PreorderPage() {
       </header>
 
       <main>
-        <section className="hero" aria-label="New TIS Wheel Preorder">
+        <section className="hero" aria-label="New TIS Wheel Pre-Order">
           <div className="hero-card">
             <p className="badge">Retailer commitment preview</p>
-            <h1>TIS Forged Preorder</h1>
+            <h1>TIS Forged Pre-Order</h1>
             <p>
               GET THE NEWEST TIS FORGED STYLES FIRST! PLACE YOUR PRE-ORDER OR SIMPLY HELP US CHOOSE THE BEST STYLES BY UPVOTING YOUR FAVORITES.
             </p>
           </div>
 
-          <aside ref={summaryRef} className="summary" aria-label="Order summary">
-            <h2>Order Summary</h2>
+          <aside ref={summaryRef} className="summary" aria-label="Pre-order summary">
+            <h2>Pre-Order Summary</h2>
             <p className="summary-note">Add configured styles here, then submit checkout to send the preorder request to TIS.</p>
             {order.length === 0 ? (
               <div className="empty-cart">No styles added yet. Select all options on any wheel card to unlock Add to Order.</div>
