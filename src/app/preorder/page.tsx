@@ -404,26 +404,29 @@ export default function PreorderPage() {
           width: auto;
         }
 
-        .brand-lockup span {
-          border-left: 1px solid rgba(255, 255, 255, 0.14);
-          color: #d8d8dc;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          padding-left: 12px;
-          text-transform: uppercase;
+        .preorder-nav {
+          align-items: center;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
         }
 
-        .back-link {
+        .preorder-nav a {
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 999px;
           color: #f4f4f5;
           font-size: 12px;
           font-weight: 900;
-          letter-spacing: 0.08em;
-          padding: 9px 13px;
+          letter-spacing: 0.05em;
+          padding: 8px 12px;
           text-decoration: none;
           text-transform: uppercase;
+        }
+
+        .preorder-nav a.active {
+          background: #dc2626;
+          border-color: rgba(220, 38, 38, 0.8);
+          color: #fff;
         }
 
         main {
@@ -1116,8 +1119,12 @@ export default function PreorderPage() {
             grid-template-columns: 1fr;
           }
 
-          .brand-lockup span {
-            display: none;
+          .preorder-nav {
+            width: 100%;
+          }
+
+          .preorder-nav a {
+            text-align: center;
           }
 
           .card-footer button {
@@ -1128,13 +1135,14 @@ export default function PreorderPage() {
 
       <header>
         <div className="header-inner">
-          <a className="brand-lockup" href="/">
+          <a className="brand-lockup" href="/" aria-label="TIS Dealer Tool home">
             <img src="/tis-logo.png" alt="TIS" />
-            <span>Dealer pre-order</span>
           </a>
-          <a className="back-link" href="/">
-            Back to Search
-          </a>
+          <nav className="preorder-nav" aria-label="Dealer tool sections">
+            <a href="/">Wheel Search</a>
+            <a href="/">Tire Search</a>
+            <a className="active" href="/preorder">Preorder</a>
+          </nav>
         </div>
       </header>
 
