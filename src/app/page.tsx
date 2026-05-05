@@ -390,7 +390,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
             </span>
           )}
         </div>
-        <h3 style={{ fontSize: '26.25px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.2 }}>
+        <h3 style={{ fontSize: '32.8px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.1 }}>
           {wheel.model}
         </h3>
         <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>
@@ -518,7 +518,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
                     {tireImage ? <img src={tireImage} alt={`${tire.line} ${tire.size}`} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8 }} /> : <span style={{ opacity: 0.45, fontSize: 12 }}>No image</span>}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', marginBottom: 4 }}>
-                    <strong style={{ fontSize: 16 }}>{tire.line} {tire.size}</strong>
+                    <strong style={{ fontSize: 20 }}>{tire.line} {tire.size}</strong>
                     <span style={{ fontSize: 10, fontWeight: 900, color: tire.inStock ? '#22c55e' : '#ef4444', whiteSpace: 'nowrap' }}>{tireStockLabel(tire)}</span>
                   </div>
                   <div style={{ fontSize: 12, color: isLightMode ? '#71717a' : '#a1a1aa', marginBottom: 8 }}>{tire.terrain}</div>
@@ -639,7 +639,7 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
         <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>
           <img src={isLightMode ? BRAND_LOGO_ASSETS.TIS.light : BRAND_LOGO_ASSETS.TIS.dark} alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block' }} />
         </div>
-        <h3 style={{ fontSize: '26.25px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.2 }}>
+        <h3 style={{ fontSize: '32.8px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.1 }}>
           {tire.line} {tire.size}
         </h3>
         <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>

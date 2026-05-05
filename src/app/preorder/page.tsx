@@ -560,7 +560,8 @@ export default function PreorderPage() {
         }
 
         .order-item h3 {
-          font-size: 14px;
+          font-size: 17.5px;
+          line-height: 1.1;
           margin: 0 0 4px;
         }
 
@@ -881,10 +882,10 @@ export default function PreorderPage() {
 
         .card-copy h2 {
           color: #111113;
-          font-size: 26.25px;
+          font-size: 32.8px;
           font-weight: 800;
           letter-spacing: 0;
-          line-height: 1.2;
+          line-height: 1.1;
           margin: 4px 0 0;
           text-transform: uppercase;
         }
@@ -1065,7 +1066,8 @@ export default function PreorderPage() {
         }
 
         .lightbox-caption h2 {
-          font-size: 22px;
+          font-size: 27.5px;
+          line-height: 1.1;
           margin: 0;
           text-transform: uppercase;
         }
