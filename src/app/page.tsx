@@ -1089,14 +1089,14 @@ export default function Home() {
 
         .home-video-bg::before {
           background:
-            radial-gradient(circle at 50% 36%, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.46) 58%, rgba(0,0,0,0.88) 100%),
-            linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.22) 30%, rgba(0,0,0,0.30) 62%, rgba(0,0,0,0.92) 100%);
+            radial-gradient(circle at 50% 36%, rgba(0,0,0,0.34) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0.94) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.38) 30%, rgba(0,0,0,0.46) 62%, rgba(0,0,0,0.96) 100%);
         }
 
         .home-video-bg::after {
           background:
-            linear-gradient(90deg, rgba(0,0,0,0.82) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.82) 100%),
-            linear-gradient(180deg, rgba(0,0,0,0.74) 0%, transparent 18%, transparent 70%, var(--page-bg) 100%);
+            linear-gradient(90deg, rgba(0,0,0,0.90) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.90) 100%),
+            linear-gradient(180deg, rgba(0,0,0,0.84) 0%, transparent 18%, transparent 70%, var(--page-bg) 100%);
         }
 
         .theme-light .home-video-bg video {
