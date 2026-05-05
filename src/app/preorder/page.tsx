@@ -492,6 +492,10 @@ export default function PreorderPage() {
           text-transform: uppercase;
         }
 
+        .headline-break {
+          display: block;
+        }
+
         .hero-card p:not(.badge) {
           color: #c8c8cf;
           font-size: 18px;
@@ -1136,7 +1140,9 @@ export default function PreorderPage() {
         <section className="hero" aria-label="New TIS Wheel Pre-Order">
           <div className="hero-card">
             <p className="badge">Retailer commitment preview</p>
-            <h1>TIS Forged Pre-Order</h1>
+            <h1>
+              TIS Forged <span className="headline-break">Pre-Order</span>
+            </h1>
             <p>
               GET THE NEWEST TIS FORGED STYLES FIRST! PLACE YOUR PRE-ORDER OR SIMPLY HELP US CHOOSE THE BEST STYLES BY UPVOTING YOUR FAVORITES.
             </p>
