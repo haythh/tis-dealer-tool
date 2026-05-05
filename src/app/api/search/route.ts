@@ -12,6 +12,18 @@ interface ParsedQuery {
 }
 
 type FitmentStatus = 'exact' | 'bolt_pattern' | 'demo_fallback' | 'catalog_search'
+type VehicleSegment = 'truck' | 'passenger'
+
+function vehicleSegmentFromRows(rows: { segment?: string | null }[]): VehicleSegment | null {
+  if (!rows.length) return null
+  return rows.every(row => row.segment === 'passenger') ? 'passenger' : 'truck'
+}
+
+function passengerBrandNotice(vehicleLabel: string, requestedBrand?: string | null) {
+  return requestedBrand && requestedBrand !== 'TIS Motorsports'
+    ? `Passenger-car demo fitments are limited to TIS Motorsports wheels. I’m not showing ${requestedBrand} as a confirmed fit for ${vehicleLabel}.`
+    : `Passenger-car demo fitment matched ${vehicleLabel}; showing TIS Motorsports options only. Confirm final fitment with ATDOnline.`
+}
 
 function selectedWheelFields() {
   return 'id, supplier_pn, oracle_id, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, placement, material, fitment_category, msrp, map_price, upc, image_url, atd_url, in_stock, stock_pickup, stock_today, stock_tomorrow, stock_national, total_stock, atd_image_url, ta_image_url, ta_images_json, stock_updated_at'
@@ -124,10 +136,11 @@ function parseQueryFallback(query: string): ParsedQuery {
     'gmc': 'GMC', 'sierra': 'GMC', 'canyon': 'GMC', 'yukon': 'GMC',
     'ram': 'RAM', 'dodge': 'Dodge', 'challenger': 'Dodge', 'charger': 'Dodge',
     'toyota': 'Toyota', 'tacoma': 'Toyota', 'tundra': 'Toyota', '4runner': 'Toyota',
+    'camry': 'Toyota', 'corolla': 'Toyota', 'rav4': 'Toyota', 'highlander': 'Toyota',
     'sequoia': 'Toyota', 'land cruiser': 'Toyota',
     'jeep': 'Jeep', 'wrangler': 'Jeep', 'gladiator': 'Jeep', 'grand cherokee': 'Jeep',
     'nissan': 'Nissan', 'titan': 'Nissan', 'frontier': 'Nissan',
-    'honda': 'Honda', 'ridgeline': 'Honda', 'pilot': 'Honda',
+    'honda': 'Honda', 'ridgeline': 'Honda', 'pilot': 'Honda', 'accord': 'Honda', 'civic': 'Honda',
     'tesla': 'Tesla', 'cybertruck': 'Tesla',
     'bmw': 'BMW', 'x3': 'BMW', 'x5': 'BMW', 'x6': 'BMW', 'x7': 'BMW', 'ix': 'BMW', 'i8': 'BMW',
     'mercedes': 'Mercedes-Benz', 'mercedes-benz': 'Mercedes-Benz', 'g wagon': 'Mercedes-Benz', 'g-wagon': 'Mercedes-Benz', 'sprinter': 'Mercedes-Benz',
@@ -158,10 +171,11 @@ function parseQueryFallback(query: string): ParsedQuery {
       'sierra': 'Sierra', 'canyon': 'Canyon', 'yukon': 'Yukon',
       'challenger': 'Challenger', 'charger': 'Charger',
       'tacoma': 'Tacoma', 'tundra': 'Tundra', '4runner': '4Runner',
+      'camry': 'Camry', 'corolla': 'Corolla', 'rav4': 'RAV4', 'highlander': 'Highlander',
       'sequoia': 'Sequoia',
       'wrangler': 'Wrangler', 'gladiator': 'Gladiator',
       'titan': 'Titan', 'frontier': 'Frontier',
-      'ridgeline': 'Ridgeline', 'pilot': 'Pilot',
+      'ridgeline': 'Ridgeline', 'pilot': 'Pilot', 'accord': 'Accord', 'civic': 'Civic',
       'cybertruck': 'Cybertruck',
       'x3': 'X3', 'x5': 'X5', 'x6': 'X6', 'x7': 'X7', 'ix': 'iX', 'i8': 'i8',
       'g wagon': 'G Wagon', 'g-wagon': 'G Wagon', 'sprinter': 'Sprinter',
@@ -243,6 +257,10 @@ export async function POST(request: NextRequest) {
     }
 
     const parsed = await parseQueryWithGemini(query)
+    const fallbackParsed = parseQueryFallback(query)
+    if (parsed.vehicle?.make && !parsed.vehicle.model && fallbackParsed.vehicle?.model) {
+      parsed.vehicle = fallbackParsed.vehicle
+    }
     // Sanitize: if wheelModel looks like a year (4 digits, starts with 19/20), clear it
     if (parsed.wheelModel && /^(19|20)\d{2}$/.test(parsed.wheelModel)) {
       parsed.wheelModel = null
@@ -261,7 +279,7 @@ export async function POST(request: NextRequest) {
       const { year, make, model } = parsed.vehicle
 
       // Find matching vehicles
-      let vehicleQuery = 'SELECT DISTINCT bolt_pattern FROM vehicles WHERE 1=1'
+      let vehicleQuery = 'SELECT DISTINCT bolt_pattern, segment FROM vehicles WHERE 1=1'
       const vehicleParams: (string | number)[] = []
 
       if (make) {
@@ -277,8 +295,10 @@ export async function POST(request: NextRequest) {
         vehicleParams.push(year, year)
       }
 
-      const vehicleRows = db.prepare(vehicleQuery).all(...vehicleParams) as { bolt_pattern: string }[]
+      const vehicleRows = db.prepare(vehicleQuery).all(...vehicleParams) as { bolt_pattern: string; segment: VehicleSegment }[]
       const boltPatterns = vehicleRows.map(r => r.bolt_pattern)
+      const vehicleSegment = vehicleSegmentFromRows(vehicleRows)
+      const vehicleLabel = [parsed.vehicle.year, parsed.vehicle.make, parsed.vehicle.model].filter(Boolean).join(' ')
       matchedBoltPatterns = [...new Set(boltPatterns)]
 
       if (boltPatterns.length > 0) {
@@ -302,7 +322,23 @@ export async function POST(request: NextRequest) {
           wheelQuery += ' AND LOWER(color_finish) LIKE LOWER(?)'
           wheelParams.push(`%${parsed.finish}%`)
         }
-        if (parsed.brand) {
+        if (vehicleSegment === 'passenger') {
+          if (parsed.brand && parsed.brand !== 'TIS Motorsports') {
+            wheels = []
+            notice = passengerBrandNotice(vehicleLabel, parsed.brand)
+            return NextResponse.json({
+              wheels,
+              query_parsed: parsed,
+              total: 0,
+              fitment_status: fitmentStatus,
+              matched_bolt_patterns: matchedBoltPatterns,
+              notice,
+              suggested_queries: ['2022 Honda Accord 20 inch black', '2021 Toyota Camry 20 inch', '2023 BMW X5 22 inch', '2024 F-150 20 inch black'],
+            })
+          }
+          wheelQuery += ' AND UPPER(brand) = UPPER(?)'
+          wheelParams.push('TIS Motorsports')
+        } else if (parsed.brand) {
           wheelQuery += ' AND UPPER(brand) = UPPER(?)'
           wheelParams.push(parsed.brand)
         }
@@ -314,7 +350,9 @@ export async function POST(request: NextRequest) {
         wheels = db.prepare(wheelQuery).all(...wheelParams) as Wheel[]
         if (wheels.length > 0) {
           fitmentStatus = 'exact'
-          notice = `Demo fitment matched ${parsed.vehicle.year || ''} ${parsed.vehicle.make} ${parsed.vehicle.model} by bolt pattern${matchedBoltPatterns.length ? ` (${matchedBoltPatterns.join(', ')})` : ''}. Confirm final fitment with ATDOnline.`
+          notice = vehicleSegment === 'passenger'
+            ? passengerBrandNotice(vehicleLabel)
+            : `Demo fitment matched ${parsed.vehicle.year || ''} ${parsed.vehicle.make} ${parsed.vehicle.model} by bolt pattern${matchedBoltPatterns.length ? ` (${matchedBoltPatterns.join(', ')})` : ''}. Confirm final fitment with ATDOnline.`
         }
       } else {
         fitmentStatus = 'catalog_search'

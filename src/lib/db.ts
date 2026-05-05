@@ -52,6 +52,7 @@ export type Vehicle = {
   model: string
   bolt_pattern: string
   lug_count: number
+  segment: 'truck' | 'passenger'
 }
 
 // Normalize bolt pattern to both inch and mm formats for matching
@@ -74,6 +75,9 @@ export function normalizeBoltPattern(bp: string): string[] {
     '6x135': ['6x135', '6X135'],
     '8x170': ['8x170', '8X170'],
     '5x150': ['5x150', '5X150'],
+    '5x100': ['5x100', '5X100'],
+    '5x112': ['5x112', '5X112'],
+    '5x130': ['5x130', '5X130'],
   }
   const normalized = bp?.toLowerCase().replace('x', 'x')
   for (const [key, variants] of Object.entries(bpMap)) {

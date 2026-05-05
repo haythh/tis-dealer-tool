@@ -69,6 +69,13 @@ type SmsDemoOptions = {
   baseUrl?: string
 }
 
+type VehicleSegment = 'truck' | 'passenger'
+
+type VehicleFitmentContext = {
+  boltPatterns: string[]
+  segment: VehicleSegment | null
+}
+
 function currency(value: number | null) {
   return value ? `$${Math.round(value).toLocaleString()}` : 'TBD'
 }
@@ -117,8 +124,20 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     [/\btacoma\b/, 'Toyota', 'Tacoma'],
     [/\btundra\b/, 'Toyota', 'Tundra'],
     [/\b4runner\b/, 'Toyota', '4Runner'],
+    [/\bcamry\b/, 'Toyota', 'Camry'],
+    [/\bcorolla\b/, 'Toyota', 'Corolla'],
+    [/\brav4\b/, 'Toyota', 'RAV4'],
+    [/\bhighlander\b/, 'Toyota', 'Highlander'],
     [/\bwrangler\b/, 'Jeep', 'Wrangler'],
     [/\bgladiator\b/, 'Jeep', 'Gladiator'],
+    [/\baccord\b/, 'Honda', 'Accord'],
+    [/\bcivic\b/, 'Honda', 'Civic'],
+    [/\bpilot\b/, 'Honda', 'Pilot'],
+    [/\bcr[-\s]?v\b|\bcrv\b/, 'Honda', 'CR-V'],
+    [/\bbmw\s+x3\b|\bx3\b/, 'BMW', 'X3'],
+    [/\bbmw\s+x5\b|\bx5\b/, 'BMW', 'X5'],
+    [/\bbmw\s+x6\b|\bx6\b/, 'BMW', 'X6'],
+    [/\bbmw\s+x7\b|\bx7\b/, 'BMW', 'X7'],
     [/\bbmw\s+i[-\s]?x\b|\bix\b/, 'BMW', 'iX'],
     [/\bbmw\s+i8\b|\bi8\b/, 'BMW', 'i8'],
     [/\bram\s?(1500|2500|3500)?\b/, 'RAM', 'RAM'],
@@ -135,7 +154,7 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     }
   }
 
-  const makeOnly = lower.match(/\b(ford|chevy|chevrolet|gmc|ram|toyota|jeep|bmw)\b/)
+  const makeOnly = lower.match(/\b(ford|chevy|chevrolet|gmc|ram|toyota|jeep|bmw|honda)\b/)
   if (makeOnly) {
     const make = makeOnly[1] === 'chevy'
       ? 'Chevrolet'
@@ -208,8 +227,8 @@ export function parseSmsText(text: string): ParsedSms {
         if (/^(17|18|20|22|24|26|28|30)S?$/.test(term)) return false
         if (width && term === `${size}X${width}`.replace('.', '')) return false
         if (/^[568]X\d/.test(term)) return false
-        if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP', 'BMW'].includes(term)) return false
-        if (['F150', 'F-150', 'F250', 'F-250', 'F350', 'F-350', 'SILVERADO', 'SIERRA', 'TACOMA', 'TUNDRA', '4RUNNER', 'WRANGLER', 'GLADIATOR', 'BRONCO', 'RANGER'].includes(term)) return false
+        if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP', 'BMW', 'HONDA', 'TESLA', 'AUDI', 'LEXUS', 'KIA', 'HYUNDAI', 'SUBARU'].includes(term)) return false
+        if (['F150', 'F-150', 'F250', 'F-250', 'F350', 'F-350', 'SILVERADO', 'SIERRA', 'TACOMA', 'TUNDRA', '4RUNNER', 'CAMRY', 'COROLLA', 'RAV4', 'HIGHLANDER', 'ACCORD', 'CIVIC', 'PILOT', 'CRV', 'CR-V', 'X3', 'X5', 'X6', 'X7', 'IX', 'I8', 'WRANGLER', 'GLADIATOR', 'BRONCO', 'RANGER'].includes(term)) return false
         if (Object.keys(FINISH_TERMS).some(finishTerm => finishTerm.toUpperCase().replace(/[^A-Z0-9]/g, '') === term)) return false
         return term.length >= 3 || /^[A-Z]\d+$/.test(term)
       }) || []
@@ -282,10 +301,10 @@ function vehicleClarificationPrompt(vehicle?: SmsDemoVehicle | null) {
   return null
 }
 
-function findBoltPatterns(vehicle: SmsDemoVehicle) {
-  if (!vehicle.make && !vehicle.model) return []
+function findVehicleFitment(vehicle: SmsDemoVehicle): VehicleFitmentContext {
+  if (!vehicle.make && !vehicle.model) return { boltPatterns: [], segment: null }
   const db = getDb()
-  let query = 'SELECT DISTINCT bolt_pattern FROM vehicles WHERE 1=1'
+  let query = 'SELECT DISTINCT bolt_pattern, segment FROM vehicles WHERE 1=1'
   const params: (string | number)[] = []
 
   if (vehicle.make) {
@@ -301,8 +320,11 @@ function findBoltPatterns(vehicle: SmsDemoVehicle) {
     params.push(vehicle.year, vehicle.year)
   }
 
-  const rows = db.prepare(query).all(...params) as { bolt_pattern: string }[]
-  return [...new Set(rows.flatMap(row => normalizeBoltPattern(row.bolt_pattern)))]
+  const rows = db.prepare(query).all(...params) as { bolt_pattern: string; segment: VehicleSegment }[]
+  return {
+    boltPatterns: [...new Set(rows.flatMap(row => normalizeBoltPattern(row.bolt_pattern)))],
+    segment: rows.length && rows.every(row => row.segment === 'passenger') ? 'passenger' : rows.length ? 'truck' : null,
+  }
 }
 
 function compact(value: string | null | undefined) {
@@ -358,7 +380,8 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     conditions.push('COALESCE(in_stock, 0) = 0')
   }
 
-  const boltPatterns = state.vehicle ? findBoltPatterns(state.vehicle) : []
+  const vehicleFitment = state.vehicle ? findVehicleFitment(state.vehicle) : { boltPatterns: [], segment: null }
+  const boltPatterns = vehicleFitment.boltPatterns
   const requestedBoltPatterns = parsed?.boltPattern ? normalizeBoltPattern(parsed.boltPattern) : []
   const allBoltPatterns = [...new Set([...boltPatterns, ...requestedBoltPatterns])]
   if (state.vehicle?.make && state.vehicle?.model && !allBoltPatterns.length) {
@@ -387,7 +410,11 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     params.push(`%${state.finish}%`)
   }
 
-  if (state.brand) {
+  if (vehicleFitment.segment === 'passenger') {
+    if (state.brand && state.brand !== 'TIS Motorsports') return []
+    conditions.push('UPPER(brand) = UPPER(?)')
+    params.push('TIS Motorsports')
+  } else if (state.brand) {
     conditions.push('UPPER(brand) = UPPER(?)')
     params.push(state.brand)
   }
@@ -738,6 +765,17 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     }
   }
 
+  const searchVehicleFitment = searchState.vehicle?.make && searchState.vehicle?.model
+    ? findVehicleFitment(searchState.vehicle)
+    : { boltPatterns: [], segment: null }
+  const isPassengerFitment = searchVehicleFitment.segment === 'passenger'
+  if (isPassengerFitment && searchState.brand && searchState.brand !== 'TIS Motorsports') {
+    return {
+      state: { ...searchState, awaiting: null, lastResultIds: [] },
+      messages: [`Passenger-car demo fitments are limited to TIS Motorsports wheels. I’m not showing ${searchState.brand} as a confirmed fit for ${describeVehicle(searchState.vehicle)}.`],
+    }
+  }
+
   const cards = searchCards(searchState, parsed)
   const previewCards = cards.slice(0, SMS_DEMO_RESULT_LIMIT)
   const resultUrl = resultUrlFor(cards, options.baseUrl)
@@ -760,6 +798,7 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   return {
     state: nextState,
     messages: [
+      ...(isPassengerFitment ? [`Passenger-car fitment for ${describeVehicle(searchState.vehicle)}: showing TIS Motorsports options only.`] : []),
       `I found ${cards.length} ${sizeLabel} option${cards.length === 1 ? '' : 's'}${describeVehicle(searchState.vehicle) ? ` for ${describeVehicle(searchState.vehicle)}` : ''}${searchState.finish ? ` in ${searchState.finish}` : ''}.`,
       summarizeCards(previewCards),
       'Want me to email these cards and ATD buy links? Reply with an email address.',

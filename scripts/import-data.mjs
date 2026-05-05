@@ -59,6 +59,10 @@ const VEHICLES = [
   { year_start: 2007, year_end: 2021, make: 'Toyota', model: 'Tundra', bolt_pattern: '5x150', lug_count: 5 },
   { year_start: 2022, year_end: 2026, make: 'Toyota', model: 'Tundra', bolt_pattern: '6x139.7', lug_count: 6 },
   { year_start: 2010, year_end: 2026, make: 'Toyota', model: '4Runner', bolt_pattern: '6x139.7', lug_count: 6 },
+  { year_start: 2018, year_end: 2026, make: 'Toyota', model: 'Camry', bolt_pattern: '5x114.3', lug_count: 5 },
+  { year_start: 2019, year_end: 2026, make: 'Toyota', model: 'Corolla', bolt_pattern: '5x100', lug_count: 5 },
+  { year_start: 2019, year_end: 2026, make: 'Toyota', model: 'RAV4', bolt_pattern: '5x114.3', lug_count: 5 },
+  { year_start: 2020, year_end: 2026, make: 'Toyota', model: 'Highlander', bolt_pattern: '5x114.3', lug_count: 5 },
   { year_start: 2023, year_end: 2026, make: 'Toyota', model: 'Sequoia', bolt_pattern: '6x139.7', lug_count: 6 },
   { year_start: 2008, year_end: 2022, make: 'Toyota', model: 'Sequoia', bolt_pattern: '5x150', lug_count: 5 },
   { year_start: 2024, year_end: 2026, make: 'Toyota', model: 'Land Cruiser', bolt_pattern: '6x139.7', lug_count: 6 },
@@ -88,6 +92,8 @@ const VEHICLES = [
   { year_start: 2017, year_end: 2026, make: 'Honda', model: 'Ridgeline', bolt_pattern: '5x114.3', lug_count: 5 },
   { year_start: 2016, year_end: 2026, make: 'Honda', model: 'Pilot', bolt_pattern: '5x114.3', lug_count: 5 },
   { year_start: 2017, year_end: 2026, make: 'Honda', model: 'CR-V', bolt_pattern: '5x114.3', lug_count: 5 },
+  { year_start: 2018, year_end: 2026, make: 'Honda', model: 'Accord', bolt_pattern: '5x114.3', lug_count: 5 },
+  { year_start: 2016, year_end: 2026, make: 'Honda', model: 'Civic', bolt_pattern: '5x114.3', lug_count: 5 },
   // Lexus
   { year_start: 2008, year_end: 2021, make: 'Lexus', model: 'GX', bolt_pattern: '6x139.7', lug_count: 6 },
   { year_start: 2008, year_end: 2026, make: 'Lexus', model: 'LX', bolt_pattern: '5x150', lug_count: 5 },
@@ -125,6 +131,34 @@ const VEHICLES = [
   // GMC Hummer EV
   { year_start: 2022, year_end: 2026, make: 'GMC', model: 'Hummer EV', bolt_pattern: '8x180', lug_count: 8 },
 ]
+
+// ============================================================
+// VEHICLE SEGMENT CLASSIFICATION
+// ============================================================
+const PASSENGER_VEHICLES = new Set([
+  'Ford|Explorer', 'Ford|Mustang',
+  'Chevrolet|Camaro', 'Chevrolet|Corvette',
+  'Dodge|Challenger', 'Dodge|Charger', 'Dodge|Durango',
+  'Tesla|Model S', 'Tesla|Model X',
+  'Honda|Accord', 'Honda|Civic', 'Honda|Pilot', 'Honda|CR-V',
+  'Toyota|Camry', 'Toyota|Corolla', 'Toyota|RAV4', 'Toyota|Highlander',
+  'BMW|X3', 'BMW|X5', 'BMW|X6', 'BMW|X7', 'BMW|iX', 'BMW|i8',
+  'Mercedes-Benz|GLE', 'Mercedes-Benz|C-Class', 'Mercedes-Benz|E-Class', 'Mercedes-Benz|S-Class',
+  'Audi|Q5', 'Audi|Q7', 'Audi|Q8', 'Audi|A4', 'Audi|A6',
+  'Hyundai|Tucson', 'Hyundai|Palisade',
+  'Kia|Telluride', 'Kia|K5',
+  'Subaru|Outback', 'Subaru|Forester',
+  'Lexus|RX', 'Lexus|GX', 'Lexus|LX',
+  'Land Rover|Range Rover', 'Land Rover|Range Rover Sport', 'Land Rover|Discovery',
+  'Volkswagen|Touareg',
+  'Porsche|Cayenne',
+])
+
+function vehicleSegment(v) {
+  return PASSENGER_VEHICLES.has(`${v.make}|${v.model}`) ? 'passenger' : 'truck'
+}
+
+const VEHICLE_FITMENTS = VEHICLES.map(v => ({ ...v, segment: v.segment || vehicleSegment(v) }))
 
 // ============================================================
 // BRAND NORMALIZATION
@@ -235,7 +269,8 @@ db.exec(`
     make TEXT,
     model TEXT,
     bolt_pattern TEXT,
-    lug_count INTEGER
+    lug_count INTEGER,
+    segment TEXT NOT NULL DEFAULT 'truck'
   )
 `)
 
@@ -321,18 +356,18 @@ for (const [brand, count] of Object.entries(brandCounts)) {
 console.log('\n🚗 Inserting vehicle fitment data...')
 
 const insertVehicle = db.prepare(`
-  INSERT INTO vehicles (year_start, year_end, make, model, bolt_pattern, lug_count)
-  VALUES (?, ?, ?, ?, ?, ?)
+  INSERT INTO vehicles (year_start, year_end, make, model, bolt_pattern, lug_count, segment)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
 `)
 
 const insertVehicles = db.transaction((vehicles) => {
   for (const v of vehicles) {
-    insertVehicle.run(v.year_start, v.year_end, v.make, v.model, v.bolt_pattern, v.lug_count)
+    insertVehicle.run(v.year_start, v.year_end, v.make, v.model, v.bolt_pattern, v.lug_count, v.segment || vehicleSegment(v))
   }
 })
 
-insertVehicles(VEHICLES)
-console.log(`  ✅ Inserted: ${VEHICLES.length} vehicle fitment records`)
+insertVehicles(VEHICLE_FITMENTS)
+console.log(`  ✅ Inserted: ${VEHICLE_FITMENTS.length} vehicle fitment records`)
 
 // ============================================================
 // VERIFY
