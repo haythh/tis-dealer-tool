@@ -53,11 +53,13 @@ export type SmsDemoReply = {
 type ParsedSms = {
   vehicle?: SmsDemoVehicle | null
   size?: string | null
+  width?: string | null
   finish?: string | null
   brand?: string | null
   wantsEmail?: boolean
   email?: string | null
   boltPattern?: string | null
+  lugCount?: number | null
   catalogTerms?: string[]
   stockFilter?: 'in_stock' | 'out_of_stock' | 'all'
 }
@@ -79,7 +81,8 @@ const SEARCH_STOPWORDS = new Set([
   'stock', 'stocked', 'available', 'availability', 'price', 'pricing', 'map', 'for', 'the',
   'and', 'that', 'are', 'all', 'any', 'options', 'option', 'catalog', 'data', 'demo',
   'inch', 'inches', 'send', 'email', 'quote', 'share', 'please', 'lookup', 'search',
-  'out', 'oos', 'not',
+  'out', 'oos', 'not', 'lug', 'lugs', 'bolt', 'bolts', 'got', 'need', 'me', 'you', 'do', 'anything',
+  'gloss', 'matte', 'satin',
 ])
 
 const FINISH_TERMS: Record<string, string> = {
@@ -105,6 +108,8 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     [/\bf[-\s]?350\b|\bf350\b/, 'Ford', 'F-350'],
     [/\bbronco\b/, 'Ford', 'Bronco'],
     [/\branger\b/, 'Ford', 'Ranger'],
+    [/\bsilverado\s*(1500|2500|3500)\b/, 'Chevrolet', 'Silverado $1'],
+    [/\bsierra\s*(1500|2500|3500)\b/, 'GMC', 'Sierra $1'],
     [/\bsilverado\b/, 'Chevrolet', 'Silverado'],
     [/\bsierra\b/, 'GMC', 'Sierra'],
     [/\btacoma\b/, 'Toyota', 'Tacoma'],
@@ -114,7 +119,7 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     [/\bgladiator\b/, 'Jeep', 'Gladiator'],
     [/\bbmw\s+i[-\s]?x\b|\bix\b/, 'BMW', 'iX'],
     [/\bbmw\s+i8\b|\bi8\b/, 'BMW', 'i8'],
-    [/\bram\s?(1500|2500|3500)?\b/, 'RAM', '1500'],
+    [/\bram\s?(1500|2500|3500)?\b/, 'RAM', 'RAM'],
   ]
 
   for (const [pattern, make, defaultModel] of modelMap) {
@@ -123,7 +128,7 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
       return {
         year,
         make,
-        model: make === 'RAM' && match[1] ? match[1] : defaultModel,
+        model: make === 'RAM' && match[1] ? match[1] : defaultModel.replace('$1', match[1] || ''),
       }
     }
   }
@@ -141,13 +146,32 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
   return year ? { year, make: null, model: null } : null
 }
 
+function extractWheelSize(lower: string) {
+  const sizeMatch = lower.match(/\b(17|18|20|22|24|26|28|30)\s*(?:x|by)\s*(\d{1,2}(?:\.\d{1,2})?)\b/)
+  if (sizeMatch) return { diameter: sizeMatch[1], width: sizeMatch[2] }
+
+  const diameter = lower.match(/\b(17|18|20|22|24|26|28|30)\s*(?:s|in|inch|inches|\")?\b/)?.[1] || null
+  return { diameter, width: null }
+}
+
+function normalizeCatalogTerm(term: string) {
+  const upper = term.toUpperCase().replace(/[^A-Z0-9]/g, '')
+  if (/^\d{3}S$/.test(upper)) return upper.slice(0, 3)
+  const modelMatch = upper.match(/^(\d{3})([A-Z]{0,3})$/)
+  if (modelMatch) return `${modelMatch[1]}${modelMatch[2]}`
+  return upper
+}
+
 export function parseSmsText(text: string): ParsedSms {
   const q = text.trim()
   const lower = q.toLowerCase()
   const email = q.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || null
 
-  const size = lower.match(/\b(17|18|20|22|24|26|28|30)\s*(?:s|in|inch|inches|\")?\b/)?.[1] || null
+  const wheelSize = extractWheelSize(lower)
+  const size = wheelSize.diameter
+  const width = wheelSize.width
   const boltPattern = lower.match(/\b([568]\s*x\s*(?:\d{3}(?:\.\d)?|\d(?:\.\d{1,2})?))\b/i)?.[1]?.replace(/\s+/g, '').toUpperCase() || null
+  const lugCount = lower.match(/\b([568])\s*(?:lug|lugs|bolt|bolts)\b/)?.[1] ? parseInt(lower.match(/\b([568])\s*(?:lug|lugs|bolt|bolts)\b/)![1], 10) : null
 
   let finish: string | null = null
   const finishEntries = Object.entries(FINISH_TERMS).sort((a, b) => b[0].length - a[0].length)
@@ -173,15 +197,18 @@ export function parseSmsText(text: string): ParsedSms {
     q
       .replace(email || '', ' ')
       .match(/[a-z0-9][a-z0-9+.-]{1,}/gi)
-      ?.map(term => term.toUpperCase())
+      ?.map(normalizeCatalogTerm)
       .filter(term => {
         const lowerTerm = term.toLowerCase()
         if (SEARCH_STOPWORDS.has(lowerTerm)) return false
         if (/^(19|20)\d{2}$/.test(term)) return false
+        if (/^(1500|2500|3500)$/.test(term)) return false
         if (/^(17|18|20|22|24|26|28|30)S?$/.test(term)) return false
+        if (width && term === `${size}X${width}`.replace('.', '')) return false
+        if (/^[568]X\d/.test(term)) return false
         if (['FORD', 'CHEVY', 'CHEVROLET', 'GMC', 'RAM', 'TOYOTA', 'JEEP', 'BMW'].includes(term)) return false
         if (['F150', 'F-150', 'F250', 'F-250', 'F350', 'F-350', 'SILVERADO', 'SIERRA', 'TACOMA', 'TUNDRA', '4RUNNER', 'WRANGLER', 'GLADIATOR', 'BRONCO', 'RANGER'].includes(term)) return false
-        if (Object.keys(FINISH_TERMS).some(finishTerm => finishTerm.toUpperCase() === term)) return false
+        if (Object.keys(FINISH_TERMS).some(finishTerm => finishTerm.toUpperCase().replace(/[^A-Z0-9]/g, '') === term)) return false
         return term.length >= 3 || /^[A-Z]\d+$/.test(term)
       }) || []
   )].slice(0, 5)
@@ -189,11 +216,13 @@ export function parseSmsText(text: string): ParsedSms {
   return {
     vehicle: extractVehicle(q),
     size,
+    width,
     finish,
     brand,
     wantsEmail: /\b(email|send|quote|share)\b/.test(lower),
     email,
     boltPattern,
+    lugCount,
     catalogTerms,
     stockFilter,
   }
@@ -216,6 +245,13 @@ function mergeState(state: SmsDemoState, parsed: ParsedSms, rawText: string): Sm
   if (parsed.brand) next.brand = parsed.brand
   if (parsed.email) next.email = parsed.email
 
+  if (next.awaiting === 'vehicle' && next.vehicle?.model && /\b(1500|2500|3500)\b/.test(lower)) {
+    const series = lower.match(/\b(1500|2500|3500)\b/)?.[1]
+    if (series && ['Silverado', 'Sierra', 'RAM'].includes(next.vehicle.model)) {
+      next.vehicle = { ...next.vehicle, model: next.vehicle.model === 'RAM' ? series : `${next.vehicle.model} ${series}` }
+    }
+  }
+
   if (next.awaiting === 'size' && /\b(all|any|show all|no preference|no pref|whatever)\b/.test(lower)) {
     next.size = 'all'
   }
@@ -233,6 +269,15 @@ function mergeState(state: SmsDemoState, parsed: ParsedSms, rawText: string): Sm
 function describeVehicle(vehicle?: SmsDemoVehicle | null) {
   if (!vehicle) return ''
   return [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(' ')
+}
+
+function vehicleClarificationPrompt(vehicle?: SmsDemoVehicle | null) {
+  if (!vehicle?.model) return null
+  const model = vehicle.model.toLowerCase()
+  if (vehicle.make === 'Chevrolet' && model === 'silverado') return 'Which Silverado: 1500, 2500, or 3500? Bolt pattern changes, so I won’t guess-fit it.'
+  if (vehicle.make === 'GMC' && model === 'sierra') return 'Which Sierra: 1500, 2500, or 3500? Bolt pattern changes, so I won’t guess-fit it.'
+  if (vehicle.make === 'RAM' && model === 'ram') return 'Which RAM model: 1500, 2500, or 3500? Bolt pattern changes, so I won’t guess-fit it.'
+  return null
 }
 
 function findBoltPatterns(vehicle: SmsDemoVehicle) {
@@ -258,6 +303,48 @@ function findBoltPatterns(vehicle: SmsDemoVehicle) {
   return [...new Set(rows.flatMap(row => normalizeBoltPattern(row.bolt_pattern)))]
 }
 
+function compact(value: string | null | undefined) {
+  return (value || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+}
+
+function rankCards(cards: SmsDemoCard[], state: SmsDemoState, parsed?: ParsedSms) {
+  const terms = parsed?.catalogTerms || []
+
+  return [...cards].sort((a, b) => {
+    const score = (card: SmsDemoCard) => {
+      let value = 0
+      const supplier = compact(card.supplier_pn)
+      const model = compact(card.model)
+      const finish = compact(card.color_finish)
+      const size = compact(card.size)
+      const bolt = compact(card.bolt_pattern)
+
+      for (const term of terms) {
+        const cleanTerm = compact(term)
+        if (!cleanTerm) continue
+        if (supplier === cleanTerm || model === cleanTerm) value += 200
+        else if (supplier.startsWith(cleanTerm) || model.startsWith(cleanTerm)) value += 120
+        else if (supplier.includes(cleanTerm) || model.includes(cleanTerm)) value += 60
+        else if (finish.includes(cleanTerm) || size.includes(cleanTerm) || bolt.includes(cleanTerm)) value += 15
+      }
+
+      if (state.brand && compact(card.brand) === compact(state.brand)) value += 40
+      if (state.size && state.size !== 'all' && card.size.toUpperCase().startsWith(`${state.size}X`)) value += 35
+      if (parsed?.width && compact(card.size) === compact(`${state.size}X${parsed.width}`)) value += 35
+      if (state.finish && compact(card.color_finish).includes(compact(state.finish))) {
+        value += 30
+        if (compact(state.finish) === 'BLACK' && /^(GLOSSBLACK|SATINBLACK|MATTEBLACK)/.test(finish)) value += 25
+      }
+      if (parsed?.lugCount && compact(card.bolt_pattern).startsWith(`${parsed.lugCount}X`)) value += 20
+      if (card.in_stock) value += 10
+      value += Math.min(card.total_stock ?? 0, 200) / 100
+      return value
+    }
+
+    return score(b) - score(a) || (b.total_stock ?? 0) - (a.total_stock ?? 0) || (a.map_price ?? Number.MAX_SAFE_INTEGER) - (b.map_price ?? Number.MAX_SAFE_INTEGER)
+  })
+}
+
 function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
   const db = getDb()
   const conditions: string[] = []
@@ -278,11 +365,19 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
   if (allBoltPatterns.length) {
     conditions.push(`(${allBoltPatterns.map(() => `UPPER(bolt_pattern) LIKE UPPER(?)`).join(' OR ')})`)
     params.push(...allBoltPatterns.map(pattern => `%${pattern}%`))
+  } else if (parsed?.lugCount) {
+    conditions.push('UPPER(bolt_pattern) LIKE UPPER(?)')
+    params.push(`${parsed.lugCount}X%`)
   }
 
   if (state.size && state.size !== 'all') {
-    conditions.push('size LIKE ?')
-    params.push(`${state.size}X%`)
+    if (parsed?.width) {
+      conditions.push('UPPER(size) = UPPER(?)')
+      params.push(`${state.size}X${parsed.width}`)
+    } else {
+      conditions.push('size LIKE ?')
+      params.push(`${state.size}X%`)
+    }
   }
 
   if (state.finish) {
@@ -306,8 +401,15 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     FROM wheels
     WHERE ${where}
     ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
-    LIMIT ${SMS_DEMO_RESULT_LIMIT}
+    LIMIT 60
   `).all(...params) as SmsDemoCard[]
+
+  cards = rankCards(cards, state, parsed).slice(0, SMS_DEMO_RESULT_LIMIT)
+
+  if (!cards.length && parsed?.width) {
+    const relaxedParsed = { ...parsed, width: null }
+    cards = searchCards(state, relaxedParsed)
+  }
 
   if (!cards.length && state.finish) {
     const relaxed = { ...state, finish: null }
@@ -326,6 +428,7 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     state.finish ||
     state.brand ||
     parsed?.boltPattern ||
+    parsed?.lugCount ||
     parsed?.catalogTerms?.length ||
     parsed?.stockFilter
   )
@@ -380,6 +483,7 @@ function resultUrlForIds(ids: number[] | undefined, baseUrl?: string) {
 function hasCatalogCriteria(parsed: ParsedSms, state: SmsDemoState) {
   return Boolean(
     parsed.boltPattern ||
+    parsed.lugCount ||
     parsed.catalogTerms?.length ||
     parsed.stockFilter ||
     state.brand ||
@@ -435,11 +539,11 @@ function isConversationalFollowUp(text: string, incomingState: SmsDemoState, par
   const lower = text.toLowerCase()
   if (!incomingState.lastResultIds?.length && !incomingState.vehicle) return false
   if (/\b(what about|how about|instead|same|those|that|these|them|more like|can you|do you have|got anything|anything in|any in)\b/.test(lower)) return true
-  if (incomingState.vehicle && (parsed.size || parsed.finish) && !parsed.vehicle && !parsed.catalogTerms?.length && !parsed.boltPattern && !parsed.brand) return true
+  if (incomingState.vehicle && (parsed.size || parsed.finish || parsed.lugCount) && !parsed.vehicle && !parsed.catalogTerms?.length && !parsed.boltPattern && !parsed.brand) return true
   return false
 }
 
-function handleLastResultConversation(text: string, incomingState: SmsDemoState, options: SmsDemoOptions): SmsDemoReply | null {
+function handleLastResultConversation(text: string, incomingState: SmsDemoState, options: SmsDemoOptions, parsed?: ParsedSms): SmsDemoReply | null {
   const lastCards = getSmsDemoCardsByIds(incomingState.lastResultIds || [])
   if (!lastCards.length) return null
 
@@ -448,6 +552,20 @@ function handleLastResultConversation(text: string, incomingState: SmsDemoState,
   const selectedCard = selectedIndex === null
     ? (/\b(that one|this one|it|that|this)\b/.test(lower) && lastCards.length === 1 ? lastCards[0] : null)
     : lastCards[selectedIndex]
+
+  if (selectedCard && parsed?.email && /\b(send|share|quote|package|email|use|pick|choose)\b/.test(lower)) {
+    return {
+      state: { ...incomingState, lastResultIds: [selectedCard.id], awaiting: null, email: parsed.email },
+      messages: [`Got it — preparing the wheel-card package for ${parsed.email}.`],
+      cards: [selectedCard],
+      resultUrl: resultUrlFor([selectedCard], options.baseUrl),
+      emailPreview: {
+        to: parsed.email,
+        subject: `TIS wheel option${incomingState.vehicle ? ` for ${describeVehicle(incomingState.vehicle)}` : ''}`,
+        wheelCount: 1,
+      },
+    }
+  }
 
   if (/\b(cheapest|lowest price|least expensive)\b/.test(lower)) {
     const cards = [...lastCards].sort((a, b) => (a.map_price ?? Number.MAX_SAFE_INTEGER) - (b.map_price ?? Number.MAX_SAFE_INTEGER))
@@ -504,7 +622,7 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   const state = mergeState(incomingState, parsed, text)
   const lower = text.toLowerCase()
 
-  const lastResultReply = handleLastResultConversation(text, incomingState, options)
+  const lastResultReply = handleLastResultConversation(text, incomingState, options, parsed)
   if (lastResultReply) return lastResultReply
 
   if ((parsed.wantsEmail || state.awaiting === 'email') && !parsed.email) {
@@ -532,10 +650,11 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   const standaloneCatalogSearch = Boolean(
     !conversationalFollowUp &&
     !parsed.vehicle &&
+    incomingState.awaiting !== 'vehicle' &&
     incomingState.awaiting !== 'size' &&
     incomingState.awaiting !== 'finish' &&
     incomingState.awaiting !== 'email' &&
-    (parsed.catalogTerms?.length || parsed.boltPattern || parsed.brand || parsed.stockFilter || parsed.size || parsed.finish) &&
+    (parsed.catalogTerms?.length || parsed.boltPattern || parsed.lugCount || parsed.brand || parsed.stockFilter || parsed.size || parsed.finish) &&
     !/\b(same|this|that|current)\s+(truck|vehicle|fitment|one)\b/.test(lower)
   )
   const searchState: SmsDemoState = standaloneCatalogSearch
@@ -554,6 +673,14 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     return {
       state: { ...searchState, awaiting: 'vehicle' },
       messages: [`Got the make${searchState.vehicle.year ? ` and year` : ''}. Which ${searchState.vehicle.make} model? Example: BMW iX or Ford F-150.`],
+    }
+  }
+
+  const vehicleClarification = vehicleClarificationPrompt(searchState.vehicle)
+  if (vehicleClarification) {
+    return {
+      state: { ...searchState, awaiting: 'vehicle' },
+      messages: [vehicleClarification],
     }
   }
 
