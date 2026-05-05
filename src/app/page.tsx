@@ -113,7 +113,7 @@ const EXAMPLE_QUERIES = [
   '20" wheels for RAM 1500',
   'TIS 544 in black',
   'DTS wheels 20 inch',
-  'Chrome wheels for Chevy Silverado',
+  'Chrome wheels for Chevy Silverado 2500',
   'TIS Motorsports bronze',
 ]
 
