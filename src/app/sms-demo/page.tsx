@@ -54,14 +54,14 @@ function WheelCard({ card }: { card: SmsDemoCard }) {
 
   return (
     <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] shadow-2xl shadow-black/20 backdrop-blur">
-      <div className="relative flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-800 to-black p-4">
+      <div className="relative flex aspect-[4/3] items-center justify-center bg-black p-4">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={`${card.brand} ${card.model}`} className="max-h-full max-w-full object-contain drop-shadow-2xl" />
         ) : (
           <div className="text-sm uppercase tracking-[0.3em] text-white/30">TIS</div>
         )}
-        <span className="absolute left-4 top-4 rounded-full bg-emerald-400 px-3 py-1 text-xs font-black text-black">IN STOCK</span>
+        <span className="absolute left-4 top-4 rounded-full bg-emerald-400 px-3 py-1 text-xs font-black text-black">{card.total_stock ?? 0} IN STOCK</span>
       </div>
       <div className="space-y-4 p-5">
         <div>
@@ -107,6 +107,7 @@ function Spec({ label, value }: { label: string; value: string }) {
 function SmsDemoContent() {
   const searchParams = useSearchParams()
   const linkedResultIds = useMemo(() => searchParams.get('results')?.split(',').filter(Boolean) || [], [searchParams])
+  const isLinkedResultsView = linkedResultIds.length > 0
   const [input, setInput] = useState(STARTER)
   const [loading, setLoading] = useState(false)
   const [state, setState] = useState<SmsDemoState>({})
@@ -190,58 +191,60 @@ function SmsDemoContent() {
         <div className="absolute left-[-10%] top-[-20%] h-96 w-96 rounded-full bg-red-600/20 blur-3xl" />
         <div className="absolute bottom-[-20%] right-[-10%] h-96 w-96 rounded-full bg-zinc-500/10 blur-3xl" />
 
-        <div className="relative mx-auto max-w-3xl">
-          <div className="rounded-[2rem] border border-white/10 bg-zinc-950/90 shadow-2xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-              <div>
-                <div className="font-black">+1 (555) TIS-DEMO</div>
-                <div className="text-xs text-emerald-300">online · demo mode</div>
-              </div>
-              <button
-                onClick={() => sendMessage(STARTER)}
-                className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-zinc-300 transition hover:bg-white/10"
-              >
-                Run sample
-              </button>
-            </div>
-
-            <div className="h-[560px] space-y-4 overflow-y-auto p-5">
-              {messages.map(message => (
-                <div key={message.id} className={message.role === 'rep' ? 'ml-auto max-w-[82%]' : 'mr-auto max-w-[92%]'}>
-                  <div className={message.role === 'rep'
-                    ? 'whitespace-pre-line rounded-[1.4rem] bg-red-600 px-5 py-3 text-sm font-semibold text-white'
-                    : 'whitespace-pre-line rounded-[1.4rem] border border-white/10 bg-white/[0.07] px-5 py-3 text-sm leading-6 text-zinc-100'}>
-                    {message.text}
-                  </div>
-                  {message.resultUrl ? (
-                    <a href={message.resultUrl} className="mt-2 inline-block text-xs font-bold text-red-300 underline decoration-red-300/40 underline-offset-4">
-                      Open mobile wheel-card package
-                    </a>
-                  ) : null}
+        {!isLinkedResultsView ? (
+          <div className="relative mx-auto max-w-3xl">
+            <div className="rounded-[2rem] border border-white/10 bg-zinc-950/90 shadow-2xl shadow-black/40">
+              <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div>
+                  <div className="font-black">+1 (555) TIS-DEMO</div>
+                  <div className="text-xs text-emerald-300">online · demo mode</div>
                 </div>
-              ))}
-              {loading ? <div className="text-sm text-zinc-500">Assistant is checking fitment + stock…</div> : null}
-            </div>
+                <button
+                  onClick={() => sendMessage(STARTER)}
+                  className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-zinc-300 transition hover:bg-white/10"
+                >
+                  Run sample
+                </button>
+              </div>
 
-            <form
-              onSubmit={event => {
-                event.preventDefault()
-                sendMessage()
-              }}
-              className="flex gap-3 border-t border-white/10 p-4"
-            >
-              <input
-                value={input}
-                onChange={event => setInput(event.target.value)}
-                placeholder="Type an SMS message…"
-                className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none ring-red-500/50 placeholder:text-zinc-600 focus:ring-2"
-              />
-              <button className="rounded-2xl bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-red-100" disabled={loading}>
-                Send
-              </button>
-            </form>
+              <div className="h-[560px] space-y-4 overflow-y-auto p-5">
+                {messages.map(message => (
+                  <div key={message.id} className={message.role === 'rep' ? 'ml-auto max-w-[82%]' : 'mr-auto max-w-[92%]'}>
+                    <div className={message.role === 'rep'
+                      ? 'whitespace-pre-line rounded-[1.4rem] bg-red-600 px-5 py-3 text-sm font-semibold text-white'
+                      : 'whitespace-pre-line rounded-[1.4rem] border border-white/10 bg-white/[0.07] px-5 py-3 text-sm leading-6 text-zinc-100'}>
+                      {message.text}
+                    </div>
+                    {message.resultUrl ? (
+                      <a href={message.resultUrl} className="mt-2 inline-block text-xs font-bold text-red-300 underline decoration-red-300/40 underline-offset-4">
+                        Open mobile wheel-card package
+                      </a>
+                    ) : null}
+                  </div>
+                ))}
+                {loading ? <div className="text-sm text-zinc-500">Assistant is checking fitment + stock…</div> : null}
+              </div>
+
+              <form
+                onSubmit={event => {
+                  event.preventDefault()
+                  sendMessage()
+                }}
+                className="flex gap-3 border-t border-white/10 p-4"
+              >
+                <input
+                  value={input}
+                  onChange={event => setInput(event.target.value)}
+                  placeholder="Type an SMS message…"
+                  className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none ring-red-500/50 placeholder:text-zinc-600 focus:ring-2"
+                />
+                <button className="rounded-2xl bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-red-100" disabled={loading}>
+                  Send
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         {latestCards.length ? (
           <div className="relative mx-auto mt-10 max-w-7xl">
