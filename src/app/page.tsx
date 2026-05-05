@@ -1174,6 +1174,18 @@ export default function Home() {
           opacity: 0.35;
         }
 
+        .theme-dark .home-search-frame {
+          background: rgba(8,8,10,0.72);
+          border-color: rgba(255,255,255,0.16);
+          box-shadow: 0 28px 100px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .theme-light .home-search-frame {
+          background: rgba(245,245,246,0.72);
+          border-color: rgba(15,15,18,0.12);
+          box-shadow: 0 28px 90px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.52);
+        }
+
         .glass-card {
           background: var(--panel-bg);
           border: 1px solid var(--panel-border);
@@ -1349,10 +1361,6 @@ export default function Home() {
             <button type="button" className={themeMode === 'light' ? 'active' : ''} onClick={() => setThemeMode('light')}>Light</button>
             <button type="button" className={themeMode === 'dark' ? 'active' : ''} onClick={() => setThemeMode('dark')}>Dark</button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--soft-text)', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            <span style={{ width: 7, height: 7, borderRadius: 999, background: '#22c55e', boxShadow: '0 0 18px rgba(34,197,94,0.85)' }} />
-            ATD demo mode
-          </div>
         </div>
       </header>
 
@@ -1404,8 +1412,8 @@ export default function Home() {
             </>
           )}
 
-          <div className="search-animate search-frame" style={{ maxWidth: isHomeView ? 800 : 960, margin: isHomeView ? '0 auto' : '30px auto 0' }}>
-            <div className="search-glow" />
+          <div className={`search-animate search-frame${isHomeView ? ' home-search-frame' : ''}`} style={{ maxWidth: isHomeView ? 800 : 960, margin: isHomeView ? '0 auto' : '30px auto 0' }}>
+            {!isHomeView && <div className="search-glow" />}
             {isHomeView ? (
               <>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '16px', flexWrap: 'wrap' }}>
@@ -1414,8 +1422,8 @@ export default function Home() {
               onClick={handleAllBrandFilter}
               aria-label="Show all wheel brands"
               style={{
-                background: activeBrand === null ? 'rgba(220,38,38,0.2)' : 'var(--search-bg)',
-                border: `1px solid ${activeBrand === null ? 'rgba(220,38,38,0.6)' : 'var(--panel-border)'}`,
+                background: activeBrand === null ? (isHomeView ? (isLightMode ? 'rgba(15,15,18,0.08)' : 'rgba(255,255,255,0.14)') : 'rgba(220,38,38,0.2)') : 'var(--search-bg)',
+                border: `1px solid ${activeBrand === null ? (isHomeView ? (isLightMode ? 'rgba(15,15,18,0.22)' : 'rgba(255,255,255,0.28)') : 'rgba(220,38,38,0.6)') : 'var(--panel-border)'}`,
                 color: 'var(--page-text)',
                 padding: '10px 16px',
                 borderRadius: '8px',
@@ -1452,8 +1460,8 @@ export default function Home() {
                 onClick={() => handleBrandFilter(name)}
                 aria-label={`Filter by ${name}`}
                 style={{
-                  background: activeBrand === name ? 'rgba(220,38,38,0.2)' : 'var(--search-bg)',
-                  border: `1px solid ${activeBrand === name ? 'rgba(220,38,38,0.6)' : 'var(--panel-border)'}`,
+                  background: activeBrand === name ? (isHomeView ? (isLightMode ? 'rgba(15,15,18,0.08)' : 'rgba(255,255,255,0.14)') : 'rgba(220,38,38,0.2)') : 'var(--search-bg)',
+                  border: `1px solid ${activeBrand === name ? (isHomeView ? (isLightMode ? 'rgba(15,15,18,0.22)' : 'rgba(255,255,255,0.28)') : 'rgba(220,38,38,0.6)') : 'var(--panel-border)'}`,
                   color: 'var(--page-text)',
                   padding: '10px 16px',
                   borderRadius: '8px',
@@ -1513,7 +1521,7 @@ export default function Home() {
               overflow: 'hidden',
               transition: 'border-color 0.2s',
             }}
-              onFocusCapture={e => (e.currentTarget.style.borderColor = 'rgba(220,38,38,0.5)')}
+              onFocusCapture={e => (e.currentTarget.style.borderColor = isHomeView ? (isLightMode ? 'rgba(15,15,18,0.28)' : 'rgba(255,255,255,0.34)') : 'rgba(220,38,38,0.5)')}
               onBlurCapture={e => (e.currentTarget.style.borderColor = 'var(--panel-border)')}
             >
               <input
