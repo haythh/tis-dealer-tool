@@ -16,6 +16,15 @@ type VehicleSegment = 'truck' | 'passenger'
 
 const SERIES_MODELS = new Set(['1500', '2500', '3500'])
 
+function hasBmwIxContext(query: string): boolean {
+  return /\bbmw\b(?=[\s\S]{0,40}\bi[-\s]?x\b)/i.test(query)
+}
+
+function isSafeTokenPresent(query: string, token: string): boolean {
+  const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')
+  return new RegExp(`\\b${escaped}\\b`, 'i').test(query)
+}
+
 function requestedSeries(query: string): string | null {
   return query.toLowerCase().match(/\b(1500|2500|3500)\b/)?.[1] || null
 }
@@ -26,6 +35,14 @@ function canonicalizeVehicle(vehicle: ParsedQuery['vehicle'], query: string): Pa
   const model = (vehicle.model || '').trim()
   const modelLower = model.toLowerCase()
   const series = requestedSeries(query)
+
+  if (hasBmwIxContext(query)) {
+    return { ...vehicle, make: 'BMW', model: 'iX' }
+  }
+
+  if (make === 'BMW' && /^(ix|i-x|i x)$/i.test(model)) {
+    return { ...vehicle, make: 'BMW', model: 'iX' }
+  }
 
   if (make === 'Chevrolet') {
     if (SERIES_MODELS.has(model) || ((modelLower === 'silverado' || !model) && series && /\b(chevy|chevrolet|silverado)\b/i.test(query))) {
@@ -190,7 +207,7 @@ function parseQueryFallback(query: string): ParsedQuery {
     'nissan': 'Nissan', 'titan': 'Nissan', 'frontier': 'Nissan',
     'honda': 'Honda', 'ridgeline': 'Honda', 'pilot': 'Honda', 'accord': 'Honda', 'civic': 'Honda',
     'tesla': 'Tesla', 'cybertruck': 'Tesla',
-    'bmw': 'BMW', 'x3': 'BMW', 'x5': 'BMW', 'x6': 'BMW', 'x7': 'BMW', 'ix': 'BMW', 'i8': 'BMW',
+    'bmw': 'BMW', 'x3': 'BMW', 'x5': 'BMW', 'x6': 'BMW', 'x7': 'BMW', 'i8': 'BMW',
     'mercedes': 'Mercedes-Benz', 'mercedes-benz': 'Mercedes-Benz', 'g wagon': 'Mercedes-Benz', 'g-wagon': 'Mercedes-Benz', 'sprinter': 'Mercedes-Benz',
     'audi': 'Audi', 'q5': 'Audi', 'q7': 'Audi', 'q8': 'Audi',
     'lexus': 'Lexus', 'gx': 'Lexus', 'lx': 'Lexus',
@@ -225,7 +242,7 @@ function parseQueryFallback(query: string): ParsedQuery {
       'titan': 'Titan', 'frontier': 'Frontier',
       'ridgeline': 'Ridgeline', 'pilot': 'Pilot', 'accord': 'Accord', 'civic': 'Civic',
       'cybertruck': 'Cybertruck',
-      'x3': 'X3', 'x5': 'X5', 'x6': 'X6', 'x7': 'X7', 'ix': 'iX', 'i8': 'i8',
+      'x3': 'X3', 'x5': 'X5', 'x6': 'X6', 'x7': 'X7', 'i8': 'i8',
       'g wagon': 'G Wagon', 'g-wagon': 'G Wagon', 'sprinter': 'Sprinter',
       'q5': 'Q5', 'q7': 'Q7', 'q8': 'Q8',
       'gx': 'GX', 'lx': 'LX', 'escalade': 'Escalade', 'navigator': 'Navigator',
@@ -234,7 +251,7 @@ function parseQueryFallback(query: string): ParsedQuery {
     }
 
     for (const [keyword, make] of Object.entries(makes)) {
-      if (q.includes(keyword)) {
+      if (isSafeTokenPresent(query, keyword)) {
         detectedMake = make
         // Try to detect model
         if (modelMap[keyword]) detectedModel = modelMap[keyword]
@@ -242,9 +259,14 @@ function parseQueryFallback(query: string): ParsedQuery {
       }
     }
 
+    if (hasBmwIxContext(query)) {
+      detectedMake = 'BMW'
+      detectedModel = 'iX'
+    }
+
     if (detectedMake && !detectedModel) {
       for (const [keyword, model] of Object.entries(modelMap)) {
-        if (q.includes(keyword)) {
+        if (isSafeTokenPresent(query, keyword)) {
           detectedModel = model
           break
         }
@@ -307,13 +329,16 @@ export async function POST(request: NextRequest) {
 
     const parsed = await parseQueryWithGemini(query)
     const fallbackParsed = parseQueryFallback(query)
+    if (hasBmwIxContext(query)) {
+      parsed.vehicle = { year: fallbackParsed.vehicle?.year ?? parsed.vehicle?.year ?? null, make: 'BMW', model: 'iX' }
+    }
     if (parsed.vehicle?.make && !parsed.vehicle.model && fallbackParsed.vehicle?.model) {
       parsed.vehicle = fallbackParsed.vehicle
     }
     if (fallbackParsed.vehicle?.make && fallbackParsed.vehicle.model) {
       const fallbackModelToken = fallbackParsed.vehicle.model.toLowerCase().replace(/\s+\d+$/, '')
       const parsedLooksDifferent = parsed.vehicle?.make !== fallbackParsed.vehicle.make || parsed.vehicle?.model !== fallbackParsed.vehicle.model
-      if (parsedLooksDifferent && query.toLowerCase().includes(fallbackModelToken)) {
+      if (parsedLooksDifferent && isSafeTokenPresent(query, fallbackModelToken)) {
         parsed.vehicle = fallbackParsed.vehicle
       }
     }

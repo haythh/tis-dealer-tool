@@ -32,7 +32,7 @@ Fitment integrity had two dangerous failure modes: ambiguous truck series were a
    - **Where:** no prior repeatable smoke for vehicle fitment path
    - **What was wrong:** The exact user-reported regressions were not encoded as checks.
    - **Why it matters:** Parser tweaks can silently reintroduce unsafe results.
-   - **Fix:** Added `scripts/smoke-fitment.mjs` covering homepage API and direct SMS logic for required scenarios.
+   - **Fix:** Added `scripts/smoke-fitment.mjs` covering homepage API and direct SMS logic for required scenarios, including BMW iX not resolving as Ford/Ranger.
 
 ### Medium
 
@@ -51,6 +51,7 @@ Fitment integrity had two dangerous failure modes: ambiguous truck series were a
 1. **Homepage and SMS duplicate parser/canonicalization rules**
    - **Where:** `src/app/api/search/route.ts`, `src/lib/sms-demo.ts`
    - **Risk:** Fixes can drift between channels.
+   - **Current mitigation:** BMW iX now has explicit BMW-context canonicalization (`bmw ix`, `bmw i-x`, and clear `iX` token) before fitment lookup.
    - **Recommendation:** Move canonical vehicle alias/clarification/exact-match helpers into one shared module.
 
 ## Pattern Notes
@@ -91,6 +92,10 @@ Ran after fixes with `FITMENT_BASE_URL=http://localhost:4466 node scripts/smoke-
 | `2022 Honda Accord 20 black` | 4 exact | 4 preview cards | Passenger result; only `TIS Motorsports`. |
 | `2021 Toyota Camry 20` | 9 exact | 9 preview cards | Passenger result; only `TIS Motorsports`. |
 | `2023 BMW X5 22` | 2 exact | 2 preview cards | Passenger/luxury SUV result; only `TIS Motorsports`. |
+| `BMW iX` | 24 exact | 10 preview cards | Parsed `BMW iX`, not Ford/Ranger; matched `5x112`; passenger result; only `TIS Motorsports`. |
+| `show wheels for BMW iX` | 24 exact | 10 preview cards | Parsed `BMW iX`, not Ford/Ranger; matched `5x112`; passenger result; only `TIS Motorsports`. |
+| `show 22 wheels for 2024 BMW iX` | 2 exact | 2 preview cards | Parsed `2024 BMW iX`, not Ford/Ranger; matched `5x112`; passenger result; only `TIS Motorsports`. |
+| `2024 BMW iX 22 black` | 1 exact | 1 preview card | Parsed `2024 BMW iX`, not Ford/Ranger; matched `5x112`; passenger result; only `TIS Motorsports`. |
 | `show TIS wheels for 2022 Honda Accord` | 0 blocked | 0 blocked | Explicit non-Motorsports passenger request blocked with clear message. |
 
 ## Verification Commands

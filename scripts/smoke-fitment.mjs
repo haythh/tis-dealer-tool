@@ -38,6 +38,10 @@ const queries = [
   '2022 Honda Accord 20 black',
   '2021 Toyota Camry 20',
   '2023 BMW X5 22',
+  'BMW iX',
+  'show wheels for BMW iX',
+  'show 22 wheels for 2024 BMW iX',
+  '2024 BMW iX 22 black',
   'show TIS wheels for 2022 Honda Accord',
 ]
 
@@ -45,6 +49,10 @@ const passengerQueries = new Set([
   '2022 Honda Accord 20 black',
   '2021 Toyota Camry 20',
   '2023 BMW X5 22',
+  'BMW iX',
+  'show wheels for BMW iX',
+  'show 22 wheels for 2024 BMW iX',
+  '2024 BMW iX 22 black',
 ])
 
 function unique(values) {
@@ -88,6 +96,13 @@ function assertApiInvariant(query, response) {
   if (query === 'Ford Ranger') assert.equal(vehicle?.model, 'Ranger', `${query}: should parse Ranger`)
   if (query === '2022 Ford F150') assert.equal(vehicle?.model, 'F-150', `${query}: should parse F-150`)
 
+  if (/BMW iX/i.test(query)) {
+    assert.equal(vehicle?.make, 'BMW', `${query}: should parse BMW make, not Ford`)
+    assert.equal(vehicle?.model, 'iX', `${query}: should parse BMW iX model`)
+    assert.deepEqual(patterns, ['5x112'], `${query}: should match BMW iX 5x112 fitment`)
+    assert.ok(!/Ford|Ranger/i.test(notice), `${query}: notice should not mention Ford/Ranger`)
+  }
+
   if (passengerQueries.has(query)) {
     assert.ok(response.total > 0, `${query}: expected passenger Motorsports matches`)
     assert.deepEqual(brands, ['TIS Motorsports'], `${query}: passenger fitment must only show TIS Motorsports`)
@@ -130,6 +145,12 @@ function assertSmsInvariant(query, reply) {
   if (/Wrangler/.test(query)) {
     assert.equal(vehicle?.model, 'Wrangler', `${query}: SMS should parse Wrangler, not Ranger`)
     assert.ok(!/Ranger/i.test(text), `${query}: SMS response mentions Ranger`)
+  }
+  if (/BMW iX/i.test(query)) {
+    assert.equal(vehicle?.make, 'BMW', `${query}: SMS should parse BMW make, not Ford`)
+    assert.equal(vehicle?.model, 'iX', `${query}: SMS should parse BMW iX model`)
+    assert.ok(bolts.some(bp => /5X112/i.test(bp)), `${query}: SMS should match BMW iX 5x112 fitment`)
+    assert.ok(!/Ford|Ranger/i.test(text), `${query}: SMS response should not mention Ford/Ranger`)
   }
   if (passengerQueries.has(query)) assert.deepEqual(brands, ['TIS Motorsports'], `${query}: SMS passenger fitment must only show TIS Motorsports`)
   if (query === 'show TIS wheels for 2022 Honda Accord') assert.match(text, /limited to TIS Motorsports/i, `${query}: SMS should block explicit TIS passenger request`)

@@ -108,6 +108,10 @@ const FINISH_TERMS: Record<string, string> = {
 
 const SERIES_MODELS = new Set(['1500', '2500', '3500'])
 
+function hasBmwIxContext(text: string) {
+  return /\bbmw\b(?=[\s\S]{0,40}\bi[-\s]?x\b)/i.test(text)
+}
+
 function requestedSeries(text: string) {
   return text.toLowerCase().match(/\b(1500|2500|3500)\b/)?.[1] || null
 }
@@ -118,6 +122,14 @@ function canonicalizeVehicle(vehicle: SmsDemoVehicle | null, text: string): SmsD
   const model = (vehicle.model || '').trim()
   const modelLower = model.toLowerCase()
   const series = requestedSeries(text)
+
+  if (hasBmwIxContext(text)) {
+    return { ...vehicle, make: 'BMW', model: 'iX' }
+  }
+
+  if (make === 'BMW' && /^(ix|i-x|i x)$/i.test(model)) {
+    return { ...vehicle, make: 'BMW', model: 'iX' }
+  }
 
   if (make === 'Chevrolet') {
     if (SERIES_MODELS.has(model) || ((modelLower === 'silverado' || !model) && series && /\b(chevy|chevrolet|silverado)\b/i.test(text))) {
@@ -177,7 +189,7 @@ function extractVehicle(q: string): SmsDemoVehicle | null {
     [/\bbmw\s+x5\b|\bx5\b/, 'BMW', 'X5'],
     [/\bbmw\s+x6\b|\bx6\b/, 'BMW', 'X6'],
     [/\bbmw\s+x7\b|\bx7\b/, 'BMW', 'X7'],
-    [/\bbmw\s+i[-\s]?x\b|\bix\b/, 'BMW', 'iX'],
+    [/\bbmw\b(?=[\s\S]{0,40}\bi[-\s]?x\b)|^\s*i[-\s]?x\s*$/i, 'BMW', 'iX'],
     [/\bbmw\s+i8\b|\bi8\b/, 'BMW', 'i8'],
     [/\bram\s?(1500|2500|3500)?\b/, 'RAM', 'RAM'],
   ]
