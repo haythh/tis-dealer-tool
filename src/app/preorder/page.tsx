@@ -457,32 +457,6 @@ export default function PreorderPage() {
           max-width: 760px;
         }
 
-        .hero-stats {
-          display: grid;
-          gap: 12px;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          margin-top: 28px;
-        }
-
-        .hero-stats div {
-          background: rgba(0, 0, 0, 0.24);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-          padding: 14px;
-        }
-
-        .hero-stats strong {
-          display: block;
-          font-size: 24px;
-        }
-
-        .hero-stats span {
-          color: #a1a1aa;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
 
         .summary {
           align-self: start;
@@ -1069,7 +1043,6 @@ export default function PreorderPage() {
           }
 
           .category-tabs,
-          .hero-stats,
           .grid,
           .selectors {
             grid-template-columns: 1fr;
@@ -1103,22 +1076,8 @@ export default function PreorderPage() {
             <p className="badge">Retailer commitment preview</p>
             <h1>TIS Forged Preorder</h1>
             <p>
-              Review upcoming wheel styles, choose a size package, and build a no-pressure preorder summary for retailer commitments. Pricing starts at $300 per wheel for 20&quot; and steps up $40 per diameter.
+              GET THE NEWEST TIS FORGED STYLES FIRST! PLACE YOUR PRE-ORDER OR SIMPLY HELP US CHOOSE THE BEST STYLES BY UPVOTING YOUR FAVORITES.
             </p>
-            <div className="hero-stats">
-              <div>
-                <strong>{allPreorderWheels.length}</strong>
-                <span>New styles</span>
-              </div>
-              <div>
-                <strong>$300+</strong>
-                <span>Per wheel</span>
-              </div>
-              <div>
-                <strong>4x</strong>
-                <span>Qty increments</span>
-              </div>
-            </div>
           </div>
 
           <aside className="summary" aria-label="Order summary">
