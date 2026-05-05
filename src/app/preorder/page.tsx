@@ -5,7 +5,7 @@ import { preorderOffroadWheels } from '@/data/preorder-offroad-wheels'
 import { preorderWheels, type PreorderWheel } from '@/data/preorder-wheels'
 
 const SIZES = ['20"', '22"', '24"', '26"'] as const
-const WIDTHS = ['9"', '10"', '12"', '14"'] as const
+const WIDTHS = ['12"', '14"'] as const
 const LUG_PATTERNS = ['5x112', '5x114.3', '5x120', '5x127', '5x150', '6x135', '6x139.7', '8x170', '8x180'] as const
 const QUANTITIES = [4, 8, 12, 16, 20, 24, 28, 32] as const
 const PREORDER_CATEGORIES = [
@@ -20,10 +20,10 @@ const PREORDER_BRAND_LOGOS: Record<PreorderWheel['category'], { src: string; alt
 }
 
 const PRICE_BY_SIZE: Record<(typeof SIZES)[number], number> = {
-  '20"': 300,
-  '22"': 340,
-  '24"': 380,
-  '26"': 420,
+  '20"': 731,
+  '22"': 797,
+  '24"': 813,
+  '26"': 1080,
 }
 
 type WheelSelection = {
