@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { getDb, normalizeBoltPattern, type Wheel } from '@/lib/db'
 
 export type SmsDemoVehicle = {
@@ -74,6 +75,7 @@ function currency(value: number | null) {
 
 const WHEEL_FIELDS = 'id, supplier_pn, brand, model, color_finish, size, offset_mm, bolt_pattern, hub_bore, map_price, atd_url, in_stock, stock_today, stock_tomorrow, stock_national, total_stock, ta_image_url, atd_image_url'
 const SMS_DEMO_RESULT_LIMIT = 10
+const RESULT_URL_DIRECT_ID_LIMIT = 40
 
 const SEARCH_FIELDS = ['supplier_pn', 'model', 'color_finish', 'size', 'bolt_pattern', 'upc', 'brand']
 const SEARCH_STOPWORDS = new Set([
@@ -401,10 +403,9 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
     FROM wheels
     WHERE ${where}
     ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
-    LIMIT 60
   `).all(...params) as SmsDemoCard[]
 
-  cards = rankCards(cards, state, parsed).slice(0, SMS_DEMO_RESULT_LIMIT)
+  cards = rankCards(cards, state, parsed)
 
   if (!cards.length && parsed?.width) {
     const relaxedParsed = { ...parsed, width: null }
@@ -438,7 +439,6 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
       SELECT ${WHEEL_FIELDS}
       FROM wheels
       ORDER BY COALESCE(in_stock, 0) DESC, COALESCE(total_stock, 0) DESC, map_price ASC
-      LIMIT ${SMS_DEMO_RESULT_LIMIT}
     `).all() as SmsDemoCard[]
   }
 
@@ -446,7 +446,7 @@ function searchCards(state: SmsDemoState, parsed?: ParsedSms): SmsDemoCard[] {
 }
 
 export function getSmsDemoCardsByIds(ids: number[]): SmsDemoCard[] {
-  const cleanIds = [...new Set(ids.filter(id => Number.isInteger(id) && id > 0))].slice(0, 12)
+  const cleanIds = [...new Set(ids.filter(id => Number.isInteger(id) && id > 0))]
   if (!cleanIds.length) return []
 
   const db = getDb()
@@ -459,11 +459,44 @@ export function getSmsDemoCardsByIds(ids: number[]): SmsDemoCard[] {
   `).all(...cleanIds) as SmsDemoCard[]
 }
 
+function ensureSmsResultPackagesTable() {
+  const db = getDb()
+  db.prepare(`
+    CREATE TABLE IF NOT EXISTS sms_result_packages (
+      token TEXT PRIMARY KEY,
+      ids_json TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `).run()
+}
+
+function createSmsResultToken(ids: number[]) {
+  ensureSmsResultPackagesTable()
+  const token = crypto.randomBytes(12).toString('hex')
+  getDb().prepare('INSERT INTO sms_result_packages (token, ids_json) VALUES (?, ?)').run(token, JSON.stringify(ids))
+  return token
+}
+
+export function getSmsDemoCardsByResultToken(token: string): SmsDemoCard[] {
+  if (!/^[a-f0-9]{24}$/i.test(token)) return []
+  ensureSmsResultPackagesTable()
+  const row = getDb().prepare('SELECT ids_json FROM sms_result_packages WHERE token = ?').get(token) as { ids_json: string } | undefined
+  if (!row) return []
+
+  try {
+    const ids = JSON.parse(row.ids_json) as unknown
+    return Array.isArray(ids) ? getSmsDemoCardsByIds(ids.filter(id => Number.isInteger(id))) : []
+  } catch {
+    return []
+  }
+}
+
 export function getSmsDemoResultUrl(ids: number[], baseUrl?: string) {
-  const cleanIds = ids.filter(id => Number.isInteger(id) && id > 0)
+  const cleanIds = [...new Set(ids.filter(id => Number.isInteger(id) && id > 0))]
   if (!cleanIds.length) return undefined
-  const idsParam = cleanIds.join(',')
-  const path = `/sms-demo?results=${encodeURIComponent(idsParam)}`
+  const path = cleanIds.length > RESULT_URL_DIRECT_ID_LIMIT
+    ? `/sms-demo?token=${createSmsResultToken(cleanIds)}`
+    : `/sms-demo?results=${encodeURIComponent(cleanIds.join(','))}`
   return baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
 }
 
@@ -511,7 +544,7 @@ function ordinalIndex(text: string) {
   for (const [word, index] of Object.entries(ordinalMap)) {
     if (new RegExp(`\\b${word}\\b`).test(lower)) return index
   }
-  const numberMatch = lower.match(/#\s*(10|[1-9])\b|\bnumber\s*(10|[1-9])\b|\b(10|[1-9])\b/)
+  const numberMatch = lower.match(/#\s*(\d{1,4})\b|\bnumber\s*(\d{1,4})\b|\b(\d{1,4})\b/)
   const value = numberMatch?.[1] || numberMatch?.[2] || numberMatch?.[3]
   return value ? parseInt(value, 10) - 1 : null
 }
@@ -706,6 +739,7 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
   }
 
   const cards = searchCards(searchState, parsed)
+  const previewCards = cards.slice(0, SMS_DEMO_RESULT_LIMIT)
   const resultUrl = resultUrlFor(cards, options.baseUrl)
   const sizeLabel = searchState.size && searchState.size !== 'all' ? `${searchState.size}"` : 'catalog'
   if (!cards.length) {
@@ -727,10 +761,10 @@ export function handleSmsDemoMessage(text: string, incomingState: SmsDemoState =
     state: nextState,
     messages: [
       `I found ${cards.length} ${sizeLabel} option${cards.length === 1 ? '' : 's'}${describeVehicle(searchState.vehicle) ? ` for ${describeVehicle(searchState.vehicle)}` : ''}${searchState.finish ? ` in ${searchState.finish}` : ''}.`,
-      summarizeCards(cards),
+      summarizeCards(previewCards),
       'Want me to email these cards and ATD buy links? Reply with an email address.',
     ],
-    cards,
+    cards: previewCards,
     resultUrl,
   }
 }

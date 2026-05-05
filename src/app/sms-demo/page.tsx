@@ -107,7 +107,8 @@ function Spec({ label, value }: { label: string; value: string }) {
 function SmsDemoContent() {
   const searchParams = useSearchParams()
   const linkedResultIds = useMemo(() => searchParams.get('results')?.split(',').filter(Boolean) || [], [searchParams])
-  const isLinkedResultsView = linkedResultIds.length > 0
+  const linkedResultToken = searchParams.get('token') || ''
+  const isLinkedResultsView = linkedResultIds.length > 0 || Boolean(linkedResultToken)
   const [input, setInput] = useState(STARTER)
   const [loading, setLoading] = useState(false)
   const [state, setState] = useState<SmsDemoState>({})
@@ -115,18 +116,21 @@ function SmsDemoContent() {
     {
       id: 'intro',
       role: 'bot',
-      text: linkedResultIds.length
-        ? `Loaded shared result package ${linkedResultIds.join(', ')}. In the live version this link opens a permanent quote page.`
+      text: isLinkedResultsView
+        ? `Loaded shared result package. In the live version this link opens a permanent quote page.`
         : 'Text the assistant like a dealer rep would. This demo uses Dealer Tool data now; the EDI feed plugs into the same inventory/pricing seam later.',
     },
   ])
 
   useEffect(() => {
-    if (!linkedResultIds.length) return
+    if (!isLinkedResultsView) return
 
     let cancelled = false
     async function loadLinkedResults() {
-      const response = await fetch(`/api/sms-demo?ids=${encodeURIComponent(linkedResultIds.join(','))}`)
+      const query = linkedResultToken
+        ? `token=${encodeURIComponent(linkedResultToken)}`
+        : `ids=${encodeURIComponent(linkedResultIds.join(','))}`
+      const response = await fetch(`/api/sms-demo?${query}`)
       const data = await response.json()
       if (cancelled || !response.ok || !data.cards?.length) return
 
@@ -135,7 +139,7 @@ function SmsDemoContent() {
         {
           id: 'linked-results',
           role: 'bot',
-          text: `Here are the shared TIS/ATD wheel cards from the SMS conversation.`,
+          text: `Here are all ${data.cards.length} shared TIS/ATD wheel cards from the SMS conversation.`,
           cards: data.cards,
         },
       ])
@@ -145,7 +149,7 @@ function SmsDemoContent() {
     return () => {
       cancelled = true
     }
-  }, [linkedResultIds])
+  }, [isLinkedResultsView, linkedResultIds, linkedResultToken])
 
   async function sendMessage(message = input) {
     if (!message.trim() || loading) return
@@ -184,6 +188,7 @@ function SmsDemoContent() {
   }
 
   const latestCards = [...messages].reverse().find(message => message.cards?.length)?.cards || []
+  const visibleCards = isLinkedResultsView ? latestCards : latestCards.slice(0, 10)
 
   return (
     <main className="min-h-screen bg-[#050506] text-white">
@@ -246,7 +251,7 @@ function SmsDemoContent() {
           </div>
         ) : null}
 
-        {latestCards.length ? (
+        {visibleCards.length ? (
           <div className="relative mx-auto mt-10 max-w-7xl">
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
@@ -256,7 +261,7 @@ function SmsDemoContent() {
               <div className="hidden text-right text-sm text-zinc-400 sm:block">Same card payload can power MMS previews, mobile quote pages, and ATD links.</div>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {latestCards.slice(0, 10).map(card => <WheelCard key={card.id} card={card} />)}
+              {visibleCards.map(card => <WheelCard key={card.id} card={card} />)}
             </div>
           </div>
         ) : null}

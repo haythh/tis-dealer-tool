@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSmsDemoCardsByIds, handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
+import { getSmsDemoCardsByIds, getSmsDemoCardsByResultToken, handleSmsDemoMessage, type SmsDemoState } from '@/lib/sms-demo'
 import { sendWheelPackageEmail } from '@/lib/email-package'
 
 function appBaseUrl(request: NextRequest) {
@@ -16,8 +16,9 @@ export async function GET(request: NextRequest) {
       .split(',')
       .map(value => parseInt(value, 10))
       .filter(Number.isFinite)
+    const token = searchParams.get('token') || ''
 
-    return NextResponse.json({ cards: getSmsDemoCardsByIds(ids) })
+    return NextResponse.json({ cards: token ? getSmsDemoCardsByResultToken(token) : getSmsDemoCardsByIds(ids) })
   } catch (error) {
     console.error('SMS demo results error:', error)
     return NextResponse.json({ error: 'Failed to load SMS demo results' }, { status: 500 })
