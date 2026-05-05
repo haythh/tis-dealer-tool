@@ -881,10 +881,10 @@ export default function PreorderPage() {
 
         .card-copy h2 {
           color: #111113;
-          font-size: 21px;
+          font-size: 26.25px;
           font-weight: 800;
           letter-spacing: 0;
-          line-height: 1.3;
+          line-height: 1.2;
           margin: 4px 0 0;
           text-transform: uppercase;
         }

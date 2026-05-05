@@ -390,7 +390,7 @@ function WheelCard({ wheel, themeMode }: { wheel: Wheel; themeMode: 'dark' | 'li
             </span>
           )}
         </div>
-        <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: '26.25px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.2 }}>
           {wheel.model}
         </h3>
         <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>
@@ -639,7 +639,7 @@ function TireCard({ tire, themeMode }: { tire: Tire; themeMode: 'dark' | 'light'
         <div style={{ marginBottom: '4px', minHeight: '16px', display: 'block', textAlign: 'left' }}>
           <img src={isLightMode ? BRAND_LOGO_ASSETS.TIS.light : BRAND_LOGO_ASSETS.TIS.dark} alt="TIS" height={22} style={{ height: '22px', width: 'auto', objectFit: 'contain', margin: 0, display: 'inline-block' }} />
         </div>
-        <h3 style={{ fontSize: '21px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: '26.25px', fontWeight: 700, margin: '0 0 4px', color: isLightMode ? '#111113' : '#f1f1f1', lineHeight: 1.2 }}>
           {tire.line} {tire.size}
         </h3>
         <p style={{ fontSize: '13px', color: isLightMode ? '#62626a' : '#999', margin: '0 0 12px' }}>
